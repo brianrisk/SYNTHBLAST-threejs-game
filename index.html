@@ -1,0 +1,275 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>S Y N T H * B L A S T</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<script type="module">
+
+    import * as THREE from "./lib/three.module.js";
+
+    // make synthwave background (syntywave sunset)
+    // skybox: https://threejsfundamentals.org/threejs/lessons/threejs-backgrounds.html
+    // skybox SO: https://stackoverflow.com/questions/45443196/how-to-set-up-image-background-in-three-js
+    // https://videohive.net/item/80s-synthwave-retro-hd/24080448
+
+    // add touch interface
+
+    // add glow / bloom
+
+    import Hero from "./classes/Hero.js";
+    import Building from "./classes/Building.js";
+    import Gun from "./classes/Gun.js";
+    import Enemy from "./classes/Enemy.js";
+
+
+
+    let scene, camera, renderer;
+
+    let paused = false;
+
+    let hero = null;
+    let bullets = [];
+    let buildings = [];
+    let enemies = [];
+    let gun = null;
+
+    let arenaSize = 100;
+
+    let massive = new Audio('audio/massive2.wav');
+    let pew = new Audio('audio/pip.wav');
+    let explosionSound = new Audio('audio/explosion2.wav');
+    // let song = new Audio('music/implant-128kbps.mp3');
+    // song.crossOrigin = "anonymous";
+    let isSongPlaying = false;
+    let soundOn = true;
+    let isFiring = false;
+
+
+    init();
+    animate();
+
+    function init() {
+
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
+        renderer = new THREE.WebGLRenderer();
+
+        // scene.background = new THREE.Color(0xefd1b5);
+        scene.background = new THREE.Color(0x000000);
+        scene.fog = new THREE.FogExp2(0xFF00FF, 0.1);
+        scene.color = 0x00DD00;
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        hero = new Hero(scene, camera);
+        // add buildings
+        for (let gridX = 0; gridX < arenaSize; gridX++) {
+            for (let gridY = 0; gridY < arenaSize; gridY++) {
+                if (randomInt(10) === 0) {
+                    let boxHeight = randomInt(2) + 1;
+                    let building = new Building(gridX, gridY - arenaSize / 2, boxHeight, scene);
+                    buildings.push(building);
+                } else if (randomInt(20) === 0) {
+                    let enemy = new Enemy(gridX, gridY, scene, explosionSound);
+                    enemies.push(enemy);
+                }
+            }
+        }
+
+        gun = new Gun(scene, bullets, camera, pew);
+
+        // floor
+        let floorTexture = new THREE.TextureLoader().load('img/floor-tile.png');
+        floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+        floorTexture.repeat.set(1000, 1000);
+        let floorMaterial = new THREE.MeshBasicMaterial({map: floorTexture, side: THREE.FrontSide});
+        let floorGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
+        let plane = new THREE.Mesh(floorGeometry, floorMaterial);
+        plane.position.z = 0;
+        scene.add(plane);
+
+        // light
+        let dirLight;
+        dirLight = new THREE.DirectionalLight(0xffffff);
+        dirLight.position.set(-2, 5, 3).normalize();
+        scene.add(dirLight);
+
+        // let enemy = new Enemy(0, camera.position.y + 3, scene, explosionSound);
+        // enemies.push(enemy);
+
+        let axesHelper = new THREE.AxesHelper( 5 );
+        scene.add( axesHelper );
+
+        window.addEventListener('resize', onWindowResize, false);
+        document.addEventListener('keydown', onDocumentKeyDown, false);
+        document.addEventListener('keyup', onDocumentKeyUp, false);
+        // document.addEventListener('mouseup', onMouseUp, false);
+        // document.addEventListener('mousedown', onMouseDown, false);
+        document.addEventListener('touchend', onMouseUp, true);
+        document.addEventListener('touchstart', onMouseDown, true);
+
+
+    }
+
+    function onMouseDown(event) {
+
+    }
+
+    function onMouseUp(event) {
+
+    }
+
+    function down(event, isTouch) {
+        let pos = event.touches[0].clientX;
+        let posA = window.outerWidth * .3333 * window.devicePixelRatio;
+        let posB = window.outerWidth * .6666 * window.devicePixelRatio;
+        if (pos < posA) {
+
+        } else if (pos < posB) {
+            fire();
+        } else {
+
+        }
+    }
+
+    function onDocumentKeyDown(event) {
+        let keyCode = event["which"];
+        if (keyCode === 9) { // tab
+
+        }
+        if (keyCode === 32) {
+            isFiring = true;
+        }
+        else if (keyCode === 37) {hero.turnLeft();}
+        else if (keyCode === 38) {hero.forward();}
+        else if (keyCode === 39) {hero.turnRight();}
+        else if (keyCode === 40) {hero.reverse();}
+    }
+
+    function onDocumentKeyUp(event) {
+        let keyCode = event["which"];
+        if (keyCode === 32) {
+            isFiring = false;
+        }
+        else if (keyCode === 37) {hero.stopTurning();}
+        else if (keyCode === 38) {hero.stop();}
+        else if (keyCode === 39) {hero.stopTurning();} else if (keyCode === 40) {hero.stop();}
+    }
+
+    function animate() {
+        if (!paused) {
+
+            if (isFiring) {
+                fire();
+            }
+            hero.move();
+            // bullets hitting things
+            bullets.forEach(bullet => {
+                if (bullet.isActive()) {
+                    buildings.forEach(building => {
+                        if (
+                            building.isActive()
+                            && Math.abs(building.getX() - bullet.getX()) < 0.5
+                            && Math.abs(building.getY() - bullet.getY()) < 0.5
+                        ) {
+                            building.hit();
+                            bullet.hit();
+
+                        }
+                    });
+                    enemies.forEach(enemy => {
+                        if (
+                            enemy.isAlive()
+                            && Math.abs(enemy.getX() - bullet.getX()) < 0.4
+                            && Math.abs(enemy.getY() - bullet.getY()) < 0.4
+                        ) {
+                            enemy.hit();
+                            bullet.hit();
+                        }
+                    });
+
+                }
+            });
+
+            // can't go through buildings
+            buildings.forEach(building => {
+                if (building.isActive()) {
+                if (
+                    Math.abs(building.getX() - hero.getX()) < 0.6
+                    && Math.abs(building.getY() - hero.getY()) < 0.6
+                ) {
+                    // mildly confusing, but direction already had a multiplySclar earlier.
+                    // this reversing that
+                    hero.unMove();
+                }
+                enemies.forEach(
+                    enemy => {
+                        if (
+                            enemy.isAlive()
+                            && Math.abs(enemy.getX() - building.getX()) < 0.6
+                            && Math.abs(enemy.getY() - building.getY()) < 0.6
+                        ) {
+                            enemy.unMove();
+                        }
+                    });
+                }
+            });
+
+            enemies.forEach(
+                enemy => {
+                    if (
+                        enemy.isAlive()
+                        && Math.abs(enemy.getX() - hero.getX()) < 0.4
+                        && Math.abs(enemy.getY() - hero.getY()) < 0.4
+                    ) {
+                        hero.reset();
+                    }
+                });
+
+            // update our objects
+            bullets.forEach(bullet => bullet.update());
+            buildings.forEach(building => building.update());
+            enemies.forEach(enemy => enemy.update(hero));
+        }
+
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function randomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    }
+
+
+    function fire(spread) {
+        if (soundOn) {
+            if (!isSongPlaying) {
+                // song.play();
+                isSongPlaying = true;
+            }
+        }
+        gun.fire(soundOn);
+    }
+
+
+</script>
+</body>
+</html>
