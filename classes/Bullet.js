@@ -43,7 +43,7 @@ class Bullet {
         this.resetWithDirection(direction);
         this.object.position.x = position.x;
         this.object.position.y = position.y;
-        this.object.position.z = position.z - .2;
+        this.object.position.z = .2;
     }
 
     resetWithDirection(direction) {

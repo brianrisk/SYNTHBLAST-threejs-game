@@ -5,13 +5,11 @@ import Particle from "./Particle.js";
 class Enemy {
 
     constructor(x, y, scene, explosionSound) {
-        let shinyMaterial = new THREE.MeshPhongMaterial({
-            color: 0x3333DD,
-            specular: 0x33DDDD,
-            shininess: 50,
+        let material = new THREE.MeshBasicMaterial({
+            color: 0x00FFFF
         });
         let geometry = new THREE.ConeGeometry(.5, 1, 4);
-        let cone = new THREE.Mesh(geometry, shinyMaterial);
+        let cone = new THREE.Mesh(geometry, material);
         cone.position.x = x;
         cone.position.y = y;
         cone.position.z = 0.66;

@@ -4,9 +4,9 @@ class Building {
 
     constructor(x, y, height, scene) {
         let geometry = new THREE.BoxGeometry(1, 1, height);
-        //var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true, wireframeLinewidth: 200} );
+        let material = new THREE.MeshBasicMaterial( { color: 0x000000} );
         // let wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000} );
-        let cube = new THREE.Mesh(geometry);
+        let cube = new THREE.Mesh(geometry, material);
         // let wireFrame = new THREE.Mesh(geometry, wireframeMaterial)
         // cube.add(wireFrame);
         cube.position.x = x;

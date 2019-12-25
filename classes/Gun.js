@@ -3,11 +3,11 @@ import Bullet from "./Bullet.js";
 
 class Gun {
 
-    constructor(scene, bullets, camera, pew) {
+    constructor(scene, bullets, hero, pew) {
         this.lastFired = 0;
         this.scene = scene;
         this.bullets = bullets;
-        this.camera = camera;
+        this.hero = hero;
         this.pew = pew;
     }
 
@@ -16,14 +16,15 @@ class Gun {
         if (currentTime - this.lastFired < 100) return;
         let fired = false;
         if (this.bullets.length < 50) {
-            let direction = new THREE.Vector3();
-            this.camera.getWorldDirection(direction);
-            let geometry = new THREE.BoxGeometry(.1, .1, .1);
+            let direction = this.hero.direction.clone();
+            let bulletSize = 0.15;
+            let geometry = new THREE.BoxGeometry(bulletSize, bulletSize, bulletSize);
             let material = new THREE.MeshBasicMaterial({color: 0xffffff});
             let bulletMesh = new THREE.Mesh(geometry, material);
-            bulletMesh.position.x = this.camera.position.x;
-            bulletMesh.position.y = this.camera.position.y;
-            bulletMesh.position.z = this.camera.position.z - .2;
+            let heroPosition = this.hero.getPosition();
+            bulletMesh.position.x = heroPosition.x;
+            bulletMesh.position.y = heroPosition.y;
+            bulletMesh.position.z =  .2;
             this.scene.add(bulletMesh);
             let bullet = new Bullet(bulletMesh, direction);
             this.bullets.push(bullet);
@@ -33,9 +34,10 @@ class Gun {
         else {
             for (let i = 0; i < this.bullets.length; i++) {
                 if (!this.bullets[i].isActive()) {
-                    let direction = new THREE.Vector3();
-                    this.camera.getWorldDirection(direction);
-                    this.bullets[i].reset(direction, this.camera.position.clone());
+                    let direction = this.hero.direction.clone();
+                    let heroPosition = this.hero.getPosition();
+                    let bulletPosition = new THREE.Vector3(heroPosition.x, heroPosition.y,  0.2);
+                    this.bullets[i].reset(direction, bulletPosition);
                     fired = true;
                     break;
                 }

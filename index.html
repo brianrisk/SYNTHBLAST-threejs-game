@@ -102,8 +102,8 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        hero = new Hero(scene, camera);
-        hero.forward();
+        hero = new Hero(scene, camera, -10, 0);
+        // hero.forward();
         // add buildings
         for (let gridX = 0; gridX < arenaSize; gridX++) {
             for (let gridY = 0; gridY < arenaSize; gridY++) {
@@ -118,7 +118,7 @@
             }
         }
 
-        gun = new Gun(scene, bullets, camera, pew);
+        gun = new Gun(scene, bullets, hero, pew);
 
         // floor
         let floorTexture = new THREE.TextureLoader().load('img/floor-tile.png');
@@ -211,11 +211,11 @@
         } else if (keyCode === 37) {
             hero.turnLeft();
         } else if (keyCode === 38) {
-            // hero.forward();
+            hero.forward();
         } else if (keyCode === 39) {
             hero.turnRight();
         } else if (keyCode === 40) {
-            // hero.reverse();
+            hero.reverse();
         }
     }
 
@@ -226,11 +226,11 @@
         } else if (keyCode === 37) {
             hero.stopTurning();
         } else if (keyCode === 38) {
-            // hero.stop();
+            hero.stop();
         } else if (keyCode === 39) {
             hero.stopTurning();
         } else if (keyCode === 40) {
-            // hero.stop();
+            hero.stop();
         }
     }
 
