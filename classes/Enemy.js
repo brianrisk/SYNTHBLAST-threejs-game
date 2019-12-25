@@ -12,7 +12,6 @@ class Enemy {
         });
         let geometry = new THREE.ConeGeometry(.5, 1, 4);
         let cone = new THREE.Mesh(geometry, shinyMaterial);
-
         cone.position.x = x;
         cone.position.y = y;
         cone.position.z = 0.66;
@@ -23,13 +22,14 @@ class Enemy {
         this.hitPoints = 1;
         scene.add(cone);
 
+        this.maxSpeed = 0.05;
         this.rotationAxis = new THREE.Vector3(0, 0, 1);
         let rotationAngle = 45 * Math.PI / 180;
         this.direction = new THREE.Vector3(0, 1, 0);
         this.direction.applyAxisAngle(this.rotationAxis, rotationAngle);
         this.object.rotateOnAxis(this.rotationAxis, rotationAngle);
         this.moveInc = this.direction.clone();
-        this.moveInc.multiplyScalar(0.05);
+        this.moveInc.multiplyScalar(this.maxSpeed);
         this.particles = [];
 
         // this.object.rotation.x = -90 * Math.PI / 180;
@@ -80,7 +80,7 @@ class Enemy {
                 this.direction.applyAxisAngle(this.rotationAxis, angleToRotate);
                 this.object.rotateOnAxis(this.rotationAxis, angleToRotate);
                 this.moveInc = this.direction.clone();
-                this.moveInc.multiplyScalar(0.05);
+                this.moveInc.multiplyScalar(this.maxSpeed);
             }
             this.move();
         } else {
@@ -97,10 +97,6 @@ class Enemy {
             }
 
         }
-
-    }
-
-    explode() {
 
     }
 

@@ -5,6 +5,7 @@ class Particle {
 
     constructor(x, y, z, scene) {
         let size = Math.random() * 0.2;
+        size = Math.max(size, 0.05);
         let geometry = new THREE.BoxGeometry(size, size, size);
         let material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF} );
         let cube = new THREE.Mesh(geometry, material);

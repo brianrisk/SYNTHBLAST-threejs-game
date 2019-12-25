@@ -7,12 +7,12 @@ class Hero {
         this.camera = camera;
         this.turnSpeed = 0;
         this.speed = 0;
-        this.direction = new THREE.Vector3();
-        this.direction = camera.getWorldDirection(this.direction);
         this.maxSpeed = 0.15;
+        this.moveInc = null;
         this.maxRotationSpeed = 2 * Math.PI / 180;
         this.bottomZ = 0.5;
-
+        this.rotationAxis = new THREE.Vector3(0, 0, 1);
+        this.isFirstPerson = true;
         this.reset();
     }
 
@@ -24,6 +24,7 @@ class Hero {
         this.camera.rotation.y = -90 * Math.PI / 180;
         this.isActive = true;
         this.hitPoints = 10;
+        this.direction = new THREE.Vector3(1,0,0);
     }
 
     update() {
@@ -33,11 +34,13 @@ class Hero {
     move() {
         // moving
         if (this.isActive) {
+            this.moveInc = this.direction.clone();
+            this.moveInc.multiplyScalar(this.maxSpeed);
             this.camera.getWorldDirection(this.direction);
             this.camera.position.add(this.direction.multiplyScalar(this.speed));
             this.camera.rotation.y += this.turnSpeed;
         }
-        if (this.camera.position.z > this.bottomZ) {
+        if (this.isFirstPerson && this.camera.position.z > this.bottomZ) {
             let down = new THREE.Vector3(0, 0, -1 * this.maxSpeed);
             this.camera.position.add(down);
         }
