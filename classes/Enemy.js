@@ -5,7 +5,7 @@ import Particle from "./Particle.js";
 class Enemy {
 
     constructor(x, y, scene, explosionSound) {
-        let material = new THREE.MeshBasicMaterial({
+        let material = new THREE.MeshPhongMaterial({
             color: 0x00FFFF
         });
         let geometry = new THREE.ConeGeometry(.5, 1, 4);

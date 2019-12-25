@@ -131,10 +131,10 @@
         scene.add(plane);
 
         // light
-        // let dirLight;
-        // dirLight = new THREE.DirectionalLight(0xffffff);
-        // dirLight.position.set(-2, 5, 3).normalize();
-        // scene.add(dirLight);
+        let dirLight;
+        dirLight = new THREE.DirectionalLight(0xffffff);
+        dirLight.position.set(-2, 5, 3).normalize();
+        scene.add(dirLight);
 
         // helpers
         let axesHelper = new THREE.AxesHelper(5);

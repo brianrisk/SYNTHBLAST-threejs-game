@@ -13,7 +13,7 @@ class Hero {
         this.bottomZ = 0.5;
         this.topZ = 10;
         this.rotationAxis = new THREE.Vector3(0, 0, 1);
-        this.isFirstPerson = true;
+        this.isFirstPerson = false;
         this.originalX = x;
         this.originalY = y;
         this.createObject();
