@@ -1,19 +1,36 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="SYNTH*BLAST" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="apple-touch-icon" sizes="150x150" href="img/apple-touch-icon.png">
     <title>S Y N T H * B L A S T</title>
     <style>
-        body {
+        body, html {
             margin: 0;
+            padding: 0;
+            /*position: fixed;*/
         }
 
         canvas {
             width: 100%;
             height: 100%;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            outline: none;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
         }
     </style>
 </head>
 <body>
+<script src='node_modules/stats.js/build/stats.min.js'></script>
 <script type="module">
 
     import * as THREE from "./lib/three.module.js";
@@ -25,14 +42,17 @@
 
     // add touch interface
 
+    // add shooting stars
+
+    // make guns things you can pick up
+
     // add glow / bloom
 
     import Hero from "./classes/Hero.js";
     import Building from "./classes/Building.js";
     import Gun from "./classes/Gun.js";
     import Enemy from "./classes/Enemy.js";
-
-
+    import Bullet from "./classes/Bullet.js";
 
     let scene, camera, renderer;
 
@@ -46,21 +66,29 @@
 
     let arenaSize = 100;
 
+    // Sounds
     let massive = new Audio('audio/massive2.wav');
     let pew = new Audio('audio/pip.wav');
     let explosionSound = new Audio('audio/explosion2.wav');
+
+    // Music
     // let song = new Audio('music/implant-128kbps.mp3');
     // song.crossOrigin = "anonymous";
+
+    // State
     let isSongPlaying = false;
     let soundOn = true;
     let isFiring = false;
 
+    // stats
+    let stats = new Stats();
+    stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild( stats.dom );
 
     init();
     animate();
 
     function init() {
-
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
         renderer = new THREE.WebGLRenderer();
@@ -74,11 +102,12 @@
         document.body.appendChild(renderer.domElement);
 
         hero = new Hero(scene, camera);
+        hero.forward();
         // add buildings
         for (let gridX = 0; gridX < arenaSize; gridX++) {
             for (let gridY = 0; gridY < arenaSize; gridY++) {
                 if (randomInt(10) === 0) {
-                    let boxHeight = randomInt(2) + 1;
+                    let boxHeight = randomInt(10) + 1;
                     let building = new Building(gridX, gridY - arenaSize / 2, boxHeight, scene);
                     buildings.push(building);
                 } else if (randomInt(20) === 0) {
@@ -101,46 +130,73 @@
         scene.add(plane);
 
         // light
-        let dirLight;
-        dirLight = new THREE.DirectionalLight(0xffffff);
-        dirLight.position.set(-2, 5, 3).normalize();
-        scene.add(dirLight);
+        // let dirLight;
+        // dirLight = new THREE.DirectionalLight(0xffffff);
+        // dirLight.position.set(-2, 5, 3).normalize();
+        // scene.add(dirLight);
 
-        // let enemy = new Enemy(0, camera.position.y + 3, scene, explosionSound);
-        // enemies.push(enemy);
+        // helpers
+        let axesHelper = new THREE.AxesHelper(5);
+        scene.add(axesHelper);
 
-        let axesHelper = new THREE.AxesHelper( 5 );
-        scene.add( axesHelper );
-
+        // listeners
         window.addEventListener('resize', onWindowResize, false);
         document.addEventListener('keydown', onDocumentKeyDown, false);
         document.addEventListener('keyup', onDocumentKeyUp, false);
-        // document.addEventListener('mouseup', onMouseUp, false);
-        // document.addEventListener('mousedown', onMouseDown, false);
-        document.addEventListener('touchend', onMouseUp, true);
-        document.addEventListener('touchstart', onMouseDown, true);
+        document.addEventListener('mouseup', onMouseUp, false);
+        document.addEventListener('mousedown', onMouseDown, false);
+        document.addEventListener('touchstart', touchStart, true);
+        document.addEventListener('touchend', touchEnd, true);
 
+        document.body.addEventListener('touchmove', preventDefault, { passive: false });
 
+    }
+
+    function preventDefault(e){
+        e.preventDefault();
     }
 
     function onMouseDown(event) {
-
+        down(event, false);
     }
 
     function onMouseUp(event) {
+        hero.stopTurning();
+        isFiring = false;
+    }
 
+    function touchStart(event) {
+        down(event, true);
+    }
+
+    function touchEnd(event) {
+        let pos = event.touches[0].clientX;
+        let posA = window.innerWidth * .3333;
+        let posB = window.innerWidth * .6666;
+        if (pos > posA && pos < posB) {
+            isFiring = false;
+        } else {
+            hero.stopTurning();
+        }
     }
 
     function down(event, isTouch) {
-        let pos = event.touches[0].clientX;
-        let posA = window.outerWidth * .3333 * window.devicePixelRatio;
-        let posB = window.outerWidth * .6666 * window.devicePixelRatio;
+        console.log(event);
+        let pos = 0;
+        if (isTouch) {pos = event.touches[0].clientX;}
+        else {pos = event.screenX;}
+
+        let posA = window.innerWidth * .3333 ;
+        let posB = window.innerWidth * .6666;
+        console.log(pos + " A: " + posA + ", B: " + posB);
         if (pos < posA) {
+            hero.turnLeft();
 
         } else if (pos < posB) {
-            fire();
+            isFiring = true;
+            // hero.forward();
         } else {
-
+            hero.turnRight();
         }
     }
 
@@ -151,24 +207,34 @@
         }
         if (keyCode === 32) {
             isFiring = true;
+        } else if (keyCode === 37) {
+            hero.turnLeft();
+        } else if (keyCode === 38) {
+            // hero.forward();
+        } else if (keyCode === 39) {
+            hero.turnRight();
+        } else if (keyCode === 40) {
+            // hero.reverse();
         }
-        else if (keyCode === 37) {hero.turnLeft();}
-        else if (keyCode === 38) {hero.forward();}
-        else if (keyCode === 39) {hero.turnRight();}
-        else if (keyCode === 40) {hero.reverse();}
     }
 
     function onDocumentKeyUp(event) {
         let keyCode = event["which"];
         if (keyCode === 32) {
             isFiring = false;
+        } else if (keyCode === 37) {
+            hero.stopTurning();
+        } else if (keyCode === 38) {
+            // hero.stop();
+        } else if (keyCode === 39) {
+            hero.stopTurning();
+        } else if (keyCode === 40) {
+            // hero.stop();
         }
-        else if (keyCode === 37) {hero.stopTurning();}
-        else if (keyCode === 38) {hero.stop();}
-        else if (keyCode === 39) {hero.stopTurning();} else if (keyCode === 40) {hero.stop();}
     }
 
     function animate() {
+        stats.begin();
         if (!paused) {
 
             if (isFiring) {
@@ -206,24 +272,24 @@
             // can't go through buildings
             buildings.forEach(building => {
                 if (building.isActive()) {
-                if (
-                    Math.abs(building.getX() - hero.getX()) < 0.6
-                    && Math.abs(building.getY() - hero.getY()) < 0.6
-                ) {
-                    // mildly confusing, but direction already had a multiplySclar earlier.
-                    // this reversing that
-                    hero.unMove();
-                }
-                enemies.forEach(
-                    enemy => {
-                        if (
-                            enemy.isAlive()
-                            && Math.abs(enemy.getX() - building.getX()) < 0.6
-                            && Math.abs(enemy.getY() - building.getY()) < 0.6
-                        ) {
-                            enemy.unMove();
-                        }
-                    });
+                    if (
+                        Math.abs(building.getX() - hero.getX()) < 0.6
+                        && Math.abs(building.getY() - hero.getY()) < 0.6
+                    ) {
+                        // mildly confusing, but direction already had a multiplySclar earlier.
+                        // this reversing that
+                        hero.unMove();
+                    }
+                    enemies.forEach(
+                        enemy => {
+                            if (
+                                enemy.isAlive()
+                                && Math.abs(enemy.getX() - building.getX()) < 0.6
+                                && Math.abs(enemy.getY() - building.getY()) < 0.6
+                            ) {
+                                enemy.unMove();
+                            }
+                        });
                 }
             });
 
@@ -244,6 +310,7 @@
             enemies.forEach(enemy => enemy.update(hero));
         }
 
+        stats.end();
         requestAnimationFrame(animate);
         renderer.render(scene, camera);
     }

@@ -13,7 +13,7 @@ class Gun {
 
     fire(soundOn) {
         let currentTime = (new Date()).getTime();
-        if (currentTime - this.lastFired < 50) return;
+        if (currentTime - this.lastFired < 100) return;
         let fired = false;
         if (this.bullets.length < 50) {
             let direction = new THREE.Vector3();

@@ -2,3 +2,5 @@
 .idea/
 audio/
 music/
+node_modules/
+package-lock.json
