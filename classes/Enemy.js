@@ -37,7 +37,7 @@ class Enemy {
     }
 
     hit() {
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 100; i++) {
             this.particles.push(new Particle(
                 this.object.position.x,
                 this.object.position.y,
@@ -68,7 +68,7 @@ class Enemy {
 
     update(hero) {
         if (this.alive) {
-            let pointA = hero.getPosition();
+            let pointA = hero.getFuturePosition();
             let pointB = this.object.position;
             let pointC = pointB.clone();
             pointC.add(this.direction)
@@ -104,6 +104,7 @@ class Enemy {
 
     unMove() {
         this.object.position.add(this.moveInc.negate());
+        // this.moveInc.negate();
     }
 
     isAlive() {

@@ -26,7 +26,7 @@ class Gun {
             bulletMesh.position.y = heroPosition.y;
             bulletMesh.position.z =  .2;
             this.scene.add(bulletMesh);
-            let bullet = new Bullet(bulletMesh, direction);
+            let bullet = new Bullet(bulletMesh, direction, this.scene);
             this.bullets.push(bullet);
             fired = true;
         }

@@ -48,6 +48,8 @@
 
     // add glow / bloom
 
+        // have to be facing an enemy to shoot them
+
     import Hero from "./classes/Hero.js";
     import Building from "./classes/Building.js";
     import Gun from "./classes/Gun.js";
@@ -69,7 +71,7 @@
 
     // Sounds
     let massive = new Audio('audio/massive2.wav');
-    let pew = new Audio('audio/pip.wav');
+    let pew = new Audio('audio/pip2.wav');
     let explosionSound = new Audio('audio/explosion2.wav');
 
     // Music
@@ -96,7 +98,7 @@
 
         // scene.background = new THREE.Color(0xefd1b5);
         scene.background = new THREE.Color(0x000000);
-        scene.fog = new THREE.FogExp2(0xFF00FF, 0.1);
+        scene.fog = new THREE.FogExp2(0xFF00FF, 0.05);
         scene.color = 0x00DD00;
 
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -204,7 +206,7 @@
     function onDocumentKeyDown(event) {
         let keyCode = event["which"];
         if (keyCode === 9) { // tab
-
+            hero.isFirstPerson = !hero.isFirstPerson;
         }
         if (keyCode === 32) {
             isFiring = true;
