@@ -15,18 +15,17 @@ class Gun {
         let currentTime = (new Date()).getTime();
         if (currentTime - this.lastFired < 100) return;
         let fired = false;
+        let heroPosition = this.hero.getPosition();
+        let bulletPosition = new THREE.Vector3(heroPosition.x, heroPosition.y,  0.2);
+        let direction = this.hero.direction.clone();
         if (this.bullets.length < 50) {
-            let direction = this.hero.direction.clone();
             let bulletSize = 0.15;
-            let geometry = new THREE.BoxGeometry(bulletSize, bulletSize, bulletSize);
-            let material = new THREE.MeshBasicMaterial({color: 0xffffff});
-            let bulletMesh = new THREE.Mesh(geometry, material);
-            let heroPosition = this.hero.getPosition();
-            bulletMesh.position.x = heroPosition.x;
-            bulletMesh.position.y = heroPosition.y;
-            bulletMesh.position.z =  .2;
-            this.scene.add(bulletMesh);
-            let bullet = new Bullet(bulletMesh, direction, this.scene);
+            let bullet = new Bullet(
+                bulletSize,
+                bulletPosition,
+                20,
+                direction,
+                this.scene);
             this.bullets.push(bullet);
             fired = true;
         }
@@ -34,9 +33,6 @@ class Gun {
         else {
             for (let i = 0; i < this.bullets.length; i++) {
                 if (!this.bullets[i].isActive()) {
-                    let direction = this.hero.direction.clone();
-                    let heroPosition = this.hero.getPosition();
-                    let bulletPosition = new THREE.Vector3(heroPosition.x, heroPosition.y,  0.2);
                     this.bullets[i].reset(direction, bulletPosition);
                     fired = true;
                     break;
