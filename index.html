@@ -146,8 +146,6 @@
         window.addEventListener('resize', onWindowResize, false);
         document.addEventListener('keydown', onDocumentKeyDown, false);
         document.addEventListener('keyup', onDocumentKeyUp, false);
-        document.addEventListener('mouseup', onMouseUp, false);
-        document.addEventListener('mousedown', onMouseDown, false);
         document.addEventListener('touchstart', touchStart, true);
         document.addEventListener('touchend', touchEnd, true);
 
@@ -157,15 +155,6 @@
 
     function preventDefault(e){
         e.preventDefault();
-    }
-
-    function onMouseDown(event) {
-        down(event, false);
-    }
-
-    function onMouseUp(event) {
-        hero.stopTurning();
-        isFiring = false;
     }
 
     function touchStart(event) {
@@ -205,8 +194,8 @@
 
     function onDocumentKeyDown(event) {
         let keyCode = event["which"];
-        if (keyCode === 9) { // tab
-            hero.isFirstPerson = !hero.isFirstPerson;
+        if (event.shiftKey) {
+            hero.changePerspective();
         }
         if (keyCode === 32) {
             isFiring = true;
