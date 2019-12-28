@@ -14,10 +14,29 @@ class Gun {
     fire(soundOn) {
         let currentTime = (new Date()).getTime();
         if (currentTime - this.lastFired < 100) return;
-        let fired = false;
+
         let heroPosition = this.hero.getPosition();
         let bulletPosition = new THREE.Vector3(heroPosition.x, heroPosition.y,  0.2);
         let direction = this.hero.direction.clone();
+        let left = this.hero.direction.clone();
+        left.applyAxisAngle(new THREE.Vector3(0,0,1), .1);
+        let right = this.hero.direction.clone();
+        right.applyAxisAngle(new THREE.Vector3(0,0,1), -.1);
+        let fired = false;
+        fired = this.shoot(bulletPosition, direction) || fired;
+        fired = this.shoot(bulletPosition, left) || fired;
+        fired = this.shoot(bulletPosition, right) || fired;
+        if (fired) {
+            this.lastFired = currentTime;
+            if (soundOn) {
+                this.pew.currentTime = 0;
+                this.pew.play();
+            }
+        }
+    }
+
+    shoot(bulletPosition, direction) {
+        let fired = false;
         if (this.bullets.length < 50) {
             let bulletSize = 0.15;
             let bullet = new Bullet(
@@ -39,13 +58,7 @@ class Gun {
                 }
             }
         }
-        if (fired) {
-            this.lastFired = currentTime;
-            if (soundOn) {
-                this.pew.currentTime = 0;
-                this.pew.play();
-            }
-        }
+        return fired;
     }
 
 }
