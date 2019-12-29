@@ -154,9 +154,6 @@
 
     }
 
-    function preventDefault(e){
-        e.preventDefault();
-    }
 
     function touchStart(event) {
         down(event);
@@ -166,23 +163,9 @@
     }
 
     function touchEnd(event) {
-        // let posX = event.touches[0].clientX;
-        // // if position is in the controller, stop motion
-        // if (posX < window.innerWidth ) {
-        //     hero.stopTurning();
-        //     hero.stop();
-        // }
-        // // if position is in the firing area, stop firing
-        // else {
-        //     isFiring = false;
-        // }
-        //
-        // event.stopImmediatePropagation();
-        // event.preventDefault();
         hero.stopTurning();
         hero.stop();
         isFiring = false;
-
     }
 
     function down(event) {
