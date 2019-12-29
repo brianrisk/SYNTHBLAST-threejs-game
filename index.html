@@ -12,7 +12,9 @@
         body, html {
             margin: 0;
             padding: 0;
-            /*position: fixed;*/
+            position: fixed;
+            /*https://stackoverflow.com/questions/15829172/stop-chrome-back-forward-two-finger-swipe*/
+            overscroll-behavior-x: none;
         }
 
         canvas {
@@ -105,7 +107,6 @@
         document.body.appendChild(renderer.domElement);
 
         hero = new Hero(scene, camera, -10, 0);
-        // hero.forward();
         // add buildings
         for (let gridX = 0; gridX < arenaSize; gridX++) {
             for (let gridY = 0; gridY < arenaSize; gridY++) {
@@ -149,7 +150,7 @@
         document.addEventListener('touchstart', touchStart, true);
         document.addEventListener('touchend', touchEnd, true);
 
-        document.body.addEventListener('touchmove', preventDefault, { passive: false });
+        document.body.addEventListener('touchmove', touchStart, { passive: false });
 
     }
 
@@ -158,37 +159,68 @@
     }
 
     function touchStart(event) {
-        down(event, true);
+        down(event);
+        //event.stopPropagation();
+        event.stopImmediatePropagation();
+        event.preventDefault();
     }
 
     function touchEnd(event) {
-        let pos = event.touches[0].clientX;
-        let posA = window.innerWidth * .3333;
-        let posB = window.innerWidth * .6666;
-        if (pos > posA && pos < posB) {
-            isFiring = false;
-        } else {
-            hero.stopTurning();
-        }
+        // let posX = event.touches[0].clientX;
+        // // if position is in the controller, stop motion
+        // if (posX < window.innerWidth ) {
+        //     hero.stopTurning();
+        //     hero.stop();
+        // }
+        // // if position is in the firing area, stop firing
+        // else {
+        //     isFiring = false;
+        // }
+        //
+        // event.stopImmediatePropagation();
+        // event.preventDefault();
+        hero.stopTurning();
+        hero.stop();
+        isFiring = false;
+
     }
 
-    function down(event, isTouch) {
-        console.log(event);
-        let pos = 0;
-        if (isTouch) {pos = event.touches[0].clientX;}
-        else {pos = event.screenX;}
+    function down(event) {
+        let posX = event.touches[0].clientX;
+        let posY = event.touches[0].clientY;
+        let width = 50;
+        let x1 = width;
+        let x2 = width * 2;
+        let x3 = width * 3;
+        let y1 = window.innerHeight  - width * 3;
+        let y2 = window.innerHeight  - width * 2;
+        let y3 = window.innerHeight  - width;
 
-        let posA = window.innerWidth * .3333 ;
-        let posB = window.innerWidth * .6666;
-        console.log(pos + " A: " + posA + ", B: " + posB);
-        if (pos < posA) {
-            hero.turnLeft();
+        // check that we're in the control box
+        if (posX < x3 && posY > y1) {
+            if (posX < x1) {
+                hero.turnLeft();
+            }
+            if (posX > x1 && posX < x2) {
+                hero.stopTurning();
+            }
+            if (posX > x2) {
+                hero.turnRight();
+            }
+            if (posY < y2) {
+                hero.forward();
+            }
+            if (posY > y2 && posY < y3) {
+                hero.stop();
+            }
+            if (posY > y3) {
+                hero.reverse();
+            }
+        }
 
-        } else if (pos < posB) {
+        if (posX > window.innerWidth - 3 * width) {
             isFiring = true;
-            // hero.forward();
-        } else {
-            hero.turnRight();
+            // gun.fire();
         }
     }
 
