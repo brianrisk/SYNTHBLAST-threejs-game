@@ -33,8 +33,8 @@
 </head>
 <body>
 <script src='node_modules/stats.js/build/stats.min.js'></script>
+<script src='lib/pixi.min.js'></script>
 <script type="module">
-
 
 
     // make synthwave background (syntywave sunset)
@@ -54,20 +54,23 @@
 
     // make speeds adjust for framerate so we have consistent time
 
+    // add UI elements: health bar
+
+    // handle multitouch shoot and fire
 
 
     // libraries
     import * as THREE from "./lib/three.module.js";
-    // import * as PIXI from "./lib/pixi.js";
+    // import * as PIXI from "./lib/pixi.min.js";
     import * as Utils from "./js/Utils.js";
 
     // classes
-    import Hero from "./classes/Hero.js";
-    import Building from "./classes/Building.js";
-    import Gun from "./classes/Gun.js";
-    import Enemy from "./classes/Enemy.js";
+    import Hero from "./js/classes/Hero.js";
+    import Building from "./js/classes/Building.js";
+    import Gun from "./js/classes/Gun.js";
+    import Enemy from "./js/classes/Enemy.js";
 
-    let scene, camera, rendererThree;
+    let scene, camera, rendererThree, rendererPixi, pixiStage;
 
     let hero = null;
     let bullets = [];
@@ -103,25 +106,80 @@
         render3d();
         rendererThree.state.reset();
 
-        // rendererPixi.reset();
-        // rendererPixi.render(stage, undefined, false);
-        // rendererPixi.reset();
+        rendererPixi.reset();
+        render2d();
+        rendererPixi.reset();
 
         stats.end();
         requestAnimationFrame(animate);
     }
 
+    // custom game loop: https://github.com/pixijs/pixi.js/wiki/v5-Custom-Application-GameLoop
+    function render2d() {
+
+
+
+        rendererPixi.render(pixiStage, undefined, false);
+    }
+
+
 
     function init() {
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
         const canvas = document.getElementById("screen");
         rendererThree = new THREE.WebGLRenderer({
             canvas: canvas
         });
+        rendererPixi = new PIXI.Renderer({
+            view: canvas,
+            context: rendererThree.getContext()
+        });
+        pixiStage = new PIXI.Container();
 
-        // scene.background = new THREE.Color(0xefd1b5);
+        init3d();
+        init2d();
+
+        // listeners
+        window.addEventListener('resize', onWindowResize, false);
+        document.addEventListener('keydown', onDocumentKeyDown, false);
+        document.addEventListener('keyup', onDocumentKeyUp, false);
+        document.addEventListener('touchstart', touchStart, {passive: false});
+        document.addEventListener('touchend', touchEnd, {passive: false});
+        document.body.addEventListener('touchmove', touchStart, {passive: false});
+    }
+
+    function init2d() {
+        let rectangle = new PIXI.Graphics();
+        rectangle.lineStyle(4, 0xFF3300, 1);
+        rectangle.beginFill(0x66CCFF);
+        rectangle.drawRect(0, 0, 64, 64);
+        rectangle.endFill();
+        // rectangle.x = 170;
+        // rectangle.y = 170;
+        pixiStage.addChild(rectangle);
+
+        let style = new PIXI.TextStyle({
+            fontFamily: "Arial",
+            fontSize: 36,
+            fill: "white",
+            stroke: '#ff00FF',
+            strokeThickness: 4,
+            dropShadow: true,
+            dropShadowColor: "#000000",
+            dropShadowBlur: 2,
+            dropShadowAngle: 0,
+            dropShadowDistance: 0,
+        });
+
+        let message = new PIXI.Text("S  Y  N  T  H  *  B  L  A  S  T", style);
+        message.position.set(54, 96);
+        pixiStage.addChild(message);
+    }
+
+    function init3d() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
         scene.background = new THREE.Color(0x000000);
+        // scene.background = new THREE.Color(0xefd1b5);
         scene.fog = new THREE.FogExp2(0xFF00FF, 0.05);
         scene.color = 0x00DD00;
 
@@ -164,15 +222,6 @@
         // helpers
         let axesHelper = new THREE.AxesHelper(5);
         scene.add(axesHelper);
-
-        // listeners
-        window.addEventListener('resize', onWindowResize, false);
-        document.addEventListener('keydown', onDocumentKeyDown, false);
-        document.addEventListener('keyup', onDocumentKeyUp, false);
-        document.addEventListener('touchstart', touchStart, true);
-        document.addEventListener('touchend', touchEnd, true);
-        document.body.addEventListener('touchmove', touchStart, {passive: false});
-
     }
 
     function touchStart(event) {
@@ -327,7 +376,7 @@
                     // hero.reset();
                 }
             });
-        
+
         rendererThree.render(scene, camera);
     }
 
@@ -336,7 +385,6 @@
         camera.updateProjectionMatrix();
         rendererThree.setSize(window.innerWidth, window.innerHeight);
     }
-
 
 
 </script>
