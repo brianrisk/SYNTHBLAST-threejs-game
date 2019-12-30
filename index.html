@@ -69,8 +69,6 @@
 
     let scene, camera, rendererThree;
 
-    let paused = false;
-
     let hero = null;
     let bullets = [];
     let buildings = [];
@@ -99,15 +97,19 @@
     init();
     animate();
 
-    // function loop() {
-    //     rendererThree.state.reset();
-    //     rendererThree.render(scene, camera);
-    //     rendererThree.state.reset();
-    //
-    //     // rendererPixi.reset();
-    //     // rendererPixi.render(stage, undefined, false);
-    //     // rendererPixi.reset();
-    // }
+    function animate() {
+        stats.begin();
+        rendererThree.state.reset();
+        render3d();
+        rendererThree.state.reset();
+
+        // rendererPixi.reset();
+        // rendererPixi.render(stage, undefined, false);
+        // rendererPixi.reset();
+
+        stats.end();
+        requestAnimationFrame(animate);
+    }
 
 
     function init() {
@@ -129,11 +131,11 @@
         // add buildings
         for (let gridX = 0; gridX < arenaSize; gridX++) {
             for (let gridY = 0; gridY < arenaSize; gridY++) {
-                if (Utils.randomInt(10) === 0) {
+                if (Utils.randomInt(20) === 0) {
                     let boxHeight = Utils.randomInt(10) + 1;
                     let building = new Building(gridX, gridY - arenaSize / 2, boxHeight, scene);
                     buildings.push(building);
-                } else if (Utils.randomInt(20) === 0) {
+                } else if (Utils.randomInt(40) === 0) {
                     let enemy = new Enemy(gridX, gridY, scene, explosionSound);
                     enemies.push(enemy);
                 }
@@ -255,14 +257,14 @@
         }
     }
 
-    function animate() {
-        stats.begin();
-        // TODO: try moving to end with other updates
+    function render3d() {
+
         // update our objects
         bullets.forEach(bullet => bullet.update());
         buildings.forEach(building => building.update());
         enemies.forEach(enemy => enemy.update(hero));
         hero.update();
+
         // bullets hitting things
         bullets.forEach(bullet => {
             if (bullet.isActive()) {
@@ -322,14 +324,10 @@
                     && Math.abs(enemy.getX() - hero.getX()) < 0.4
                     && Math.abs(enemy.getY() - hero.getY()) < 0.4
                 ) {
-                    hero.reset();
+                    // hero.reset();
                 }
             });
-
-
-
-        stats.end();
-        requestAnimationFrame(animate);
+        
         rendererThree.render(scene, camera);
     }
 
