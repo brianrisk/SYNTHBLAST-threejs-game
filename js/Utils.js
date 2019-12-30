@@ -24,3 +24,7 @@ export function randomVector() {
     if (Math.random() < 0.5) z *= -1;
     return new THREE.Vector3(x,y,z);
 }
+
+export function randomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}

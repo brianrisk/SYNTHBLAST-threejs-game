@@ -1,11 +1,11 @@
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="SYNTH*BLAST" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1" />
-    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-title" content="SYNTH*BLAST"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+    <meta name="format-detection" content="telephone=no"/>
     <link rel="apple-touch-icon" sizes="150x150" href="img/apple-touch-icon.png">
     <title>S Y N T H * B L A S T</title>
     <style>
@@ -36,6 +36,8 @@
 <script type="module">
 
     import * as THREE from "./lib/three.module.js";
+    import * as PIXI from "./lib/pixi.js";
+    import * as Utils from "./js/Utils.js";
 
     // make synthwave background (syntywave sunset)
     // skybox: https://threejsfundamentals.org/threejs/lessons/threejs-backgrounds.html
@@ -50,7 +52,7 @@
 
     // add glow / bloom
 
-        // have to be facing an enemy to shoot them
+    // have to be facing an enemy to shoot them
 
     import Hero from "./classes/Hero.js";
     import Building from "./classes/Building.js";
@@ -58,10 +60,9 @@
     import Enemy from "./classes/Enemy.js";
     import Bullet from "./classes/Bullet.js";
 
-    let scene, camera, renderer;
+    let scene, camera, rendererThree, rendererPixi, ctx2d;
 
     let paused = false;
-    let isFirstPerson = false;
 
     let hero = null;
     let bullets = [];
@@ -73,7 +74,7 @@
 
     // Sounds
     let massive = new Audio('audio/massive2.wav');
-    let pew = new Audio('audio/pip2.wav');
+    let pew = new Audio('audio/pip.wav');
     let explosionSound = new Audio('audio/explosion2.wav');
 
     // Music
@@ -87,34 +88,47 @@
 
     // stats
     let stats = new Stats();
-    stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-    document.body.appendChild( stats.dom );
+    stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild(stats.dom);
 
     init();
     animate();
 
+    // function loop() {
+    //     rendererThree.state.reset();
+    //     rendererThree.render(scene, camera);
+    //     rendererThree.state.reset();
+    //
+    //     // rendererPixi.reset();
+    //     // rendererPixi.render(stage, undefined, false);
+    //     // rendererPixi.reset();
+    // }
+
+
     function init() {
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
-        renderer = new THREE.WebGLRenderer();
+        const canvas = document.getElementById("screen");
+        rendererThree = new THREE.WebGLRenderer({
+            canvas: canvas
+        });
 
         // scene.background = new THREE.Color(0xefd1b5);
         scene.background = new THREE.Color(0x000000);
         scene.fog = new THREE.FogExp2(0xFF00FF, 0.05);
         scene.color = 0x00DD00;
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        rendererThree.setSize(window.innerWidth, window.innerHeight);
 
         hero = new Hero(scene, camera, -10, 0);
         // add buildings
         for (let gridX = 0; gridX < arenaSize; gridX++) {
             for (let gridY = 0; gridY < arenaSize; gridY++) {
-                if (randomInt(10) === 0) {
-                    let boxHeight = randomInt(10) + 1;
+                if (Utils.randomInt(10) === 0) {
+                    let boxHeight = Utils.randomInt(10) + 1;
                     let building = new Building(gridX, gridY - arenaSize / 2, boxHeight, scene);
                     buildings.push(building);
-                } else if (randomInt(20) === 0) {
+                } else if (Utils.randomInt(20) === 0) {
                     let enemy = new Enemy(gridX, gridY, scene, explosionSound);
                     enemies.push(enemy);
                 }
@@ -149,11 +163,9 @@
         document.addEventListener('keyup', onDocumentKeyUp, false);
         document.addEventListener('touchstart', touchStart, true);
         document.addEventListener('touchend', touchEnd, true);
-
-        document.body.addEventListener('touchmove', touchStart, { passive: false });
+        document.body.addEventListener('touchmove', touchStart, {passive: false});
 
     }
-
 
     function touchStart(event) {
         down(event);
@@ -162,7 +174,7 @@
         event.preventDefault();
     }
 
-    function touchEnd(event) {
+    function touchEnd() {
         hero.stopTurning();
         hero.stop();
         isFiring = false;
@@ -175,9 +187,9 @@
         let x1 = width;
         let x2 = width * 2;
         let x3 = width * 3;
-        let y1 = window.innerHeight  - width * 3;
-        let y2 = window.innerHeight  - width * 2;
-        let y3 = window.innerHeight  - width;
+        let y1 = window.innerHeight - width * 3;
+        let y2 = window.innerHeight - width * 2;
+        let y3 = window.innerHeight - width;
 
         // check that we're in the control box
         if (posX < x3 && posY > y1) {
@@ -211,8 +223,7 @@
         let keyCode = event["which"];
         if (event.shiftKey) {
             hero.changePerspective();
-        }
-        if (keyCode === 32) {
+        } else if (keyCode === 32) {
             isFiring = true;
         } else if (keyCode === 37) {
             hero.turnLeft();
@@ -242,98 +253,92 @@
 
     function animate() {
         stats.begin();
-        if (!paused) {
 
-            if (isFiring) {
-                fire();
-            }
-            hero.move();
-            // bullets hitting things
-            bullets.forEach(bullet => {
-                if (bullet.isActive()) {
-                    buildings.forEach(building => {
-                        if (
-                            building.isActive()
-                            && Math.abs(building.getX() - bullet.getX()) < 0.5
-                            && Math.abs(building.getY() - bullet.getY()) < 0.5
-                        ) {
-                            building.hit();
-                            bullet.hit();
-
-                        }
-                    });
-                    enemies.forEach(enemy => {
-                        if (
-                            enemy.isAlive()
-                            && Math.abs(enemy.getX() - bullet.getX()) < 0.4
-                            && Math.abs(enemy.getY() - bullet.getY()) < 0.4
-                        ) {
-                            enemy.hit();
-                            bullet.hit();
-                        }
-                    });
-
-                }
-            });
-
-            // can't go through buildings
-            buildings.forEach(building => {
-                if (building.isActive()) {
+        if (isFiring) {
+            fire();
+        }
+        hero.move();
+        // bullets hitting things
+        bullets.forEach(bullet => {
+            if (bullet.isActive()) {
+                buildings.forEach(building => {
                     if (
-                        Math.abs(building.getX() - hero.getX()) < 0.6
-                        && Math.abs(building.getY() - hero.getY()) < 0.6
+                        building.isActive()
+                        && Math.abs(building.getX() - bullet.getX()) < 0.5
+                        && Math.abs(building.getY() - bullet.getY()) < 0.5
                     ) {
-                        // mildly confusing, but direction already had a multiplySclar earlier.
-                        // this reversing that
-                        hero.unMove();
-                    }
-                    enemies.forEach(
-                        enemy => {
-                            if (
-                                enemy.isAlive()
-                                && Math.abs(enemy.getX() - building.getX()) < 0.6
-                                && Math.abs(enemy.getY() - building.getY()) < 0.6
-                            ) {
-                                enemy.unMove();
-                            }
-                        });
-                }
-            });
+                        building.hit();
+                        bullet.hit();
 
-            enemies.forEach(
-                enemy => {
+                    }
+                });
+                enemies.forEach(enemy => {
                     if (
                         enemy.isAlive()
-                        && Math.abs(enemy.getX() - hero.getX()) < 0.4
-                        && Math.abs(enemy.getY() - hero.getY()) < 0.4
+                        && Math.abs(enemy.getX() - bullet.getX()) < 0.4
+                        && Math.abs(enemy.getY() - bullet.getY()) < 0.4
                     ) {
-                        hero.reset();
+                        enemy.hit();
+                        bullet.hit();
                     }
                 });
 
-            // update our objects
-            bullets.forEach(bullet => bullet.update());
-            buildings.forEach(building => building.update());
-            enemies.forEach(enemy => enemy.update(hero));
-        }
+            }
+        });
+
+        // can't go through buildings
+        buildings.forEach(building => {
+            if (building.isActive()) {
+                if (
+                    Math.abs(building.getX() - hero.getX()) < 0.6
+                    && Math.abs(building.getY() - hero.getY()) < 0.6
+                ) {
+                    // mildly confusing, but direction already had a multiplySclar earlier.
+                    // this reversing that
+                    hero.unMove();
+                }
+                enemies.forEach(
+                    enemy => {
+                        if (
+                            enemy.isAlive()
+                            && Math.abs(enemy.getX() - building.getX()) < 0.6
+                            && Math.abs(enemy.getY() - building.getY()) < 0.6
+                        ) {
+                            enemy.unMove();
+                        }
+                    });
+            }
+        });
+
+        enemies.forEach(
+            enemy => {
+                if (
+                    enemy.isAlive()
+                    && Math.abs(enemy.getX() - hero.getX()) < 0.4
+                    && Math.abs(enemy.getY() - hero.getY()) < 0.4
+                ) {
+                    hero.reset();
+                }
+            });
+
+        // update our objects
+        bullets.forEach(bullet => bullet.update());
+        buildings.forEach(building => building.update());
+        enemies.forEach(enemy => enemy.update(hero));
 
         stats.end();
         requestAnimationFrame(animate);
-        renderer.render(scene, camera);
+        rendererThree.render(scene, camera);
     }
 
     function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    function randomInt(max) {
-        return Math.floor(Math.random() * Math.floor(max));
+        rendererThree.setSize(window.innerWidth, window.innerHeight);
     }
 
 
-    function fire(spread) {
+    function fire() {
         if (soundOn) {
             if (!isSongPlaying) {
                 // song.play();
@@ -345,5 +350,6 @@
 
 
 </script>
+<canvas id="screen"></canvas>
 </body>
 </html>
