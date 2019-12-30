@@ -35,9 +35,7 @@
 <script src='node_modules/stats.js/build/stats.min.js'></script>
 <script type="module">
 
-    import * as THREE from "./lib/three.module.js";
-    import * as PIXI from "./lib/pixi.js";
-    import * as Utils from "./js/Utils.js";
+
 
     // make synthwave background (syntywave sunset)
     // skybox: https://threejsfundamentals.org/threejs/lessons/threejs-backgrounds.html
@@ -54,13 +52,22 @@
 
     // have to be facing an enemy to shoot them
 
+    // make speeds adjust for framerate so we have consistent time
+
+
+
+    // libraries
+    import * as THREE from "./lib/three.module.js";
+    // import * as PIXI from "./lib/pixi.js";
+    import * as Utils from "./js/Utils.js";
+
+    // classes
     import Hero from "./classes/Hero.js";
     import Building from "./classes/Building.js";
     import Gun from "./classes/Gun.js";
     import Enemy from "./classes/Enemy.js";
-    import Bullet from "./classes/Bullet.js";
 
-    let scene, camera, rendererThree, rendererPixi, ctx2d;
+    let scene, camera, rendererThree;
 
     let paused = false;
 
@@ -83,12 +90,10 @@
 
     // State
     let isSongPlaying = false;
-    let soundOn = true;
-    let isFiring = false;
 
     // stats
     let stats = new Stats();
-    stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
+    stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(stats.dom);
 
     init();
@@ -136,6 +141,7 @@
         }
 
         gun = new Gun(scene, bullets, hero, pew);
+        hero.setGun(gun);
 
         // floor
         let floorTexture = new THREE.TextureLoader().load('img/floor-tile.png');
@@ -169,7 +175,6 @@
 
     function touchStart(event) {
         down(event);
-        //event.stopPropagation();
         event.stopImmediatePropagation();
         event.preventDefault();
     }
@@ -177,7 +182,7 @@
     function touchEnd() {
         hero.stopTurning();
         hero.stop();
-        isFiring = false;
+        hero.stopShooting();
     }
 
     function down(event) {
@@ -214,8 +219,7 @@
         }
 
         if (posX > window.innerWidth - 3 * width) {
-            isFiring = true;
-            // gun.fire();
+            hero.startShooting();
         }
     }
 
@@ -224,7 +228,7 @@
         if (event.shiftKey) {
             hero.changePerspective();
         } else if (keyCode === 32) {
-            isFiring = true;
+            hero.startShooting();
         } else if (keyCode === 37) {
             hero.turnLeft();
         } else if (keyCode === 38) {
@@ -239,7 +243,7 @@
     function onDocumentKeyUp(event) {
         let keyCode = event["which"];
         if (keyCode === 32) {
-            isFiring = false;
+            hero.stopShooting();
         } else if (keyCode === 37) {
             hero.stopTurning();
         } else if (keyCode === 38) {
@@ -253,11 +257,12 @@
 
     function animate() {
         stats.begin();
-
-        if (isFiring) {
-            fire();
-        }
-        hero.move();
+        // TODO: try moving to end with other updates
+        // update our objects
+        bullets.forEach(bullet => bullet.update());
+        buildings.forEach(building => building.update());
+        enemies.forEach(enemy => enemy.update(hero));
+        hero.update();
         // bullets hitting things
         bullets.forEach(bullet => {
             if (bullet.isActive()) {
@@ -321,10 +326,7 @@
                 }
             });
 
-        // update our objects
-        bullets.forEach(bullet => bullet.update());
-        buildings.forEach(building => building.update());
-        enemies.forEach(enemy => enemy.update(hero));
+
 
         stats.end();
         requestAnimationFrame(animate);
@@ -337,16 +339,6 @@
         rendererThree.setSize(window.innerWidth, window.innerHeight);
     }
 
-
-    function fire() {
-        if (soundOn) {
-            if (!isSongPlaying) {
-                // song.play();
-                isSongPlaying = true;
-            }
-        }
-        gun.fire(soundOn);
-    }
 
 
 </script>

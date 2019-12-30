@@ -3,8 +3,11 @@ import * as THREE from "./../lib/three.module.js";
 class Hero {
 
     constructor(scene, camera, x, y) {
+        // rendering
         this.scene = scene;
         this.camera = camera;
+
+        // positioning
         this.turnSpeed = 0;
         this.speed = 0;
         this.maxSpeed = 0.15;
@@ -18,28 +21,16 @@ class Hero {
         this.perspectiveHeight = 0;
         this.originalX = x;
         this.originalY = y;
+
+        // attributes
+        this.hitPoints = 10;
+        this.gun = null;
+        this.isShooting = false;
+
+        // setting up
         this.createObject();
         this.setPerspective(true);
         this.reset();
-    }
-
-    changePerspective() {
-        this.setPerspective(!this.isFirstPerson);
-    }
-
-    setPerspective(isFirstPerson) {
-        this.isFirstPerson = isFirstPerson;
-        if (this.isFirstPerson) {
-            this.headTiltDelta += this.headTiltDelta + Math.PI / 2;
-            this.perspectiveHeight = this.bottomZ;
-            this.object.visible = false;
-        }
-        // overhead
-        else {
-            this.headTiltDelta += this.headTiltDelta - Math.PI / 2;
-            this.perspectiveHeight = this.topZ;
-            this.object.visible = true;
-        }
     }
 
     createObject(x, y) {
@@ -67,10 +58,10 @@ class Hero {
         this.object.rotateOnWorldAxis(this.rotationAxis, -90 * Math.PI / 180);
         if (this.isFirstPerson) {
             this.camera.rotation.z = 0;
-            this.camera.rotation.x = 90 * Math.PI / 180 ;
+            this.camera.rotation.x = 90 * Math.PI / 180;
             this.camera.rotation.y = -90 * Math.PI / 180;
             // tilt up just a bit to make buildings look more imposing
-            this.camera.rotateOnAxis(new THREE.Vector3(-1,0,0), -0.1);
+            this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), -0.1);
         } else {
             this.camera.rotation.z = -90 * Math.PI / 180;
         }
@@ -80,7 +71,29 @@ class Hero {
     }
 
     update() {
+        if (this.isShooting) {
+            this.gun.fire(true);
+        }
+        this.move();
+    }
 
+    changePerspective() {
+        this.setPerspective(!this.isFirstPerson);
+    }
+
+    setPerspective(isFirstPerson) {
+        this.isFirstPerson = isFirstPerson;
+        if (this.isFirstPerson) {
+            this.headTiltDelta += this.headTiltDelta + Math.PI / 2;
+            this.perspectiveHeight = this.bottomZ;
+            this.object.visible = false;
+        }
+        // overhead
+        else {
+            this.headTiltDelta += this.headTiltDelta - Math.PI / 2;
+            this.perspectiveHeight = this.topZ;
+            this.object.visible = true;
+        }
     }
 
     move() {
@@ -97,41 +110,33 @@ class Hero {
         // drop down to ground level
         // if (this.isFirstPerson) {
         let heightDiff = Math.abs(this.camera.position.z - this.perspectiveHeight);
-            if (heightDiff < this.maxSpeed * .9) {
-                this.camera.position.z = this.perspectiveHeight;
-                this.headTiltDelta = 0;
-                if (heightDiff > 0.00001) {
-                    this.camera.rotateOnAxis(new THREE.Vector3(-1,0,0), this.headTiltDelta);
-                }
-            } else {
-                let absDelta = Math.abs(this.headTiltDelta);
-                let rotationMultiplier = 1;
-                // switching perspective height
-                if (this.camera.position.z < this.perspectiveHeight) {
-                    let up = new THREE.Vector3(0, 0, this.maxSpeed);
-                    this.camera.position.add(up);
-                } else {
-                    let down = new THREE.Vector3(0, 0, -1 * this.maxSpeed);
-                    this.camera.position.add(down);
-                    rotationMultiplier = -1;
-                }
-                // switching perspective rotation
-                if (absDelta <= this.perspectiveRotationSpeed) {
-                    this.camera.rotateOnAxis(new THREE.Vector3(-1,0,0), rotationMultiplier * absDelta);
-                    this.headTiltDelta = 0;
-                } else {
-                    this.camera.rotateOnAxis(new THREE.Vector3(-1,0,0), rotationMultiplier * this.perspectiveRotationSpeed);
-                    this.headTiltDelta += rotationMultiplier * this.perspectiveRotationSpeed;
-                }
+        if (heightDiff < this.maxSpeed * .9) {
+            this.camera.position.z = this.perspectiveHeight;
+            this.headTiltDelta = 0;
+            if (heightDiff > 0.00001) {
+                this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), this.headTiltDelta);
             }
-            // if (this.camera.position.z > this.bottomZ) {
-            //     let down = new THREE.Vector3(0, 0, -1 * this.maxSpeed);
-            //     this.camera.position.add(down);
-            //     if (this.camera.position.z < this.bottomZ) {
-            //         this.camera.position.add(new THREE.Vector3(0, 0, this.camera.position.z - this.bottomZ ));
-            //     }
-            // }
-        // }
+        } else {
+            let absDelta = Math.abs(this.headTiltDelta);
+            let rotationMultiplier = 1;
+            // switching perspective height
+            if (this.camera.position.z < this.perspectiveHeight) {
+                let up = new THREE.Vector3(0, 0, this.maxSpeed);
+                this.camera.position.add(up);
+            } else {
+                let down = new THREE.Vector3(0, 0, -1 * this.maxSpeed);
+                this.camera.position.add(down);
+                rotationMultiplier = -1;
+            }
+            // switching perspective rotation
+            if (absDelta <= this.perspectiveRotationSpeed) {
+                this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), rotationMultiplier * absDelta);
+                this.headTiltDelta = 0;
+            } else {
+                this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), rotationMultiplier * this.perspectiveRotationSpeed);
+                this.headTiltDelta += rotationMultiplier * this.perspectiveRotationSpeed;
+            }
+        }
     }
 
     unMove() {
@@ -187,6 +192,18 @@ class Hero {
         futureInc.multiplyScalar(this.speed * 10);
         future.add(futureInc);
         return future;
+    }
+
+    setGun(gun) {
+        this.gun = gun;
+    }
+
+    startShooting() {
+        this.isShooting = true;
+    }
+
+    stopShooting() {
+        this.isShooting = false;
     }
 
 }
