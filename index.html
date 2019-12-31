@@ -70,6 +70,9 @@
     import Gun from "./js/classes/Gun.js";
     import Enemy from "./js/classes/Enemy.js";
 
+    // let isMobile = window.matchMedia("only screen and (max-width: 760px)").matches;
+    let isMobile = 'ontouchstart' in document.documentElement;
+
     let scene, camera, rendererThree, rendererPixi, pixiStage;
 
     let hero = null;
@@ -173,34 +176,68 @@
         // message.position.set(54, 96);
         // pixiStage.addChild(message);
 
-        let width = 50;
-        let offset = 10;
-        let x0 = offset;
-        let x1 = width + offset;
-        let x2 = width * 2 + offset;
-        let x3 = width * 3 + offset;
+        if (isMobile) {
+            let width = 50;
+            let half = width / 2;
+            let tick = width / 4;
+            let offset = 10;
+            let x0 = offset;
+            let x1 = width + offset;
+            let x2 = width * 2 + offset;
+            let x3 = width * 3 + offset;
+            let y1 = window.innerHeight - width * 3 - offset;
+            let y2 = window.innerHeight - width * 2 - offset;
+            let y3 = window.innerHeight - width - offset;
+            let y4 = window.innerHeight - offset;
 
-        let y1 = window.innerHeight - width * 3 - offset;
-        let y2 = window.innerHeight - width * 2 - offset;
-        let y3 = window.innerHeight - width - offset;
-        let y4 = window.innerHeight - offset;
-
-        drawLine(x0, y1, x3, y1);
-        drawLine(x0, y2, x3, y2);
-        drawLine(x0, y3, x3, y3);
-        drawLine(x0, y4, x3, y4);
-        drawLine(x0, y1, x0, y4);
-        drawLine(x1, y1, x1, y4);
-        drawLine(x2, y1, x2, y4);
-        drawLine(x3, y1, x3, y4);
+            // grid
+            let gridThickness = 2;
+            drawLine(x0, y1, x3, y1, gridThickness);
+            drawLine(x0, y2, x3, y2, gridThickness);
+            drawLine(x0, y3, x3, y3, gridThickness);
+            drawLine(x0, y4, x3, y4, gridThickness);
+            drawLine(x0, y1, x0, y4, gridThickness);
+            drawLine(x1, y1, x1, y4, gridThickness);
+            drawLine(x2, y1, x2, y4, gridThickness);
+            drawLine(x3, y1, x3, y4, gridThickness);
+            //arrows
+            drawArrow(x0 + half, y1 + half, Math.PI * -.25);
+            drawArrow(x1 + half, y1 + half, 0);
+            drawArrow(x2 + half, y1 + half, Math.PI * .25);
+            drawArrow(x0 + half, y2 + half, Math.PI * -.5);
+            drawArrow(x2 + half, y2 + half, Math.PI * .5);
+            drawArrow(x0 + half, y3 + half, Math.PI * -.75);
+            drawArrow(x1 + half, y3 + half, Math.PI * -1);
+            drawArrow(x2 + half, y3 + half, Math.PI * -1.25);
+        }
     }
 
-    function drawLine(x1, y1, x2, y2) {
+    function drawLine(x1, y1, x2, y2, thickness) {
+        pixiStage.addChild(getLine(x1, y1, x2, y2, thickness));
+    }
+
+    function getLine(x1, y1, x2, y2, thickness) {
         let line = new PIXI.Graphics();
-        line.lineStyle(1, 0xAA00AA, 1);
+        line.lineStyle(thickness, 0xAA00AA, 1);
         line.moveTo(x1, y1);
         line.lineTo(x2, y2);
-        pixiStage.addChild(line);
+        return line;
+    }
+
+    function drawArrow(x, y, rotation) {
+        const container = new PIXI.Container();
+        let l = 10;
+        let thickness = 2;
+        container.addChild(getLine(0, 5, 0, 0 - l, thickness));
+        container.addChild(getLine(0, 0 - l, 0 - l, 0, thickness));
+        container.addChild(getLine(0, 0 - l, l, 0, thickness));
+        // container.pivot.x = container.width / 2;
+        // container.pivot.y = container.height / 2;
+        container.x = x;
+        container.y = y;
+        container.rotation = rotation;
+        pixiStage.addChild(container);
+
     }
 
     function init3d() {
@@ -265,41 +302,46 @@
     }
 
     function down(event) {
-        let posX = event.touches[0].clientX;
-        let posY = event.touches[0].clientY;
-        let width = 50;
-        let x1 = width;
-        let x2 = width * 2;
-        let x3 = width * 3;
-        let y1 = window.innerHeight - width * 3;
-        let y2 = window.innerHeight - width * 2;
-        let y3 = window.innerHeight - width;
+        for (let i = 0; i < event.touches.length; i++) {
+            let touch = event.touches[i];
+            let posX = touch.clientX;
+            let posY = touch.clientY;
+            let width = 50;
+            let offset = 10;
+            let x1 = width + offset;
+            let x2 = width * 2 + offset;
+            let x3 = width * 3 + offset;
+            let y1 = window.innerHeight - width * 3 - offset;
+            let y2 = window.innerHeight - width * 2 - offset;
+            let y3 = window.innerHeight - width - offset;
 
-        // check that we're in the control box
-        if (posX < x3 && posY > y1) {
-            if (posX < x1) {
-                hero.turnLeft();
+            // check that we're in the control box
+            if (posX < x3 && posY > y1) {
+                if (posX < x1) {
+                    hero.turnLeft();
+                }
+                if (posX > x1 && posX < x2) {
+                    hero.stopTurning();
+                }
+                if (posX > x2) {
+                    hero.turnRight();
+                }
+                if (posY < y2) {
+                    hero.forward();
+                }
+                if (posY > y2 && posY < y3) {
+                    hero.stop();
+                }
+                if (posY > y3) {
+                    hero.reverse();
+                }
             }
-            if (posX > x1 && posX < x2) {
-                hero.stopTurning();
-            }
-            if (posX > x2) {
-                hero.turnRight();
-            }
-            if (posY < y2) {
-                hero.forward();
-            }
-            if (posY > y2 && posY < y3) {
-                hero.stop();
-            }
-            if (posY > y3) {
-                hero.reverse();
+
+            if (posX > window.innerWidth - 3 * width) {
+                hero.startShooting();
             }
         }
 
-        if (posX > window.innerWidth - 3 * width) {
-            hero.startShooting();
-        }
     }
 
     function onDocumentKeyDown(event) {

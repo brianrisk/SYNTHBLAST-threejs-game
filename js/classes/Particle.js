@@ -4,9 +4,10 @@ import * as Utils from "../Utils.js";
 class Particle {
 
     constructor(x, y, z, scene) {
-        let size = Math.random() * 0.2;
+        let size = Math.random() * 0.4;
         size = Math.max(size, 0.05);
-        let geometry = new THREE.BoxGeometry(size, size, size);
+        // let geometry = new THREE.BoxGeometry(size, size, size);
+        let geometry = new THREE.ConeGeometry(size / 2, size, 3);
         let material = new THREE.MeshBasicMaterial( { color: 0x00FFFF} );
         let cube = new THREE.Mesh(geometry, material);
         cube.position.x = x;
