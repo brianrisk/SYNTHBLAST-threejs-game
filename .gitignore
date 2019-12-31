@@ -1,6 +1,6 @@
 .DS_Store
 .idea/
-audio/
+assets/audio/
 jsm/
 music/
 node_modules/

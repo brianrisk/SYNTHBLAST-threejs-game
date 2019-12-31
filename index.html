@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
     <meta name="format-detection" content="telephone=no"/>
-    <link rel="apple-touch-icon" sizes="150x150" href="img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="150x150" href="assets/img/apple-touch-icon.png">
     <title>S Y N T H * B L A S T</title>
     <style>
         body, html {
@@ -29,6 +29,12 @@
             outline: none;
             -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
         }
+
+        @font-face {
+            font-family: 'pokemon';
+            src: url("assets/fonts/pokemon.ttf");
+        }
+
     </style>
 </head>
 <body>
@@ -42,8 +48,6 @@
     // skybox SO: https://stackoverflow.com/questions/45443196/how-to-set-up-image-background-in-three-js
     // https://videohive.net/item/80s-synthwave-retro-hd/24080448
 
-    // add touch interface
-
     // add shooting stars
 
     // make guns things you can pick up
@@ -56,12 +60,10 @@
 
     // add UI elements: health bar
 
-    // handle multitouch shoot and fire
 
 
     // libraries
     import * as THREE from "./lib/three.module.js";
-    // import * as PIXI from "./lib/pixi.min.js";
     import * as Utils from "./js/Utils.js";
 
     // classes
@@ -70,10 +72,11 @@
     import Gun from "./js/classes/Gun.js";
     import Enemy from "./js/classes/Enemy.js";
 
-    // let isMobile = window.matchMedia("only screen and (max-width: 760px)").matches;
     let isMobile = 'ontouchstart' in document.documentElement;
 
     let scene, camera, rendererThree, rendererPixi, pixiStage;
+
+    let instructionText;
 
     let hero = null;
     let bullets = [];
@@ -84,9 +87,9 @@
     let arenaSize = 100;
 
     // Sounds
-    let massive = new Audio('audio/massive2.wav');
-    let pew = new Audio('audio/pip.wav');
-    let explosionSound = new Audio('audio/explosion2.wav');
+    // let massive = new Audio('assets/audio/massive2.wav');
+    let pew = new Audio('assets/audio/pip.wav');
+    let explosionSound = new Audio('assets/audio/explosion2.wav');
 
     // Music
     // let song = new Audio('music/implant-128kbps.mp3');
@@ -177,7 +180,7 @@
         // pixiStage.addChild(message);
 
         if (isMobile) {
-            let width = 50;
+            let width = 60;
             let half = width / 2;
             let tick = width / 4;
             let offset = 10;
@@ -209,6 +212,24 @@
             drawArrow(x0 + half, y3 + half, Math.PI * -.75);
             drawArrow(x1 + half, y3 + half, Math.PI * -1);
             drawArrow(x2 + half, y3 + half, Math.PI * -1.25);
+        } else {
+            // https://stackoverflow.com/questions/55692097/stop-pixel-font-from-being-blurred-when-rendered
+            let style = new PIXI.TextStyle({
+                fontFamily: "pokemon, \"Courier New\", Courier, monospace",
+                fontSize: 14,
+                fill: "#00FFFF",
+                stroke: '#ff00FF',
+                strokeThickness: 1,
+                dropShadow: true,
+                dropShadowColor: "#000000",
+                dropShadowBlur: 2,
+                dropShadowAngle: 0,
+                dropShadowDistance: 0,
+            });
+
+            instructionText = new PIXI.Text('Arrow keys to steer; space to fire.', style);
+            instructionText.position.set(10, window.innerHeight - 50);
+            pixiStage.addChild(instructionText);
         }
     }
 
@@ -269,7 +290,7 @@
         hero.setGun(gun);
 
         // floor
-        let floorTexture = new THREE.TextureLoader().load('img/floor-tile.png');
+        let floorTexture = new THREE.TextureLoader().load('assets/img/floor-tile.png');
         floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
         floorTexture.repeat.set(1000, 1000);
         let floorMaterial = new THREE.MeshBasicMaterial({map: floorTexture, side: THREE.FrontSide});
@@ -306,7 +327,7 @@
             let touch = event.touches[i];
             let posX = touch.clientX;
             let posY = touch.clientY;
-            let width = 50;
+            let width = 60;
             let offset = 10;
             let x1 = width + offset;
             let x2 = width * 2 + offset;
@@ -359,6 +380,7 @@
         } else if (keyCode === 40) {
             hero.reverse();
         }
+        pixiStage.removeChild(instructionText);
     }
 
     function onDocumentKeyUp(event) {
