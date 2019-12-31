@@ -148,31 +148,59 @@
     }
 
     function init2d() {
-        let rectangle = new PIXI.Graphics();
-        rectangle.lineStyle(4, 0xFF3300, 1);
-        rectangle.beginFill(0x66CCFF);
-        rectangle.drawRect(0, 0, 64, 64);
-        rectangle.endFill();
-        // rectangle.x = 170;
-        // rectangle.y = 170;
-        pixiStage.addChild(rectangle);
+        // let rectangle = new PIXI.Graphics();
+        // rectangle.lineStyle(4, 0xFF3300, 1);
+        // rectangle.beginFill(0x66CCFF);
+        // rectangle.drawRect(0, 0, 64, 64);
+        // rectangle.endFill();
+        // // rectangle.x = 170;
+        // // rectangle.y = 170;
+        // pixiStage.addChild(rectangle);
+        //
+        // let style = new PIXI.TextStyle({
+        //     fontFamily: "Arial",
+        //     fontSize: 36,
+        //     fill: "white",
+        //     stroke: '#ff00FF',
+        //     strokeThickness: 4,
+        //     dropShadow: true,
+        //     dropShadowColor: "#000000",
+        //     dropShadowBlur: 2,
+        //     dropShadowAngle: 0,
+        //     dropShadowDistance: 0,
+        // });
+        // let message = new PIXI.Text("S  Y  N  T  H  *  B  L  A  S  T", style);
+        // message.position.set(54, 96);
+        // pixiStage.addChild(message);
 
-        let style = new PIXI.TextStyle({
-            fontFamily: "Arial",
-            fontSize: 36,
-            fill: "white",
-            stroke: '#ff00FF',
-            strokeThickness: 4,
-            dropShadow: true,
-            dropShadowColor: "#000000",
-            dropShadowBlur: 2,
-            dropShadowAngle: 0,
-            dropShadowDistance: 0,
-        });
+        let width = 50;
+        let offset = 10;
+        let x0 = offset;
+        let x1 = width + offset;
+        let x2 = width * 2 + offset;
+        let x3 = width * 3 + offset;
 
-        let message = new PIXI.Text("S  Y  N  T  H  *  B  L  A  S  T", style);
-        message.position.set(54, 96);
-        pixiStage.addChild(message);
+        let y1 = window.innerHeight - width * 3 - offset;
+        let y2 = window.innerHeight - width * 2 - offset;
+        let y3 = window.innerHeight - width - offset;
+        let y4 = window.innerHeight - offset;
+
+        drawLine(x0, y1, x3, y1);
+        drawLine(x0, y2, x3, y2);
+        drawLine(x0, y3, x3, y3);
+        drawLine(x0, y4, x3, y4);
+        drawLine(x0, y1, x0, y4);
+        drawLine(x1, y1, x1, y4);
+        drawLine(x2, y1, x2, y4);
+        drawLine(x3, y1, x3, y4);
+    }
+
+    function drawLine(x1, y1, x2, y2) {
+        let line = new PIXI.Graphics();
+        line.lineStyle(1, 0xAA00AA, 1);
+        line.moveTo(x1, y1);
+        line.lineTo(x2, y2);
+        pixiStage.addChild(line);
     }
 
     function init3d() {
