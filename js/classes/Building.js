@@ -2,9 +2,12 @@ import * as THREE from "../../lib/three.module.js";
 
 class Building {
 
-    constructor(x, y, height, scene) {
+    constructor(x, y, height, scene, damageable) {
         let geometry = new THREE.BoxGeometry(1, 1, height);
         let material = new THREE.MeshBasicMaterial( { color: 0x000000} );
+        if (!damageable) {
+            material = new THREE.MeshBasicMaterial( { color: 0xDDDDDD} );
+        }
         // let wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000} );
         let cube = new THREE.Mesh(geometry, material);
         // let wireFrame = new THREE.Mesh(geometry, wireframeMaterial)
@@ -17,14 +20,17 @@ class Building {
         this.desiredZ = cube.position.z;
         this.scene = scene;
         this.active = true;
+        this.damageable = damageable;
         scene.add(cube);
     }
 
     hit() {
-        this.height -= 1;
-        this.desiredZ -= 1;
-        if (this.height <= 0.001) {
-            this.active = false;
+        if (this.damageable) {
+            this.height -= 1;
+            this.desiredZ -= 1;
+            if (this.height <= 0.001) {
+                this.active = false;
+            }
         }
     }
 

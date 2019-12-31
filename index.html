@@ -60,6 +60,8 @@
 
     // add UI elements: health bar
 
+    // see where blasts hit buildings:
+    // https://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection
 
 
     // libraries
@@ -77,6 +79,7 @@
     let scene, camera, rendererThree, rendererPixi, pixiStage;
 
     let instructionText;
+    let b1,b2,b3,b4,b6,b7,b8,b9,bFire;
 
     let hero = null;
     let bullets = [];
@@ -124,10 +127,8 @@
     function render2d() {
 
 
-
         rendererPixi.render(pixiStage, undefined, false);
     }
-
 
 
     function init() {
@@ -178,11 +179,10 @@
         // let message = new PIXI.Text("S  Y  N  T  H  *  B  L  A  S  T", style);
         // message.position.set(54, 96);
         // pixiStage.addChild(message);
-
+        isMobile = true;
         if (isMobile) {
             let width = 60;
             let half = width / 2;
-            let tick = width / 4;
             let offset = 10;
             let x0 = offset;
             let x1 = width + offset;
@@ -192,6 +192,38 @@
             let y2 = window.innerHeight - width * 2 - offset;
             let y3 = window.innerHeight - width - offset;
             let y4 = window.innerHeight - offset;
+
+            // squares
+            b1 = getSquare( x0, y1, width);
+            pixiStage.addChild(b1);
+            b2 = getSquare( x1, y1, width);
+            pixiStage.addChild(b2);
+            b3 = getSquare( x2, y1, width);
+            pixiStage.addChild(b3);
+
+            b4 = getSquare( x0, y2, width);
+            pixiStage.addChild(b4);
+            b6 = getSquare( x2, y2, width);
+            pixiStage.addChild(b6);
+
+            b7 = getSquare( x0, y3, width);
+            pixiStage.addChild(b7);
+            b8 = getSquare( x1, y3, width);
+            pixiStage.addChild(b8);
+            b9 = getSquare( x2, y3, width);
+            pixiStage.addChild(b9);
+
+            bFire = new PIXI.Graphics();
+            bFire.beginFill(0xFF00FF);
+            bFire.drawEllipse(window.innerWidth - (width * 1.5), window.innerHeight - (width  * 1.5), width, width);
+            bFire.alpha = 0.6;
+            bFire.visible = false; // initially hidden
+            pixiStage.addChild(bFire);
+
+            let fireOutline = new PIXI.Graphics();
+            fireOutline.lineStyle(2, 0xCC88CC, 1);
+            fireOutline.drawEllipse(window.innerWidth - (width * 1.5), window.innerHeight - (width  * 1.5), width, width);
+            pixiStage.addChild(fireOutline);
 
             // grid
             let gridThickness = 2;
@@ -233,13 +265,23 @@
         }
     }
 
+    function getSquare(x,y, width) {
+        let square = new PIXI.Graphics();
+        square.beginFill(0xFF00FF);
+        square.drawRect(x, y, width, width);
+        square.alpha = 0.6;
+        square.visible = false; // initially hidden
+        // square.lineStyle(thickness, 0xAA00AA, 1);
+        return square;
+    }
+
     function drawLine(x1, y1, x2, y2, thickness) {
         pixiStage.addChild(getLine(x1, y1, x2, y2, thickness));
     }
 
     function getLine(x1, y1, x2, y2, thickness) {
         let line = new PIXI.Graphics();
-        line.lineStyle(thickness, 0xAA00AA, 1);
+        line.lineStyle(thickness, 0xCC88CC, 1);
         line.moveTo(x1, y1);
         line.lineTo(x2, y2);
         return line;
@@ -271,17 +313,39 @@
 
         rendererThree.setSize(window.innerWidth, window.innerHeight);
 
-        hero = new Hero(scene, camera, -10, 0);
+        hero = new Hero(scene, camera, -55, 0);
         // add buildings
+        let halfArena = arenaSize / 2;
         for (let gridX = 0; gridX < arenaSize; gridX++) {
             for (let gridY = 0; gridY < arenaSize; gridY++) {
+                if (gridY === halfArena) continue;
+                // if (gridY % 3 === 0 || gridX % 3 === 0) continue;
+                // if (!(gridY % 4 === 0 || gridY % 4 === 1 || gridX % 4 === 0 || gridX % 4 === 1)) {
                 if (Utils.randomInt(20) === 0) {
                     let boxHeight = Utils.randomInt(10) + 1;
-                    let building = new Building(gridX, gridY - arenaSize / 2, boxHeight, scene);
+                    let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
                     buildings.push(building);
-                } else if (Utils.randomInt(40) === 0) {
-                    let enemy = new Enemy(gridX, gridY, scene, explosionSound);
+                } else
+                if (Utils.randomInt(40) === 0) {
+                    let enemy = new Enemy(gridX, gridY - halfArena, scene, explosionSound);
                     enemies.push(enemy);
+                }
+            }
+        }
+
+        // add fence around the buildings
+
+        for (let gridX = -1; gridX <= arenaSize; gridX++) {
+            for (let gridY = -1; gridY <= arenaSize; gridY++) {
+                // leaving a gap
+                if (gridY === halfArena && gridX === -1) continue;
+                // only filling in edges
+                if (gridX === -1 || gridY === -1 || gridX === arenaSize || gridY === arenaSize) {
+                    let boxHeight = 1;
+                    // if (gridY % 2 === 0 || gridX % 2 === 0) boxHeight = 2;
+                    if (gridX !== arenaSize && (gridY === halfArena - 1 || gridY === halfArena + 1)) boxHeight = 20;
+                    let building = new Building(gridX, gridY - arenaSize / 2, boxHeight, scene, false);
+                    buildings.push(building);
                 }
             }
         }
@@ -305,9 +369,23 @@
         dirLight.position.set(-2, 5, 3).normalize();
         scene.add(dirLight);
 
-        // helpers
-        let axesHelper = new THREE.AxesHelper(5);
-        scene.add(axesHelper);
+        addTitleImage();
+    }
+
+    //https://codepen.io/duhaime/pen/jaYdLg
+    function addTitleImage() {
+        let loader = new THREE.TextureLoader();
+        let material = new THREE.MeshLambertMaterial({
+            map: loader.load('assets/img/synthblast.png'),
+            fog: false
+        });
+        // preserve ratio
+        let geometry = new THREE.PlaneGeometry(5 * 358 / 32, 5);
+        let mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(-10, 0, 25);
+        mesh.rotation.y = -Math.PI / 2;
+        mesh.rotation.x = Math.PI / 2;
+        scene.add(mesh);
     }
 
     function touchStart(event) {
@@ -316,50 +394,84 @@
         event.preventDefault();
     }
 
-    function touchEnd() {
+    function touchEnd(event) {
         hero.stopTurning();
         hero.stop();
         hero.stopShooting();
+        b1.visible = false;
+        b2.visible = false;
+        b3.visible = false;
+        b4.visible = false;
+        b6.visible = false;
+        b7.visible = false;
+        b8.visible = false;
+        b9.visible = false;
+        bFire.visible = false;
     }
 
     function down(event) {
         for (let i = 0; i < event.touches.length; i++) {
             let touch = event.touches[i];
-            let posX = touch.clientX;
-            let posY = touch.clientY;
+            let x = touch.clientX;
+            let y = touch.clientY;
             let width = 60;
             let offset = 10;
+            let x0 = offset;
             let x1 = width + offset;
             let x2 = width * 2 + offset;
             let x3 = width * 3 + offset;
             let y1 = window.innerHeight - width * 3 - offset;
             let y2 = window.innerHeight - width * 2 - offset;
             let y3 = window.innerHeight - width - offset;
+            let y4 = window.innerHeight - offset;
+
+            if (x < x3 && y > y1) {
+                b1.visible = false;
+                b2.visible = false;
+                b3.visible = false;
+                b4.visible = false;
+                b6.visible = false;
+                b7.visible = false;
+                b8.visible = false;
+                b9.visible = false;
+
+                if (x > x0 && x < x1 && y > y1 && y < y2) b1.visible = true;
+                if (x > x1 && x < x2 && y > y1 && y < y2) b2.visible = true;
+                if (x > x2 && x < x3 && y > y1 && y < y2) b3.visible = true;
+
+                if (x > x0 && x < x1 && y > y2 && y < y3) b4.visible = true;
+                if (x > x2 && x < x3 && y > y2 && y < y3) b6.visible = true;
+
+                if (x > x0 && x < x1 && y > y3 && y < y4) b7.visible = true;
+                if (x > x1 && x < x2 && y > y3 && y < y4) b8.visible = true;
+                if (x > x2 && x < x3 && y > y3 && y < y4) b9.visible = true;
+            }
 
             // check that we're in the control box
-            if (posX < x3 && posY > y1) {
-                if (posX < x1) {
+            if (x < x3 && y > y1) {
+                if (x < x1) {
                     hero.turnLeft();
                 }
-                if (posX > x1 && posX < x2) {
+                if (x > x1 && x < x2) {
                     hero.stopTurning();
                 }
-                if (posX > x2) {
+                if (x > x2) {
                     hero.turnRight();
                 }
-                if (posY < y2) {
+                if (y < y2) {
                     hero.forward();
                 }
-                if (posY > y2 && posY < y3) {
+                if (y > y2 && y < y3) {
                     hero.stop();
                 }
-                if (posY > y3) {
+                if (y > y3) {
                     hero.reverse();
                 }
             }
 
-            if (posX > window.innerWidth - 3 * width) {
+            if (x > window.innerWidth - 3 * width) {
                 hero.startShooting();
+                bFire.visible = true;
             }
         }
 
