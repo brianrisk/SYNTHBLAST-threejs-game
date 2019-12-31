@@ -35,6 +35,11 @@
             src: url("assets/fonts/pokemon.ttf");
         }
 
+        @font-face {
+            font-family: 'krueger';
+            src: url("assets/fonts/atc_krueger_regular.ttf");
+        }
+
     </style>
 </head>
 <body>
@@ -75,6 +80,7 @@
     import Enemy from "./js/classes/Enemy.js";
 
     let isMobile = 'ontouchstart' in document.documentElement;
+    let canvas;
 
     let scene, camera, rendererThree, rendererPixi, pixiStage;
 
@@ -132,7 +138,7 @@
 
 
     function init() {
-        const canvas = document.getElementById("screen");
+        canvas = document.getElementById("screen");
         rendererThree = new THREE.WebGLRenderer({
             canvas: canvas
         });
@@ -155,31 +161,7 @@
     }
 
     function init2d() {
-        // let rectangle = new PIXI.Graphics();
-        // rectangle.lineStyle(4, 0xFF3300, 1);
-        // rectangle.beginFill(0x66CCFF);
-        // rectangle.drawRect(0, 0, 64, 64);
-        // rectangle.endFill();
-        // // rectangle.x = 170;
-        // // rectangle.y = 170;
-        // pixiStage.addChild(rectangle);
-        //
-        // let style = new PIXI.TextStyle({
-        //     fontFamily: "Arial",
-        //     fontSize: 36,
-        //     fill: "white",
-        //     stroke: '#ff00FF',
-        //     strokeThickness: 4,
-        //     dropShadow: true,
-        //     dropShadowColor: "#000000",
-        //     dropShadowBlur: 2,
-        //     dropShadowAngle: 0,
-        //     dropShadowDistance: 0,
-        // });
-        // let message = new PIXI.Text("S  Y  N  T  H  *  B  L  A  S  T", style);
-        // message.position.set(54, 96);
-        // pixiStage.addChild(message);
-        isMobile = true;
+        // isMobile = true;
         if (isMobile) {
             let width = 60;
             let half = width / 2;
@@ -258,6 +240,13 @@
                 dropShadowAngle: 0,
                 dropShadowDistance: 0,
             });
+
+            // let style = new PIXI.TextStyle({
+            //     fontFamily: "krueger, \"Courier New\", Courier, monospace",
+            //     fontSize: 64,
+            //     fill: "#00FFFF",
+            //     padding: 64,
+            // });
 
             instructionText = new PIXI.Text('Arrow keys to steer; space to fire.', style);
             instructionText.position.set(10, window.innerHeight - 50);
