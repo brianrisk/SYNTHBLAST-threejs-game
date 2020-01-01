@@ -5,3 +5,4 @@ jsm/
 music/
 node_modules/
 package-lock.json
+lib/three/

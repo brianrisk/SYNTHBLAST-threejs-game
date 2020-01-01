@@ -1,4 +1,4 @@
-import * as THREE from "../../lib/three.module.js";
+import * as THREE from "../../lib/three/build/three.module.js";
 import * as Utils from "../Utils.js";
 
 class Particle {
@@ -7,29 +7,30 @@ class Particle {
         let size = Math.random() * 0.4;
         size = Math.max(size, 0.05);
         // let geometry = new THREE.BoxGeometry(size, size, size);
-        let geometry = new THREE.ConeGeometry(size / 2, size, 3);
-        let material = new THREE.MeshBasicMaterial( { color: 0x00FFFF} );
-        let cube = new THREE.Mesh(geometry, material);
-        cube.position.x = x;
-        cube.position.y = y;
-        cube.position.z = z;
-        cube.rotateX(Math.random());
-        cube.rotateY(Math.random());
-        cube.rotateZ(Math.random());
-        this.object = cube;
+        this.geometry = new THREE.ConeGeometry(size / 1.5, size, 3);
+        this.material = new THREE.MeshBasicMaterial( { color: 0x00FFFF} );
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh.position.x = x;
+        this.mesh.position.y = y;
+        this.mesh.position.z = z;
+        this.mesh.rotateX(Math.random());
+        this.mesh.rotateY(Math.random());
+        this.mesh.rotateZ(Math.random());
         this.velocity = Utils.randomVector();
         this.velocity.multiplyScalar(0.5);
         this.scene = scene;
-        scene.add(cube);
+        scene.add(this.mesh);
     }
 
     remove() {
-        this.scene.remove(this.object);
+        this.scene.remove(this.mesh);
+        this.geometry.dispose();
+        this.material.dispose();
     }
 
     update() {
         // this.object.visible = this.isActive();
-        this.object.position.add(this.velocity);
+        this.mesh.position.add(this.velocity);
     }
 
 

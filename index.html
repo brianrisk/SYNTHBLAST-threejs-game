@@ -70,10 +70,15 @@
 
 
     // libraries
-    import * as THREE from "./lib/three.module.js";
+    import * as THREE from "./lib/three/build/three.module.js";
     import * as Utils from "./js/Utils.js";
 
-    // classes
+    // Three.js classes
+    import { EffectComposer } from './lib/three/examples/jsm/postprocessing/EffectComposer.js';
+    import { RenderPass } from './lib/three/examples/jsm/postprocessing/RenderPass.js';
+    import { GlitchPass } from './js/CustomGlitchPass.js';
+
+    // my classes
     import Hero from "./js/classes/Hero.js";
     import Building from "./js/classes/Building.js";
     import Gun from "./js/classes/Gun.js";
@@ -82,7 +87,11 @@
     let isMobile = 'ontouchstart' in document.documentElement;
     let canvas;
 
-    let scene, camera, rendererThree, rendererPixi, pixiStage;
+    // three objects
+    let scene, camera, rendererThree, composer, glitchPass;
+
+        // pixi objects
+      let  rendererPixi, pixiStage;
 
     let instructionText;
     let b1,b2,b3,b4,b6,b7,b8,b9,bFire;
@@ -97,8 +106,11 @@
 
     // Sounds
     // let massive = new Audio('assets/audio/massive2.wav');
+    let song = new Audio('music/implant-128kbps.mp3');
     let pew = new Audio('assets/audio/pip.wav');
+    let hitSound = new Audio('assets/audio/hit.wav');
     let explosionSound = new Audio('assets/audio/explosion2.wav');
+    let audiosWeWantToUnlock = [pew, hitSound, explosionSound, song];
 
     // Music
     // let song = new Audio('music/implant-128kbps.mp3');
@@ -131,8 +143,6 @@
 
     // custom game loop: https://github.com/pixijs/pixi.js/wiki/v5-Custom-Application-GameLoop
     function render2d() {
-
-
         rendererPixi.render(pixiStage, undefined, false);
     }
 
@@ -241,13 +251,6 @@
                 dropShadowDistance: 0,
             });
 
-            // let style = new PIXI.TextStyle({
-            //     fontFamily: "krueger, \"Courier New\", Courier, monospace",
-            //     fontSize: 64,
-            //     fill: "#00FFFF",
-            //     padding: 64,
-            // });
-
             instructionText = new PIXI.Text('Arrow keys to steer; space to fire.', style);
             instructionText.position.set(10, window.innerHeight - 50);
             pixiStage.addChild(instructionText);
@@ -260,7 +263,6 @@
         square.drawRect(x, y, width, width);
         square.alpha = 0.6;
         square.visible = false; // initially hidden
-        // square.lineStyle(thickness, 0xAA00AA, 1);
         return square;
     }
 
@@ -283,8 +285,6 @@
         container.addChild(getLine(0, 5, 0, 0 - l, thickness));
         container.addChild(getLine(0, 0 - l, 0 - l, 0, thickness));
         container.addChild(getLine(0, 0 - l, l, 0, thickness));
-        // container.pivot.x = container.width / 2;
-        // container.pivot.y = container.height / 2;
         container.x = x;
         container.y = y;
         container.rotation = rotation;
@@ -301,6 +301,8 @@
         scene.color = 0x00DD00;
 
         rendererThree.setSize(window.innerWidth, window.innerHeight);
+
+        composer = new EffectComposer( rendererThree );
 
         hero = new Hero(scene, camera, -55, 0);
         // add buildings
@@ -323,7 +325,6 @@
         }
 
         // add fence around the buildings
-
         for (let gridX = -1; gridX <= arenaSize; gridX++) {
             for (let gridY = -1; gridY <= arenaSize; gridY++) {
                 // leaving a gap
@@ -358,6 +359,12 @@
         dirLight.position.set(-2, 5, 3).normalize();
         scene.add(dirLight);
 
+        // post
+        let renderPass = new RenderPass( scene, camera );
+        composer.addPass( renderPass );
+        glitchPass = new GlitchPass();
+        composer.addPass( glitchPass );
+
         addTitleImage();
     }
 
@@ -378,9 +385,21 @@
     }
 
     function touchStart(event) {
+        if(audiosWeWantToUnlock) {
+            for(let audio of audiosWeWantToUnlock) {
+                audio.play();
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            audiosWeWantToUnlock = null
+        }
+        // if (!isSongPlaying) {
+        //     song.play();
+        // }
         down(event);
         event.stopImmediatePropagation();
         event.preventDefault();
+
     }
 
     function touchEnd(event) {
@@ -567,10 +586,13 @@
                     && Math.abs(enemy.getY() - hero.getY()) < 0.4
                 ) {
                     // hero.reset();
+                    glitchPass.trigger();
+                    hitSound.play();
                 }
             });
 
-        rendererThree.render(scene, camera);
+        composer.render();
+        // rendererThree.render(scene, camera);
     }
 
     function onWindowResize() {

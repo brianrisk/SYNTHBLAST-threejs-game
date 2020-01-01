@@ -1,4 +1,4 @@
-import * as THREE from "../../lib/three.module.js";
+import * as THREE from "../../lib/three/build/three.module.js";
 
 class Bullet {
     constructor(bulletSize, bulletPosition, hitPoints, direction, scene) {

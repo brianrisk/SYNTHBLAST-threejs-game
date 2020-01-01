@@ -1,4 +1,4 @@
-import * as THREE from "../../lib/three.module.js";
+import * as THREE from "../../lib/three/build/three.module.js";
 import * as Utils from "../Utils.js";
 import Particle from "./Particle.js";
 
@@ -20,7 +20,7 @@ class Enemy {
         this.hitPoints = 1;
         scene.add(cone);
 
-        this.maxSpeed = 0.05;
+        this.maxSpeed = 0.05 + Math.random() * .1;
         this.rotationAxis = new THREE.Vector3(0, 0, 1);
         let rotationAngle = 45 * Math.PI / 180;
         this.direction = new THREE.Vector3(0, 1, 0);
@@ -71,7 +71,7 @@ class Enemy {
             let pointA = hero.getFuturePosition();
             let pointB = this.object.position;
             let pointC = pointB.clone();
-            pointC.add(this.direction)
+            pointC.add(this.direction);
             let angle = Utils.find_angle(pointA, pointB, pointC);
             if (angle > Math.PI / 18) {
                 let angleToRotate = angle / 10;
@@ -90,6 +90,7 @@ class Enemy {
             } else {
                 this.particles.forEach(particle => {
                     particle.remove();
+
                 });
                 this.particles = [];
             }
