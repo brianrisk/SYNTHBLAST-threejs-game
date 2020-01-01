@@ -251,7 +251,7 @@
                 dropShadowDistance: 0,
             });
 
-            instructionText = new PIXI.Text('Arrow keys to steer; space to fire.', style);
+            instructionText = new PIXI.Text('Arrow keys to move; space to fire.', style);
             instructionText.position.set(10, window.innerHeight - 50);
             pixiStage.addChild(instructionText);
         }
@@ -587,6 +587,7 @@
                 ) {
                     // hero.reset();
                     glitchPass.trigger();
+                    hitSound.currentTime = 0;
                     hitSound.play();
                 }
             });

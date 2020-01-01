@@ -49,7 +49,7 @@ class Enemy {
         this.object.visible = false;
         this.explosionSound.currentTime = 0;
         this.explosionSound.play();
-        this.hitTime = (new Date()).getTime();
+        this.deathTime = (new Date()).getTime();
     }
 
 
@@ -83,7 +83,7 @@ class Enemy {
             this.move();
         } else {
             let currentTime = (new Date()).getTime();
-            if (currentTime - this.hitTime < 200) {
+            if (currentTime - this.deathTime < 200) {
                 this.particles.forEach(particle => {
                     particle.update();
                 });
@@ -105,7 +105,7 @@ class Enemy {
 
     unMove() {
         this.object.position.add(this.moveInc.negate());
-        // this.moveInc.negate();
+        this.moveInc.negate();
     }
 
     isAlive() {
