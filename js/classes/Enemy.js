@@ -36,7 +36,7 @@ class Enemy {
 
     }
 
-    hit(impact) {
+    hit(impact, fpsAdjustment) {
         this.hitPoints -= impact;
         if (this.hitPoints <= 0) {
             for (let i = 0; i < 100; i++) {
@@ -44,7 +44,8 @@ class Enemy {
                     this.object.position.x,
                     this.object.position.y,
                     this.object.position.z,
-                    this.scene
+                    this.scene,
+                    fpsAdjustment
                 ));
             }
             this.alive = false;
@@ -75,7 +76,7 @@ class Enemy {
     }
 
 
-    update(hero) {
+    update(hero, fpsAdjustment) {
         if (this.alive) {
             if (hero.isAlive()) {
                 let pointA = hero.getFuturePosition();
@@ -84,7 +85,7 @@ class Enemy {
                 pointC.add(this.direction);
                 let angle = Utils.find_angle(pointA, pointB, pointC);
                 if (angle > Math.PI / 18) {
-                    let angleToRotate = angle / 25;
+                    let angleToRotate = angle / 25 * fpsAdjustment;
                     this.direction.applyAxisAngle(this.rotationAxis, angleToRotate);
                     this.object.rotateOnAxis(this.rotationAxis, angleToRotate);
                     this.moveInc = this.direction.clone();
@@ -93,12 +94,12 @@ class Enemy {
             } else {
                 let angle = this.wanderAngle;
                 if (angle > Math.PI / 18) {
-                    let angleToRotate = angle / 100;
+                    let angleToRotate = angle / 100 * fpsAdjustment;
                     this.wanderAngle -= angleToRotate;
                     this.direction.applyAxisAngle(this.rotationAxis, angleToRotate);
                     this.object.rotateOnAxis(this.rotationAxis, angleToRotate);
                     this.moveInc = this.direction.clone();
-                    this.moveInc.multiplyScalar(this.maxSpeed);
+                    this.moveInc.multiplyScalar(this.maxSpeed * fpsAdjustment);
                 }
             }
             this.move();

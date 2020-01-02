@@ -57,8 +57,6 @@
 
     // make guns things you can pick up
 
-    // add glow / bloom
-
     // have to be facing an enemy to shoot them
 
     // make speeds adjust for framerate so we have consistent time
@@ -99,7 +97,7 @@
     let enemies = [];
     let gun = null;
 
-    let arenaSize = 50;
+    let arenaSize = 100;
 
     // Sounds
     // let massive = new Audio('assets/audio/massive2.wav');
@@ -109,6 +107,10 @@
     let explosionSound = new Audio('assets/audio/explosion2.wav');
     let impactSound = new Audio('assets/audio/impact.wav');
     let audiosWeWantToUnlock = [pew, hitSound, explosionSound, song];
+
+    let frameCount = 0;
+    let frameTimes = [];
+    let fpsAdjustment = 1;
 
     // Music
     // let song = new Audio('music/implant-128kbps.mp3');
@@ -135,8 +137,25 @@
         rendererPixi.render(pixiStage, undefined, false);
         rendererPixi.reset();
 
+        calculateFps();
         stats.end();
         requestAnimationFrame(animate);
+    }
+
+    function calculateFps() {
+        frameCount++;
+        if (frameCount < 10) {
+            frameTimes.push((new Date()).getTime());
+        } else {
+            let frameIndex = frameCount % 10;
+            let now = (new Date()).getTime();
+            let then = frameTimes[frameIndex];
+            frameTimes[frameIndex] = now;
+            let fps = 10.0 / ((now - then) / 1000);
+            if (fps > 1) {
+                fpsAdjustment = 60 / fps;
+            }
+        }
     }
 
 
@@ -305,7 +324,7 @@
                 if (gridY === halfArena) continue;
                 // if (gridY % 3 === 0 || gridX % 3 === 0) continue;
                 // if (!(gridY % 4 === 0 || gridY % 4 === 1 || gridX % 4 === 0 || gridX % 4 === 1)) {
-                if (Utils.randomInt(20) === 0) {
+                if (Utils.randomInt(40) === 0) {
                     let boxHeight = Utils.randomInt(10) + 1;
                     let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
                     buildings.push(building);
@@ -351,13 +370,14 @@
         dirLight.position.set(-2, 5, 3).normalize();
         scene.add(dirLight);
 
-        // post
+        // "synth blast" title
+        addTitleImage();
+
+        // post processing
         let renderPass = new RenderPass(scene, camera);
         composer.addPass(renderPass);
         glitchPass = new GlitchPass();
         composer.addPass(glitchPass);
-
-        addTitleImage();
     }
 
     //https://codepen.io/duhaime/pen/jaYdLg
@@ -370,7 +390,7 @@
         // preserve ratio
         let geometry = new THREE.PlaneGeometry(5 * 358 / 32, 5);
         let mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(-10, 0, 25);
+        mesh.position.set(-10, 0, 20);
         mesh.rotation.y = -Math.PI / 2;
         mesh.rotation.x = Math.PI / 2;
         scene.add(mesh);
@@ -517,9 +537,9 @@
 
         // update our objects
         bullets.forEach(bullet => bullet.update());
-        buildings.forEach(building => building.update());
-        enemies.forEach(enemy => enemy.update(hero));
-        hero.update();
+        buildings.forEach(building => building.update(fpsAdjustment));
+        enemies.forEach(enemy => enemy.update(hero, fpsAdjustment));
+        hero.update(fpsAdjustment);
 
         // bullets hitting things
         bullets.forEach(bullet => {
@@ -545,7 +565,7 @@
                         && Math.abs(enemy.getY() - bullet.getY()) < 0.5
                     ) {
                         let enemyHitPoints = enemy.getHitPoints();
-                        enemy.hit(bullet.getHitPoints());
+                        enemy.hit(bullet.getHitPoints(), fpsAdjustment);
                         bullet.hit(enemyHitPoints);
                         if (!enemy.isAlive()) {
                             explosionSound.currentTime = 0;
@@ -594,7 +614,7 @@
 
                         let heroHitPoints = hero.getHitPoints();
                         hero.hit(enemy.getHitPoints());
-                        enemy.hit(heroHitPoints);
+                        enemy.hit(heroHitPoints, fpsAdjustment);
                         // hero.reset();
                         glitchPass.trigger();
                         hitSound.currentTime = 0;

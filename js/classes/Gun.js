@@ -11,7 +11,7 @@ class Gun {
         this.pew = pew;
     }
 
-    fire(soundOn) {
+    fire(soundOn, fpsAdjustment) {
         let currentTime = (new Date()).getTime();
         if (currentTime - this.lastFired < 100) return;
 
@@ -23,9 +23,9 @@ class Gun {
         let right = this.hero.direction.clone();
         right.applyAxisAngle(new THREE.Vector3(0,0,1), -.1);
         let fired = false;
-        fired = this.shoot(bulletPosition, direction) || fired;
-        // fired = this.shoot(bulletPosition, left) || fired;
-        // fired = this.shoot(bulletPosition, right) || fired;
+        fired = this.shoot(bulletPosition, direction, fpsAdjustment) || fired;
+        // fired = this.shoot(bulletPosition, left, fpsAdjustment) || fired;
+        // fired = this.shoot(bulletPosition, right, fpsAdjustment) || fired;
         if (fired) {
             this.lastFired = currentTime;
             if (soundOn) {
@@ -35,7 +35,7 @@ class Gun {
         }
     }
 
-    shoot(bulletPosition, direction) {
+    shoot(bulletPosition, direction, fpsAdjustment) {
         let fired = false;
         if (this.bullets.length < 50) {
             let bulletSize = 0.15;
@@ -44,7 +44,8 @@ class Gun {
                 bulletPosition,
                 1,
                 direction,
-                this.scene);
+                this.scene,
+                fpsAdjustment);
             this.bullets.push(bullet);
             fired = true;
         }
@@ -52,7 +53,7 @@ class Gun {
         else {
             for (let i = 0; i < this.bullets.length; i++) {
                 if (!this.bullets[i].isActive()) {
-                    this.bullets[i].reset(direction, bulletPosition);
+                    this.bullets[i].reset(direction, bulletPosition, fpsAdjustment);
                     fired = true;
                     break;
                 }

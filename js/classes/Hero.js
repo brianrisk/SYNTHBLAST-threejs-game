@@ -23,9 +23,9 @@ class Hero {
         this.originalY = y;
 
         // attributes
-        this.hitPoints = 10;
         this.gun = null;
         this.isShooting = false;
+        this.maxHitPoints = 10;
 
         // setting up
         this.createObject();
@@ -66,15 +66,15 @@ class Hero {
             this.camera.rotation.z = -90 * Math.PI / 180;
         }
         this.isActive = true;
-        this.hitPoints = 10;
+        this.hitPoints = this.maxHitPoints;
         this.direction = new THREE.Vector3(1, 0, 0);
     }
 
-    update() {
+    update(fpsAdjustment) {
         if (this.isShooting) {
-            this.gun.fire(true);
+            this.gun.fire(true, fpsAdjustment);
         }
-        this.move();
+        this.move(fpsAdjustment);
     }
 
     hit(impact) {
@@ -105,15 +105,15 @@ class Hero {
         }
     }
 
-    move() {
+    move(fpsAdjustment) {
         // moving
         this.moveInc = this.direction.clone();
-        this.moveInc.multiplyScalar(this.speed);
+        this.moveInc.multiplyScalar(this.speed * fpsAdjustment);
         this.camera.position.add(this.moveInc);
         this.object.position.add(this.moveInc);
-        this.direction.applyAxisAngle(this.rotationAxis, this.turnSpeed);
-        this.camera.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed);
-        this.object.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed);
+        this.direction.applyAxisAngle(this.rotationAxis, this.turnSpeed * fpsAdjustment);
+        this.camera.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed * fpsAdjustment);
+        this.object.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed * fpsAdjustment);
 
         // drop down to ground level
         // if (this.isFirstPerson) {
@@ -129,10 +129,10 @@ class Hero {
             let rotationMultiplier = 1;
             // switching perspective height
             if (this.camera.position.z < this.perspectiveHeight) {
-                let up = new THREE.Vector3(0, 0, this.maxSpeed);
+                let up = new THREE.Vector3(0, 0, this.maxSpeed * fpsAdjustment);
                 this.camera.position.add(up);
             } else {
-                let down = new THREE.Vector3(0, 0, -1 * this.maxSpeed);
+                let down = new THREE.Vector3(0, 0, -1 * this.maxSpeed * fpsAdjustment);
                 this.camera.position.add(down);
                 rotationMultiplier = -1;
             }
@@ -142,7 +142,7 @@ class Hero {
                 this.headTiltDelta = 0;
             } else {
                 this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), rotationMultiplier * this.perspectiveRotationSpeed);
-                this.headTiltDelta += rotationMultiplier * this.perspectiveRotationSpeed;
+                this.headTiltDelta += rotationMultiplier * this.perspectiveRotationSpeed * fpsAdjustment;
             }
         }
     }

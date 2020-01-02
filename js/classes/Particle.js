@@ -3,7 +3,7 @@ import * as Utils from "../Utils.js";
 
 class Particle {
 
-    constructor(x, y, z, scene) {
+    constructor(x, y, z, scene, fpsAdjustment) {
         let size = Math.random() * 0.4;
         size = Math.max(size, 0.05);
         // let geometry = new THREE.BoxGeometry(size, size, size);
@@ -17,7 +17,7 @@ class Particle {
         this.mesh.rotateY(Math.random());
         this.mesh.rotateZ(Math.random());
         this.velocity = Utils.randomVector();
-        this.velocity.multiplyScalar(0.5);
+        this.velocity.multiplyScalar(0.5 * fpsAdjustment);
         this.scene = scene;
         scene.add(this.mesh);
     }

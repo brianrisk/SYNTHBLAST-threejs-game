@@ -40,12 +40,12 @@ class Building {
         return Math.max(0, this.hitPoints);
     }
 
-    update() {
+    update(fpsAdjustment) {
         // this.object.visible = this.isActive();
         // this.object.rotateZ(1 * 2 * Math.PI / 180)
         // this.object.rotateX(this.rotationSpeed * 2 * Math.PI / 180)
         if (this.object.position.z > this.desiredZ) {
-            this.object.position.z -= 0.1;
+            this.object.position.z -= 0.1 * fpsAdjustment;
         }
     }
 

@@ -1,7 +1,7 @@
 import * as THREE from "../../lib/three/build/three.module.js";
 
 class Bullet {
-    constructor(bulletSize, bulletPosition, hitPoints, direction, scene) {
+    constructor(bulletSize, bulletPosition, hitPoints, direction, scene, fpsAdjustment) {
         this.scene = scene;
         this.maxHitPoints = hitPoints;
         let geometry = new THREE.BoxGeometry(bulletSize, bulletSize, bulletSize);
@@ -12,7 +12,7 @@ class Bullet {
         bulletMesh.position.z = bulletPosition.z;
         this.object = bulletMesh;
         this.scene.add(bulletMesh);
-        this.resetWithDirection(direction);
+        this.resetWithDirection(direction, fpsAdjustment);
     }
 
     update() {
@@ -56,16 +56,16 @@ class Bullet {
         return this.active;
     }
 
-    reset(direction, position) {
-        this.resetWithDirection(direction);
+    reset(direction, position, fpsAdjustment) {
+        this.resetWithDirection(direction, fpsAdjustment);
         this.object.position.x = position.x;
         this.object.position.y = position.y;
         this.object.position.z = .2;
     }
 
-    resetWithDirection(direction) {
+    resetWithDirection(direction, fpsAdjustment) {
         this.activate();
-        this.velocity = direction.multiplyScalar(.4);
+        this.velocity = direction.multiplyScalar(.4 * fpsAdjustment);
         this.firedTime = (new Date()).getTime();
         this.hitPoints = this.maxHitPoints;
     }
