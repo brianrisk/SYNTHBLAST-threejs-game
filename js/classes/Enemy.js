@@ -19,7 +19,7 @@ class Enemy {
         this.hitPoints = hitPoints;
         scene.add(cone);
 
-        this.maxSpeed = 0.05 + Math.random() * .1;
+        this.maxSpeed = 0.05 + Math.random() * .05;
         this.rotationAxis = new THREE.Vector3(0, 0, 1);
         let rotationAngle = 45 * Math.PI / 180;
         this.direction = new THREE.Vector3(0, 1, 0);

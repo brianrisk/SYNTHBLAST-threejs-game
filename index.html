@@ -79,6 +79,7 @@
     import Building from "./js/classes/Building.js";
     import Gun from "./js/classes/Gun.js";
     import Enemy from "./js/classes/Enemy.js";
+    import Flipper from "./js/classes/powerups/Flipper.js";
 
     // three objects
     let scene, camera, rendererThree, composer, glitchPass;
@@ -94,6 +95,7 @@
     let bullets = [];
     let buildings = [];
     let enemies = [];
+    let powerUps = [];
     let gun = null;
 
     let arenaSize = 100;
@@ -314,7 +316,9 @@
 
         composer = new EffectComposer(rendererThree);
 
-        hero = new Hero(scene, camera, -55, 0);
+        //hero = new Hero(scene, camera, -55, 0);
+
+        hero = new Hero(scene, camera, -1, 0);
         // add buildings
         let halfArena = arenaSize / 2;
         for (let gridX = 0; gridX < arenaSize; gridX++) {
@@ -329,6 +333,9 @@
                 } else if (Utils.randomInt(40) === 0) {
                     let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
                     enemies.push(enemy);
+                } else if (Utils.randomInt(160) === 0) {
+                    let powerUp = new Flipper(gridX, gridY - halfArena, scene);
+                    powerUps.push(powerUp);
                 }
             }
         }
@@ -542,6 +549,7 @@
         bullets.forEach(bullet => bullet.update());
         buildings.forEach(building => building.update(fpsAdjustment));
         enemies.forEach(enemy => enemy.update(hero, fpsAdjustment));
+        powerUps.forEach(powerUp => powerUp.update(fpsAdjustment));
         hero.update(fpsAdjustment);
 
         // bullets hitting things
@@ -607,21 +615,25 @@
         });
 
         if (hero.isAlive()) {
+            let heroR = 0.4;
+            if (hero.hasShield()) heroR = 1.5;
             enemies.forEach(
                 enemy => {
                     if (
                         enemy.isAlive()
-                        && Math.abs(enemy.getX() - hero.getX()) < 0.4
-                        && Math.abs(enemy.getY() - hero.getY()) < 0.4
+                        && Math.abs(enemy.getX() - hero.getX()) < heroR
+                        && Math.abs(enemy.getY() - hero.getY()) < heroR
                     ) {
 
                         let heroHitPoints = hero.getHitPoints();
-                        hero.hit(enemy.getHitPoints());
+                        let damage = hero.hit(enemy.getHitPoints());
                         enemy.hit(heroHitPoints, fpsAdjustment);
                         // hero.reset();
-                        glitchPass.trigger();
-                        hitSound.currentTime = 0;
-                        hitSound.play();
+                        if (damage > 0) {
+                            glitchPass.trigger();
+                            hitSound.currentTime = 0;
+                            hitSound.play();
+                        }
                     }
                 });
         }

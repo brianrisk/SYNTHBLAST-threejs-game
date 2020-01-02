@@ -26,6 +26,7 @@ class Hero {
         this.gun = null;
         this.isShooting = false;
         this.maxHitPoints = 10;
+        this.shieldHitPoints = 100;
 
         // setting up
         this.createObject();
@@ -39,13 +40,28 @@ class Hero {
         });
         let geometry = new THREE.ConeGeometry(.5, 1, 4);
         let cone = new THREE.Mesh(geometry, shinyMaterial);
-        cone.position.x = this.originalX;
-        cone.position.y = this.originalY;
-        cone.position.z = 0.66;
-        cone.rotation.y = -90 * Math.PI / 180;
-        cone.rotateOnWorldAxis(this.rotationAxis, -90 * Math.PI / 180);
-        this.object = cone;
-        this.scene.add(cone);
+
+        let dotMaterial = new THREE.PointsMaterial({
+                color: 0x333366,
+                opacity: 0.1,
+                size: 0.05
+            });
+        let sphereGeometry = new THREE.SphereGeometry(1.5, 50);
+        let sphereDots = new THREE.Points(sphereGeometry, dotMaterial);
+        this.shield = sphereDots;
+
+        let object = new THREE.Group();
+        object.add(cone);
+        object.add(sphereDots);
+
+        object.position.x = this.originalX;
+        object.position.y = this.originalY;
+        object.position.z = 0.66;
+        object.rotation.y = -90 * Math.PI / 180;
+        object.rotateOnWorldAxis(this.rotationAxis, -90 * Math.PI / 180);
+
+        this.object = object;
+        this.scene.add(object);
     }
 
     reset() {
@@ -75,15 +91,33 @@ class Hero {
             this.gun.fire(true, fpsAdjustment);
         }
         this.move(fpsAdjustment);
+        this.shield.rotation.x += Math.PI / 180 * fpsAdjustment;
+        this.shield.rotation.y += Math.PI / 180 * fpsAdjustment;
+        // this.shield.rotation.z += Math.PI / 180 * fpsAdjustment;
     }
 
     hit(impact) {
-        this.hitPoints -= impact;
+        this.shieldHitPoints -= impact;
+        let damage = 0;
+        if (this.shieldHitPoints < 0) {
+            damage = Math.abs(this.shieldHitPoints);
+            this.hitPoints += this.shieldHitPoints;
+            this.shieldHitPoints = 0;
+
+        }
         if (this.hitPoints <= 0) this.isActive = false;
+        if (this.shieldHitPoints <= 0) {
+            this.shield.visible = false;
+        }
+        return damage;
     }
 
     getHitPoints() {
         return Math.max(0, this.hitPoints);
+    }
+
+    hasShield () {
+        return this.shieldHitPoints > 0;
     }
 
     changePerspective() {
@@ -95,13 +129,13 @@ class Hero {
         if (this.isFirstPerson) {
             this.headTiltDelta += this.headTiltDelta + Math.PI / 2;
             this.perspectiveHeight = this.bottomZ;
-            this.object.visible = false;
+            // this.object.visible = false;
         }
         // overhead
         else {
             this.headTiltDelta += this.headTiltDelta - Math.PI / 2;
             this.perspectiveHeight = this.topZ;
-            this.object.visible = true;
+            // this.object.visible = true;
         }
     }
 
