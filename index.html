@@ -59,8 +59,6 @@
 
     // have to be facing an enemy to shoot them
 
-    // make speeds adjust for framerate so we have consistent time
-
     // add UI elements: health bar
 
     // see where blasts hit buildings:
@@ -90,6 +88,7 @@
 
     let instructionText;
     let b1, b2, b3, b4, b6, b7, b8, b9, bFire;
+    let bWidth = 60;
 
     let hero = null;
     let bullets = [];
@@ -185,48 +184,47 @@
     function init2d() {
         let isMobile = 'ontouchstart' in document.documentElement;
         if (isMobile) {
-            let width = 60;
-            let half = width / 2;
+            let half = bWidth / 2;
             let offset = 10;
             let x0 = offset;
-            let x1 = width + offset;
-            let x2 = width * 2 + offset;
-            let x3 = width * 3 + offset;
-            let y1 = window.innerHeight - width * 3 - offset;
-            let y2 = window.innerHeight - width * 2 - offset;
-            let y3 = window.innerHeight - width - offset;
+            let x1 = bWidth + offset;
+            let x2 = bWidth * 2 + offset;
+            let x3 = bWidth * 3 + offset;
+            let y1 = window.innerHeight - bWidth * 3 - offset;
+            let y2 = window.innerHeight - bWidth * 2 - offset;
+            let y3 = window.innerHeight - bWidth - offset;
             let y4 = window.innerHeight - offset;
 
             // squares
-            b1 = getSquare(x0, y1, width);
+            b1 = getSquare(x0, y1, bWidth);
             pixiStage.addChild(b1);
-            b2 = getSquare(x1, y1, width);
+            b2 = getSquare(x1, y1, bWidth);
             pixiStage.addChild(b2);
-            b3 = getSquare(x2, y1, width);
+            b3 = getSquare(x2, y1, bWidth);
             pixiStage.addChild(b3);
 
-            b4 = getSquare(x0, y2, width);
+            b4 = getSquare(x0, y2, bWidth);
             pixiStage.addChild(b4);
-            b6 = getSquare(x2, y2, width);
+            b6 = getSquare(x2, y2, bWidth);
             pixiStage.addChild(b6);
 
-            b7 = getSquare(x0, y3, width);
+            b7 = getSquare(x0, y3, bWidth);
             pixiStage.addChild(b7);
-            b8 = getSquare(x1, y3, width);
+            b8 = getSquare(x1, y3, bWidth);
             pixiStage.addChild(b8);
-            b9 = getSquare(x2, y3, width);
+            b9 = getSquare(x2, y3, bWidth);
             pixiStage.addChild(b9);
 
             bFire = new PIXI.Graphics();
             bFire.beginFill(0xFF00FF);
-            bFire.drawEllipse(window.innerWidth - (width * 1.5), window.innerHeight - (width * 1.5), width, width);
+            bFire.drawEllipse(window.innerWidth - (bWidth * 1.5), window.innerHeight - (bWidth * 1.5), bWidth, bWidth);
             bFire.alpha = 0.6;
             bFire.visible = false; // initially hidden
             pixiStage.addChild(bFire);
 
             let fireOutline = new PIXI.Graphics();
             fireOutline.lineStyle(2, 0xCC88CC, 1);
-            fireOutline.drawEllipse(window.innerWidth - (width * 1.5), window.innerHeight - (width * 1.5), width, width);
+            fireOutline.drawEllipse(window.innerWidth - (bWidth * 1.5), window.innerHeight - (bWidth * 1.5), bWidth, bWidth);
             pixiStage.addChild(fireOutline);
 
             // grid
@@ -415,18 +413,24 @@
     }
 
     function touchEnd(event) {
-        hero.stopTurning();
-        hero.stop();
-        hero.stopShooting();
-        b1.visible = false;
-        b2.visible = false;
-        b3.visible = false;
-        b4.visible = false;
-        b6.visible = false;
-        b7.visible = false;
-        b8.visible = false;
-        b9.visible = false;
-        bFire.visible = false;
+        for (let i = 0; i < event.changedTouches.length; i++) {
+            let touch = event.changedTouches[i];
+            if (touch.clientX < window.innerWidth / 2) {
+                hero.stopTurning();
+                hero.stop();
+                b1.visible = false;
+                b2.visible = false;
+                b3.visible = false;
+                b4.visible = false;
+                b6.visible = false;
+                b7.visible = false;
+                b8.visible = false;
+                b9.visible = false;
+            } else {
+                bFire.visible = false;
+                hero.stopShooting();
+            }
+        }
     }
 
     function down(event) {
@@ -434,16 +438,15 @@
             let touch = event.touches[i];
             let x = touch.clientX;
             let y = touch.clientY;
-            let width = 60;
             let offset = 10;
-            let x0 = offset;
-            let x1 = width + offset;
-            let x2 = width * 2 + offset;
-            let x3 = width * 3 + offset;
-            let y1 = window.innerHeight - width * 3 - offset;
-            let y2 = window.innerHeight - width * 2 - offset;
-            let y3 = window.innerHeight - width - offset;
-            let y4 = window.innerHeight - offset;
+            let x0 = 0;
+            let x1 = bWidth + offset;
+            let x2 = bWidth * 2 + offset;
+            let x3 = bWidth * 4 + offset;
+            let y1 = window.innerHeight - bWidth * 4 - offset;
+            let y2 = window.innerHeight - bWidth * 2 - offset;
+            let y3 = window.innerHeight - bWidth - offset;
+            let y4 = window.innerHeight;
 
             if (x < x3 && y > y1) {
                 b1.visible = false;
@@ -489,7 +492,7 @@
                 }
             }
 
-            if (x > window.innerWidth - 3 * width) {
+            if (x > window.innerWidth - 3 * bWidth) {
                 hero.startShooting();
                 bFire.visible = true;
             }
@@ -631,6 +634,9 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         rendererThree.setSize(window.innerWidth, window.innerHeight);
+        pixiStage.destroy(true);
+        pixiStage = new PIXI.Container();
+        init2d();
     }
 
 

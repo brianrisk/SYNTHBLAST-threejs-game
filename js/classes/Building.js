@@ -4,7 +4,11 @@ class Building {
 
     constructor(x, y, height, scene, damageable) {
         let geometry = new THREE.BoxGeometry(1, 1, height);
-        let material = new THREE.MeshBasicMaterial( { color: 0x000000} );
+        let material = new THREE.MeshPhongMaterial(
+            {
+                color: 0x000000,
+                opacity: 1.0
+            });
         if (!damageable) {
             material = new THREE.MeshBasicMaterial( { color: 0xDDDDDD} );
         }
