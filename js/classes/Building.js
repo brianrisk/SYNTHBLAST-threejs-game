@@ -17,6 +17,7 @@ class Building {
         cube.position.z = height / 2;
         this.object = cube;
         this.height = height;
+        this.hitPoints = height;
         this.desiredZ = cube.position.z;
         this.scene = scene;
         this.active = true;
@@ -24,14 +25,19 @@ class Building {
         scene.add(cube);
     }
 
-    hit() {
+    hit(impact) {
         if (this.damageable) {
-            this.height -= 1;
-            this.desiredZ -= 1;
+            this.height -= impact;
+            this.hitPoints -= impact;
+            this.desiredZ -= impact;
             if (this.height <= 0.001) {
                 this.active = false;
             }
         }
+    }
+
+    getHitPoints() {
+        return Math.max(0, this.hitPoints);
     }
 
     update() {

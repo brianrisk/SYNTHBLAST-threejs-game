@@ -33,11 +33,15 @@ class Bullet {
         this.object.visible = true;
     }
 
-    hit() {
-        this.hitPoints -= 1;
+    hit(impact) {
+        this.hitPoints -= impact;
         if (this.hitPoints <= 0) {
             this.deactivate();
         }
+    }
+
+    getHitPoints() {
+        return Math.max(0, this.hitPoints);
     }
 
     getX() {

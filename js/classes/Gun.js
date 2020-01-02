@@ -24,8 +24,8 @@ class Gun {
         right.applyAxisAngle(new THREE.Vector3(0,0,1), -.1);
         let fired = false;
         fired = this.shoot(bulletPosition, direction) || fired;
-        fired = this.shoot(bulletPosition, left) || fired;
-        fired = this.shoot(bulletPosition, right) || fired;
+        // fired = this.shoot(bulletPosition, left) || fired;
+        // fired = this.shoot(bulletPosition, right) || fired;
         if (fired) {
             this.lastFired = currentTime;
             if (soundOn) {
@@ -42,7 +42,7 @@ class Gun {
             let bullet = new Bullet(
                 bulletSize,
                 bulletPosition,
-                20,
+                1,
                 direction,
                 this.scene);
             this.bullets.push(bullet);

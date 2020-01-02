@@ -102,7 +102,7 @@
     let enemies = [];
     let gun = null;
 
-    let arenaSize = 100;
+    let arenaSize = 50;
 
     // Sounds
     // let massive = new Audio('assets/audio/massive2.wav');
@@ -110,6 +110,7 @@
     let pew = new Audio('assets/audio/pip.wav');
     let hitSound = new Audio('assets/audio/hit.wav');
     let explosionSound = new Audio('assets/audio/explosion2.wav');
+    let impactSound = new Audio('assets/audio/impact.wav');
     let audiosWeWantToUnlock = [pew, hitSound, explosionSound, song];
 
     // Music
@@ -318,7 +319,7 @@
                     buildings.push(building);
                 } else
                 if (Utils.randomInt(40) === 0) {
-                    let enemy = new Enemy(gridX, gridY - halfArena, scene, explosionSound);
+                    let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
                     enemies.push(enemy);
                 }
             }
@@ -385,17 +386,17 @@
     }
 
     function touchStart(event) {
-        if(audiosWeWantToUnlock) {
-            for(let audio of audiosWeWantToUnlock) {
-                audio.play();
-                audio.pause();
-                audio.currentTime = 0;
-            }
-            audiosWeWantToUnlock = null
-        }
-        // if (!isSongPlaying) {
-        //     song.play();
+        // if(audiosWeWantToUnlock) {
+        //     for(let audio of audiosWeWantToUnlock) {
+        //         audio.play();
+        //         audio.pause();
+        //         audio.currentTime = 0;
+        //     }
+        //     audiosWeWantToUnlock = null
         // }
+        if (!isSongPlaying) {
+            song.play();
+        }
         down(event);
         event.stopImmediatePropagation();
         event.preventDefault();
@@ -486,6 +487,9 @@
     }
 
     function onDocumentKeyDown(event) {
+        if (!isSongPlaying) {
+            song.play();
+        }
         let keyCode = event["which"];
         if (event.shiftKey) {
             hero.changePerspective();
@@ -535,19 +539,30 @@
                         && Math.abs(building.getX() - bullet.getX()) < 0.5
                         && Math.abs(building.getY() - bullet.getY()) < 0.5
                     ) {
-                        building.hit();
-                        bullet.hit();
+                        let buildingHitPoints = building.getHitPoints();
+                        building.hit(bullet.getHitPoints());
+                        bullet.hit(buildingHitPoints);
+                        impactSound.currentTime = 0;
+                        impactSound.play();
 
                     }
                 });
                 enemies.forEach(enemy => {
                     if (
                         enemy.isAlive()
-                        && Math.abs(enemy.getX() - bullet.getX()) < 0.4
-                        && Math.abs(enemy.getY() - bullet.getY()) < 0.4
+                        && Math.abs(enemy.getX() - bullet.getX()) < 0.5
+                        && Math.abs(enemy.getY() - bullet.getY()) < 0.5
                     ) {
-                        enemy.hit();
-                        bullet.hit();
+                        let enemyHitPoints = enemy.getHitPoints();
+                        enemy.hit(bullet.getHitPoints());
+                        bullet.hit(enemyHitPoints);
+                        if (!enemy.isAlive()) {
+                            explosionSound.currentTime = 0;
+                            explosionSound.play();
+                        } else {
+                            impactSound.currentTime = 0;
+                            impactSound.play();
+                        }
                     }
                 });
 
@@ -561,8 +576,7 @@
                     Math.abs(building.getX() - hero.getX()) < 0.6
                     && Math.abs(building.getY() - hero.getY()) < 0.6
                 ) {
-                    // mildly confusing, but direction already had a multiplySclar earlier.
-                    // this reversing that
+                    // getting them out of the building
                     hero.unMove();
                 }
                 enemies.forEach(
@@ -578,19 +592,25 @@
             }
         });
 
-        enemies.forEach(
-            enemy => {
-                if (
-                    enemy.isAlive()
-                    && Math.abs(enemy.getX() - hero.getX()) < 0.4
-                    && Math.abs(enemy.getY() - hero.getY()) < 0.4
-                ) {
-                    // hero.reset();
-                    glitchPass.trigger();
-                    hitSound.currentTime = 0;
-                    hitSound.play();
-                }
-            });
+        if (hero.isAlive()) {
+            enemies.forEach(
+                enemy => {
+                    if (
+                        enemy.isAlive()
+                        && Math.abs(enemy.getX() - hero.getX()) < 0.4
+                        && Math.abs(enemy.getY() - hero.getY()) < 0.4
+                    ) {
+
+                        let heroHitPoints = hero.getHitPoints();
+                        hero.hit(enemy.getHitPoints());
+                        enemy.hit(heroHitPoints);
+                        // hero.reset();
+                        glitchPass.trigger();
+                        hitSound.currentTime = 0;
+                        hitSound.play();
+                    }
+                });
+        }
 
         composer.render();
         // rendererThree.render(scene, camera);

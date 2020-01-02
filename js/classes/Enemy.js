@@ -4,7 +4,7 @@ import Particle from "./Particle.js";
 
 class Enemy {
 
-    constructor(x, y, scene, explosionSound) {
+    constructor(x, y, scene, hitPoints) {
         let material = new THREE.MeshPhongMaterial({
             color: 0x00FFFF
         });
@@ -15,9 +15,8 @@ class Enemy {
         cone.position.z = 0.66;
         this.object = cone;
         this.scene = scene;
-        this.explosionSound = explosionSound;
         this.alive = true;
-        this.hitPoints = 1;
+        this.hitPoints = hitPoints;
         scene.add(cone);
 
         this.maxSpeed = 0.05 + Math.random() * .1;
@@ -28,6 +27,7 @@ class Enemy {
         this.object.rotateOnAxis(this.rotationAxis, rotationAngle);
         this.moveInc = this.direction.clone();
         this.moveInc.multiplyScalar(this.maxSpeed);
+        this.newWander();
         this.particles = [];
 
         // this.object.rotation.x = -90 * Math.PI / 180;
@@ -36,20 +36,25 @@ class Enemy {
 
     }
 
-    hit() {
-        for (let i = 0; i < 100; i++) {
-            this.particles.push(new Particle(
-                this.object.position.x,
-                this.object.position.y,
-                this.object.position.z,
-                this.scene
-            ));
+    hit(impact) {
+        this.hitPoints -= impact;
+        if (this.hitPoints <= 0) {
+            for (let i = 0; i < 100; i++) {
+                this.particles.push(new Particle(
+                    this.object.position.x,
+                    this.object.position.y,
+                    this.object.position.z,
+                    this.scene
+                ));
+            }
+            this.alive = false;
+            this.object.visible = false;
+            this.deathTime = (new Date()).getTime();
         }
-        this.alive = false;
-        this.object.visible = false;
-        this.explosionSound.currentTime = 0;
-        this.explosionSound.play();
-        this.deathTime = (new Date()).getTime();
+    }
+
+    getHitPoints() {
+        return Math.max(0, this.hitPoints);
     }
 
 
@@ -65,20 +70,36 @@ class Enemy {
         return this.object.position.z;
     }
 
+    newWander() {
+        this.wanderAngle = Math.random() * Math.PI;
+    }
+
 
     update(hero) {
         if (this.alive) {
-            let pointA = hero.getFuturePosition();
-            let pointB = this.object.position;
-            let pointC = pointB.clone();
-            pointC.add(this.direction);
-            let angle = Utils.find_angle(pointA, pointB, pointC);
-            if (angle > Math.PI / 18) {
-                let angleToRotate = angle / 10;
-                this.direction.applyAxisAngle(this.rotationAxis, angleToRotate);
-                this.object.rotateOnAxis(this.rotationAxis, angleToRotate);
-                this.moveInc = this.direction.clone();
-                this.moveInc.multiplyScalar(this.maxSpeed);
+            if (hero.isAlive()) {
+                let pointA = hero.getFuturePosition();
+                let pointB = this.object.position;
+                let pointC = pointB.clone();
+                pointC.add(this.direction);
+                let angle = Utils.find_angle(pointA, pointB, pointC);
+                if (angle > Math.PI / 18) {
+                    let angleToRotate = angle / 25;
+                    this.direction.applyAxisAngle(this.rotationAxis, angleToRotate);
+                    this.object.rotateOnAxis(this.rotationAxis, angleToRotate);
+                    this.moveInc = this.direction.clone();
+                    this.moveInc.multiplyScalar(this.maxSpeed);
+                }
+            } else {
+                let angle = this.wanderAngle;
+                if (angle > Math.PI / 18) {
+                    let angleToRotate = angle / 100;
+                    this.wanderAngle -= angleToRotate;
+                    this.direction.applyAxisAngle(this.rotationAxis, angleToRotate);
+                    this.object.rotateOnAxis(this.rotationAxis, angleToRotate);
+                    this.moveInc = this.direction.clone();
+                    this.moveInc.multiplyScalar(this.maxSpeed);
+                }
             }
             this.move();
         } else {
@@ -105,7 +126,8 @@ class Enemy {
 
     unMove() {
         this.object.position.add(this.moveInc.negate());
-        this.moveInc.negate();
+        this.newWander();
+        // this.moveInc.negate();
     }
 
     isAlive() {

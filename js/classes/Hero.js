@@ -77,6 +77,15 @@ class Hero {
         this.move();
     }
 
+    hit(impact) {
+        this.hitPoints -= impact;
+        if (this.hitPoints <= 0) this.isActive = false;
+    }
+
+    getHitPoints() {
+        return Math.max(0, this.hitPoints);
+    }
+
     changePerspective() {
         this.setPerspective(!this.isFirstPerson);
     }
@@ -98,15 +107,14 @@ class Hero {
 
     move() {
         // moving
-        if (this.isActive) {
-            this.moveInc = this.direction.clone();
-            this.moveInc.multiplyScalar(this.speed);
-            this.camera.position.add(this.moveInc);
-            this.object.position.add(this.moveInc);
-            this.direction.applyAxisAngle(this.rotationAxis, this.turnSpeed);
-            this.camera.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed);
-            this.object.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed);
-        }
+        this.moveInc = this.direction.clone();
+        this.moveInc.multiplyScalar(this.speed);
+        this.camera.position.add(this.moveInc);
+        this.object.position.add(this.moveInc);
+        this.direction.applyAxisAngle(this.rotationAxis, this.turnSpeed);
+        this.camera.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed);
+        this.object.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed);
+
         // drop down to ground level
         // if (this.isFirstPerson) {
         let heightDiff = Math.abs(this.camera.position.z - this.perspectiveHeight);
@@ -204,6 +212,10 @@ class Hero {
 
     stopShooting() {
         this.isShooting = false;
+    }
+
+    isAlive() {
+        return this.isActive;
     }
 
 }
