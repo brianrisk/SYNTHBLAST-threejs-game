@@ -60,7 +60,6 @@ class Bullet {
         this.resetWithDirection(direction, fpsAdjustment);
         this.object.position.x = position.x;
         this.object.position.y = position.y;
-        this.object.position.z = .2;
     }
 
     resetWithDirection(direction, fpsAdjustment) {

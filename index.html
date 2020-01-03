@@ -15,6 +15,7 @@
             position: fixed;
             /*https://stackoverflow.com/questions/15829172/stop-chrome-back-forward-two-finger-swipe*/
             overscroll-behavior-x: none;
+            background-color: #000000;
         }
 
         canvas {
@@ -35,11 +36,6 @@
             src: url("assets/fonts/pokemon.ttf");
         }
 
-        @font-face {
-            font-family: 'krueger';
-            src: url("assets/fonts/atc_krueger_regular.ttf");
-        }
-
     </style>
 </head>
 <body>
@@ -52,6 +48,12 @@
     // skybox: https://threejsfundamentals.org/threejs/lessons/threejs-backgrounds.html
     // skybox SO: https://stackoverflow.com/questions/45443196/how-to-set-up-image-background-in-three-js
     // https://videohive.net/item/80s-synthwave-retro-hd/24080448
+
+    // levels
+
+    // points display
+
+    // point pad
 
     // add shooting stars
 
@@ -86,8 +88,7 @@
 
     // pixi objects
     let rendererPixi, pixiStage;
-
-    let instructionText;
+    let instructionText, statusText, finalText;
     let b1, b2, b3, b4, b6, b7, b8, b9, bFire;
     let bWidth = 60;
 
@@ -97,13 +98,15 @@
     let enemies = [];
     let powerUps = [];
     let gun = null;
+    let padsRemaining = 0;
 
-    let arenaSize = 100;
+    let arenaSize = 50;
 
     // Sounds
     // let massive = new Audio('assets/audio/massive2.wav');
     let song = new Audio('music/implant-128kbps.mp3');
     let pew = new Audio('assets/audio/pip.wav');
+    let pointSound = new Audio('assets/audio/point.wav');
     let hitSound = new Audio('assets/audio/hit.wav');
     let explosionSound = new Audio('assets/audio/explosion2.wav');
     let impactSound = new Audio('assets/audio/impact.wav');
@@ -135,7 +138,7 @@
         rendererThree.state.reset();
 
         rendererPixi.reset();
-        rendererPixi.render(pixiStage, undefined, false);
+        render2d();
         rendererPixi.reset();
 
         calculateFps();
@@ -250,7 +253,7 @@
             drawArrow(x2 + half, y3 + half, Math.PI * -1.25);
         } else {
             // https://stackoverflow.com/questions/55692097/stop-pixel-font-from-being-blurred-when-rendered
-            let style = new PIXI.TextStyle({
+            let instructionStyle = new PIXI.TextStyle({
                 fontFamily: "pokemon, \"Courier New\", Courier, monospace",
                 fontSize: 14,
                 fill: "#00FFFF",
@@ -263,10 +266,31 @@
                 dropShadowDistance: 0,
             });
 
-            instructionText = new PIXI.Text('Arrow keys to move; space to fire.', style);
+            instructionText = new PIXI.Text('ARROW KEYS TO MOVE; SPACE TO FIRE.', instructionStyle);
             instructionText.position.set(10, window.innerHeight - 50);
             pixiStage.addChild(instructionText);
         }
+
+        let statusStyle = new PIXI.TextStyle({
+            fontFamily: "pokemon, \"Courier New\", Courier, monospace",
+            fontSize: 18,
+            fill: "#99DDDD",
+        });
+
+        statusText = new PIXI.Text("", statusStyle);
+        statusText.position.set(10, 50);
+        pixiStage.addChild(statusText);
+
+        let finalStyle = new PIXI.TextStyle({
+            fontFamily: "pokemon, \"Courier New\", Courier, monospace",
+            fontSize: 48,
+            fill: "#99DDDD",
+            align: "center"
+        });
+
+        finalText = new PIXI.Text("", finalStyle);
+        finalText.position.set(window.innerWidth / 2, window.innerHeight / 2);
+        pixiStage.addChild(finalText);
     }
 
     function getSquare(x, y, width) {
@@ -318,7 +342,7 @@
 
         //hero = new Hero(scene, camera, -55, 0);
 
-        hero = new Hero(scene, camera, -1, 0);
+        hero = new Hero(scene, camera, 10, 0);
         // add buildings
         let halfArena = arenaSize / 2;
         for (let gridX = 0; gridX < arenaSize; gridX++) {
@@ -336,6 +360,7 @@
                 } else if (Utils.randomInt(160) === 0) {
                     let powerUp = new Flipper(gridX, gridY - halfArena, scene);
                     powerUps.push(powerUp);
+                    padsRemaining += 1;
                 }
             }
         }
@@ -631,15 +656,53 @@
                         // hero.reset();
                         if (damage > 0) {
                             glitchPass.trigger();
+                        }
+                        if (enemy.isAlive()) {
                             hitSound.currentTime = 0;
                             hitSound.play();
+                        } else {
+                            explosionSound.currentTime = 0;
+                            explosionSound.play();
                         }
                     }
                 });
+
+            powerUps.forEach(pad => {
+                if (
+                    !pad.isUsed
+                    && Math.abs(pad.getX() - hero.getX()) < 0.5
+                    && Math.abs(pad.getY() - hero.getY()) < 0.5
+                ) {
+                    pad.hit();
+                    padsRemaining -= 1;
+                    pointSound.currentTime = 0;
+                    pointSound.play();
+                }
+            });
         }
 
         composer.render();
-        // rendererThree.render(scene, camera);
+    }
+
+    function render2d() {
+        if (padsRemaining === 0) {
+            finalText.text = "YOU WIN";
+            finalText.x = (window.innerWidth - finalText.width) / 2;
+            statusText.text = "";
+        } else if (hero.hitPoints <= 0) {
+            finalText.text = "TRY AGAIN";
+            finalText.x = (window.innerWidth - finalText.width) / 2;
+            statusText.text = "";
+        }
+
+        else {
+            finalText.text = "";
+            statusText.text =
+                "PADS: " + padsRemaining + "\n"
+                + "HEALTH: " + hero.hitPoints + "\n"
+                + "SHIELD: " + hero.shieldHitPoints + "\n";
+        }
+        rendererPixi.render(pixiStage, undefined, false);
     }
 
     function onWindowResize() {

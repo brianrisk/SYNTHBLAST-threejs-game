@@ -26,7 +26,7 @@ class Hero {
         this.gun = null;
         this.isShooting = false;
         this.maxHitPoints = 10;
-        this.shieldHitPoints = 100;
+        this.shieldHitPoints = 5;
 
         // setting up
         this.createObject();
@@ -43,8 +43,10 @@ class Hero {
 
         let dotMaterial = new THREE.PointsMaterial({
                 color: 0x333366,
+                // color: 0xFFFFFF,
                 opacity: 0.1,
-                size: 0.05
+                size: 0.05,
+                // fog: false
             });
         let sphereGeometry = new THREE.SphereGeometry(1.5, 50);
         let sphereDots = new THREE.Points(sphereGeometry, dotMaterial);
@@ -129,13 +131,11 @@ class Hero {
         if (this.isFirstPerson) {
             this.headTiltDelta += this.headTiltDelta + Math.PI / 2;
             this.perspectiveHeight = this.bottomZ;
-            // this.object.visible = false;
         }
         // overhead
         else {
             this.headTiltDelta += this.headTiltDelta - Math.PI / 2;
             this.perspectiveHeight = this.topZ;
-            // this.object.visible = true;
         }
     }
 

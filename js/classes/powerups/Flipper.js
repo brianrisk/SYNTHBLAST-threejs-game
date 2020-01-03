@@ -20,11 +20,32 @@ class Flipper {
         // cube.rotation.y += Math.PI;
         this.object = cube;
         this.scene = scene;
+        this.isUsed = false;
         scene.add(cube);
     }
 
     update(fpsAdjustment) {
         // this.object.rotation.z += Math.PI / 90 * fpsAdjustment;
+        if (this.isUsed && this.object.visible) {
+            if (this.object.scale.x > 0.1) {
+                this.object.scale.x = this.object.scale.x / (1.05 * fpsAdjustment);
+                this.object.scale.z = this.object.scale.z / (1.05 * fpsAdjustment);
+            } else {
+                this.object.visible = false;
+            }
+        }
+    }
+
+    hit() {
+        this.isUsed = true;
+    }
+
+    getX() {
+        return this.object.position.x;
+    }
+
+    getY() {
+        return this.object.position.y;
     }
 }
 

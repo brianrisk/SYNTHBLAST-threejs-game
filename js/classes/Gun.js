@@ -9,6 +9,7 @@ class Gun {
         this.bullets = bullets;
         this.hero = hero;
         this.pew = pew;
+        this.bulletZ = 0.3;
     }
 
     fire(soundOn, fpsAdjustment) {
@@ -16,7 +17,7 @@ class Gun {
         if (currentTime - this.lastFired < 100) return;
 
         let heroPosition = this.hero.getPosition();
-        let bulletPosition = new THREE.Vector3(heroPosition.x, heroPosition.y,  0.2);
+        let bulletPosition = new THREE.Vector3(heroPosition.x, heroPosition.y,  this.bulletZ);
         let direction = this.hero.direction.clone();
         let left = this.hero.direction.clone();
         left.applyAxisAngle(new THREE.Vector3(0,0,1), .1);
