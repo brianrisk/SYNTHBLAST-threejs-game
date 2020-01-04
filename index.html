@@ -32,8 +32,8 @@
         }
 
         @font-face {
-            font-family: 'pokemon';
-            src: url("assets/fonts/pokemon.ttf");
+            font-family: 'kenpixel';
+            src: url("assets/fonts/kenpixel.ttf");
         }
 
     </style>
@@ -121,6 +121,7 @@
     // song.crossOrigin = "anonymous";
 
     // State
+    let hasStarted = false;
     let isSongPlaying = false;
 
     // stats
@@ -254,7 +255,7 @@
         } else {
             // https://stackoverflow.com/questions/55692097/stop-pixel-font-from-being-blurred-when-rendered
             let instructionStyle = new PIXI.TextStyle({
-                fontFamily: "pokemon, \"Courier New\", Courier, monospace",
+                fontFamily: "kenpixel, \"Courier New\", Courier, monospace",
                 fontSize: 14,
                 fill: "#00FFFF",
                 stroke: '#ff00FF',
@@ -272,7 +273,7 @@
         }
 
         let statusStyle = new PIXI.TextStyle({
-            fontFamily: "pokemon, \"Courier New\", Courier, monospace",
+            fontFamily: "kenpixel, \"Courier New\", Courier, monospace",
             fontSize: 18,
             fill: "#99DDDD",
         });
@@ -282,9 +283,9 @@
         pixiStage.addChild(statusText);
 
         let finalStyle = new PIXI.TextStyle({
-            fontFamily: "pokemon, \"Courier New\", Courier, monospace",
+            fontFamily: "kenpixel, \"Courier New\", Courier, monospace",
             fontSize: 48,
-            fill: "#99DDDD",
+            fill: "#99FFFF",
             align: "center"
         });
 
@@ -427,6 +428,7 @@
     }
 
     function touchStart(event) {
+        hasStarted = true;
         // if(audiosWeWantToUnlock) {
         //     for(let audio of audiosWeWantToUnlock) {
         //         audio.play();
@@ -533,6 +535,7 @@
     }
 
     function onDocumentKeyDown(event) {
+        hasStarted = true;
         if (!isSongPlaying) {
             song.play();
         }
@@ -670,8 +673,8 @@
             powerUps.forEach(pad => {
                 if (
                     !pad.isUsed
-                    && Math.abs(pad.getX() - hero.getX()) < 0.5
-                    && Math.abs(pad.getY() - hero.getY()) < 0.5
+                    && Math.abs(pad.getX() - hero.getX()) < 0.7
+                    && Math.abs(pad.getY() - hero.getY()) < 0.7
                 ) {
                     pad.hit();
                     padsRemaining -= 1;
@@ -696,7 +699,12 @@
         }
 
         else {
-            finalText.text = "";
+            if (hasStarted) {
+                finalText.text = "";
+            } else {
+                finalText.text = "COLLECT ALL PADS";
+                finalText.x = (window.innerWidth - finalText.width) / 2;
+            }
             statusText.text =
                 "PADS: " + padsRemaining + "\n"
                 + "HEALTH: " + hero.hitPoints + "\n"

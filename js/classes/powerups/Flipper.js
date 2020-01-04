@@ -2,7 +2,6 @@ import * as THREE from "../../../lib/three/build/three.module.js";
 
 class Flipper {
     constructor(x, y, scene) {
-        let height = 0.0;
         let geometry = new THREE.ConeGeometry(.6, 1, 6);
         // rotate
         let material = new THREE.LineBasicMaterial(
@@ -28,8 +27,8 @@ class Flipper {
         // this.object.rotation.z += Math.PI / 90 * fpsAdjustment;
         if (this.isUsed && this.object.visible) {
             if (this.object.scale.x > 0.1) {
-                this.object.scale.x = this.object.scale.x / (1.05 * fpsAdjustment);
-                this.object.scale.z = this.object.scale.z / (1.05 * fpsAdjustment);
+                this.object.scale.x = this.object.scale.x / (1.07 * fpsAdjustment);
+                this.object.scale.z = this.object.scale.z / (1.07 * fpsAdjustment);
             } else {
                 this.object.visible = false;
             }
