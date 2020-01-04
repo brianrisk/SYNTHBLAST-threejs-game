@@ -71,6 +71,7 @@
     let rendererThree;
 
     let level = null;
+    let levelNumber = 1;
 
     // pixi objects
     let rendererPixi, pixiStage;
@@ -315,7 +316,7 @@
     }
 
     function init3d() {
-        level = new Level(10, rendererThree, sounds);
+        level = new Level(levelNumber, rendererThree, sounds);
     }
 
 
@@ -465,6 +466,10 @@
     }
 
     function render3d() {
+        if (level.hasWon()) {
+            levelNumber ++;
+            level = new Level(levelNumber, rendererThree, sounds);
+        }
         level.render(fpsAdjustment);
     }
 
@@ -487,9 +492,10 @@
                 finalText.x = (window.innerWidth - finalText.width) / 2;
             }
             statusText.text =
-                "PADS: " + level.padsRemaining + "\n"
-                + "HEALTH: " + level.hero.hitPoints + "\n"
-                + "SHIELD: " + level.hero.shieldHitPoints + "\n";
+                  "LEVEL: " + levelNumber + "\n" +
+                  "PADS: " + level.padsRemaining + "\n" +
+                  "HEALTH: " + level.hero.hitPoints + "\n" +
+                  "SHIELD: " + level.hero.shieldHitPoints + "\n";
         }
         rendererPixi.render(pixiStage, undefined, false);
     }

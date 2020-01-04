@@ -254,6 +254,14 @@ class Level {
         this.composer.render();
     }
 
+    hasWon() {
+        return this.padsRemaining === 0;
+    }
+
+    hasDied() {
+        return this.hero.hitPoints <= 0;
+    }
+
 }
 
 export default Level;
