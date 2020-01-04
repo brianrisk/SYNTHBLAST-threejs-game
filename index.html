@@ -31,11 +31,6 @@
             -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
         }
 
-        @font-face {
-            font-family: 'kenpixel';
-            src: url("assets/fonts/kenpixel.ttf");
-        }
-
     </style>
 </head>
 <body>
@@ -67,24 +62,15 @@
     // https://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection
 
 
-    // libraries
+
+
     import * as THREE from "./lib/three/build/three.module.js";
-    import * as Utils from "./js/Utils.js";
-
-    // Three.js classes
-    import {EffectComposer} from './lib/three/examples/jsm/postprocessing/EffectComposer.js';
-    import {RenderPass} from './lib/three/examples/jsm/postprocessing/RenderPass.js';
-    import {GlitchPass} from './js/CustomGlitchPass.js';
-
-    // my classes
-    import Hero from "./js/classes/Hero.js";
-    import Building from "./js/classes/Building.js";
-    import Gun from "./js/classes/Gun.js";
-    import Enemy from "./js/classes/Enemy.js";
-    import Flipper from "./js/classes/powerups/Flipper.js";
+    import Level from "./js/classes/Level.js";
 
     // three objects
-    let scene, camera, rendererThree, composer, glitchPass;
+    let rendererThree;
+
+    let level = null;
 
     // pixi objects
     let rendererPixi, pixiStage;
@@ -92,15 +78,6 @@
     let b1, b2, b3, b4, b6, b7, b8, b9, bFire;
     let bWidth = 60;
 
-    let hero = null;
-    let bullets = [];
-    let buildings = [];
-    let enemies = [];
-    let powerUps = [];
-    let gun = null;
-    let padsRemaining = 0;
-
-    let arenaSize = 50;
 
     // Sounds
     // let massive = new Audio('assets/audio/massive2.wav');
@@ -110,7 +87,15 @@
     let hitSound = new Audio('assets/audio/hit.wav');
     let explosionSound = new Audio('assets/audio/explosion2.wav');
     let impactSound = new Audio('assets/audio/impact.wav');
-    let audiosWeWantToUnlock = [pew, hitSound, explosionSound, song];
+    // let audioArray = [pew, hitSound, explosionSound, song];
+    let sounds = {
+        song: song,
+        pew: pew,
+        point: pointSound,
+        hit: hitSound,
+        explosion: explosionSound,
+        impact: impactSound
+    };
 
     let frameCount = 0;
     let frameTimes = [];
@@ -255,7 +240,7 @@
         } else {
             // https://stackoverflow.com/questions/55692097/stop-pixel-font-from-being-blurred-when-rendered
             let instructionStyle = new PIXI.TextStyle({
-                fontFamily: "kenpixel, \"Courier New\", Courier, monospace",
+                fontFamily: "\"Courier New\", Courier, monospace",
                 fontSize: 14,
                 fill: "#00FFFF",
                 stroke: '#ff00FF',
@@ -273,7 +258,7 @@
         }
 
         let statusStyle = new PIXI.TextStyle({
-            fontFamily: "kenpixel, \"Courier New\", Courier, monospace",
+            fontFamily: "\"Courier New\", Courier, monospace",
             fontSize: 18,
             fill: "#99DDDD",
         });
@@ -283,7 +268,7 @@
         pixiStage.addChild(statusText);
 
         let finalStyle = new PIXI.TextStyle({
-            fontFamily: "kenpixel, \"Courier New\", Courier, monospace",
+            fontFamily: "\"Courier New\", Courier, monospace",
             fontSize: 48,
             fill: "#99FFFF",
             align: "center"
@@ -330,102 +315,10 @@
     }
 
     function init3d() {
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
-        scene.background = new THREE.Color(0x000000);
-        // scene.background = new THREE.Color(0xefd1b5);
-        scene.fog = new THREE.FogExp2(0xFF00FF, 0.05);
-        scene.color = 0x00DD00;
-
-        rendererThree.setSize(window.innerWidth, window.innerHeight);
-
-        composer = new EffectComposer(rendererThree);
-
-        //hero = new Hero(scene, camera, -55, 0);
-
-        hero = new Hero(scene, camera, 10, 0);
-        // add buildings
-        let halfArena = arenaSize / 2;
-        for (let gridX = 0; gridX < arenaSize; gridX++) {
-            for (let gridY = 0; gridY < arenaSize; gridY++) {
-                if (gridY === halfArena) continue;
-                // if (gridY % 3 === 0 || gridX % 3 === 0) continue;
-                // if (!(gridY % 4 === 0 || gridY % 4 === 1 || gridX % 4 === 0 || gridX % 4 === 1)) {
-                if (Utils.randomInt(40) === 0) {
-                    let boxHeight = Utils.randomInt(10) + 1;
-                    let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
-                    buildings.push(building);
-                } else if (Utils.randomInt(40) === 0) {
-                    let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
-                    enemies.push(enemy);
-                } else if (Utils.randomInt(160) === 0) {
-                    let powerUp = new Flipper(gridX, gridY - halfArena, scene);
-                    powerUps.push(powerUp);
-                    padsRemaining += 1;
-                }
-            }
-        }
-
-        // add fence around the buildings
-        for (let gridX = -1; gridX <= arenaSize; gridX++) {
-            for (let gridY = -1; gridY <= arenaSize; gridY++) {
-                // leaving a gap
-                if (gridY === halfArena && gridX === -1) continue;
-                // only filling in edges
-                if (gridX === -1 || gridY === -1 || gridX === arenaSize || gridY === arenaSize) {
-                    let boxHeight = 1;
-                    // if (gridY % 2 === 0 || gridX % 2 === 0) boxHeight = 2;
-                    if (gridX !== arenaSize && (gridY === halfArena - 1 || gridY === halfArena + 1)) boxHeight = 20;
-                    let building = new Building(gridX, gridY - arenaSize / 2, boxHeight, scene, false);
-                    buildings.push(building);
-                }
-            }
-        }
-
-        gun = new Gun(scene, bullets, hero, pew);
-        hero.setGun(gun);
-
-        // floor
-        let floorTexture = new THREE.TextureLoader().load('assets/img/floor-tile.png');
-        floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-        floorTexture.repeat.set(1000, 1000);
-        let floorMaterial = new THREE.MeshBasicMaterial({map: floorTexture, side: THREE.FrontSide});
-        let floorGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
-        let plane = new THREE.Mesh(floorGeometry, floorMaterial);
-        plane.position.z = 0;
-        scene.add(plane);
-
-        // light
-        let dirLight;
-        dirLight = new THREE.DirectionalLight(0xffffff);
-        dirLight.position.set(-2, 5, 3).normalize();
-        scene.add(dirLight);
-
-        // "synth blast" title
-        addTitleImage();
-
-        // post processing
-        let renderPass = new RenderPass(scene, camera);
-        composer.addPass(renderPass);
-        glitchPass = new GlitchPass();
-        composer.addPass(glitchPass);
+        level = new Level(10, rendererThree, sounds);
     }
 
-    //https://codepen.io/duhaime/pen/jaYdLg
-    function addTitleImage() {
-        let loader = new THREE.TextureLoader();
-        let material = new THREE.MeshLambertMaterial({
-            map: loader.load('assets/img/synthblast.png'),
-            fog: false
-        });
-        // preserve ratio
-        let geometry = new THREE.PlaneGeometry(5 * 358 / 32, 5);
-        let mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(-10, 0, 20);
-        mesh.rotation.y = -Math.PI / 2;
-        mesh.rotation.x = Math.PI / 2;
-        scene.add(mesh);
-    }
+
 
     function touchStart(event) {
         hasStarted = true;
@@ -450,8 +343,8 @@
         for (let i = 0; i < event.changedTouches.length; i++) {
             let touch = event.changedTouches[i];
             if (touch.clientX < window.innerWidth / 2) {
-                hero.stopTurning();
-                hero.stop();
+                level.hero.stopTurning();
+                level.hero.stop();
                 b1.visible = false;
                 b2.visible = false;
                 b3.visible = false;
@@ -462,7 +355,7 @@
                 b9.visible = false;
             } else {
                 bFire.visible = false;
-                hero.stopShooting();
+                level.hero.stopShooting();
             }
         }
     }
@@ -507,27 +400,27 @@
             // check that we're in the control box
             if (x < x3 && y > y1) {
                 if (x < x1) {
-                    hero.turnLeft();
+                    level.hero.turnLeft();
                 }
                 if (x > x1 && x < x2) {
-                    hero.stopTurning();
+                    level.hero.stopTurning();
                 }
                 if (x > x2) {
-                    hero.turnRight();
+                    level.hero.turnRight();
                 }
                 if (y < y2) {
-                    hero.forward();
+                    level.hero.forward();
                 }
                 if (y > y2 && y < y3) {
-                    hero.stop();
+                    level.hero.stop();
                 }
                 if (y > y3) {
-                    hero.reverse();
+                    level.hero.reverse();
                 }
             }
 
             if (x > window.innerWidth - 3 * bWidth) {
-                hero.startShooting();
+                level.hero.startShooting();
                 bFire.visible = true;
             }
         }
@@ -541,17 +434,17 @@
         }
         let keyCode = event["which"];
         if (event.shiftKey) {
-            hero.changePerspective();
+            level.hero.changePerspective();
         } else if (keyCode === 32) {
-            hero.startShooting();
+            level.hero.startShooting();
         } else if (keyCode === 37) {
-            hero.turnLeft();
+            level.hero.turnLeft();
         } else if (keyCode === 38) {
-            hero.forward();
+            level.hero.forward();
         } else if (keyCode === 39) {
-            hero.turnRight();
+            level.hero.turnRight();
         } else if (keyCode === 40) {
-            hero.reverse();
+            level.hero.reverse();
         }
         pixiStage.removeChild(instructionText);
     }
@@ -559,140 +452,28 @@
     function onDocumentKeyUp(event) {
         let keyCode = event["which"];
         if (keyCode === 32) {
-            hero.stopShooting();
+            level.hero.stopShooting();
         } else if (keyCode === 37) {
-            hero.stopTurning();
+            level.hero.stopTurning();
         } else if (keyCode === 38) {
-            hero.stop();
+            level.hero.stop();
         } else if (keyCode === 39) {
-            hero.stopTurning();
+            level.hero.stopTurning();
         } else if (keyCode === 40) {
-            hero.stop();
+            level.hero.stop();
         }
     }
 
     function render3d() {
-
-        // update our objects
-        bullets.forEach(bullet => bullet.update());
-        buildings.forEach(building => building.update(fpsAdjustment));
-        enemies.forEach(enemy => enemy.update(hero, fpsAdjustment));
-        powerUps.forEach(powerUp => powerUp.update(fpsAdjustment));
-        hero.update(fpsAdjustment);
-
-        // bullets hitting things
-        bullets.forEach(bullet => {
-            if (bullet.isActive()) {
-                buildings.forEach(building => {
-                    if (
-                        building.isActive()
-                        && Math.abs(building.getX() - bullet.getX()) < 0.5
-                        && Math.abs(building.getY() - bullet.getY()) < 0.5
-                    ) {
-                        let buildingHitPoints = building.getHitPoints();
-                        building.hit(bullet.getHitPoints());
-                        bullet.hit(buildingHitPoints);
-                        impactSound.currentTime = 0;
-                        impactSound.play();
-
-                    }
-                });
-                enemies.forEach(enemy => {
-                    if (
-                        enemy.isAlive()
-                        && Math.abs(enemy.getX() - bullet.getX()) < 0.5
-                        && Math.abs(enemy.getY() - bullet.getY()) < 0.5
-                    ) {
-                        let enemyHitPoints = enemy.getHitPoints();
-                        enemy.hit(bullet.getHitPoints(), fpsAdjustment);
-                        bullet.hit(enemyHitPoints);
-                        if (!enemy.isAlive()) {
-                            explosionSound.currentTime = 0;
-                            explosionSound.play();
-                        } else {
-                            impactSound.currentTime = 0;
-                            impactSound.play();
-                        }
-                    }
-                });
-
-            }
-        });
-
-        // can't go through buildings
-        buildings.forEach(building => {
-            if (building.isActive()) {
-                if (
-                    Math.abs(building.getX() - hero.getX()) < 0.6
-                    && Math.abs(building.getY() - hero.getY()) < 0.6
-                ) {
-                    // getting them out of the building
-                    hero.unMove();
-                }
-                enemies.forEach(
-                    enemy => {
-                        if (
-                            enemy.isAlive()
-                            && Math.abs(enemy.getX() - building.getX()) < 0.6
-                            && Math.abs(enemy.getY() - building.getY()) < 0.6
-                        ) {
-                            enemy.unMove();
-                        }
-                    });
-            }
-        });
-
-        if (hero.isAlive()) {
-            let heroR = 0.4;
-            if (hero.hasShield()) heroR = 1.5;
-            enemies.forEach(
-                enemy => {
-                    if (
-                        enemy.isAlive()
-                        && Math.abs(enemy.getX() - hero.getX()) < heroR
-                        && Math.abs(enemy.getY() - hero.getY()) < heroR
-                    ) {
-
-                        let heroHitPoints = hero.getHitPoints();
-                        let damage = hero.hit(enemy.getHitPoints());
-                        enemy.hit(heroHitPoints, fpsAdjustment);
-                        // hero.reset();
-                        if (damage > 0) {
-                            glitchPass.trigger();
-                        }
-                        if (enemy.isAlive()) {
-                            hitSound.currentTime = 0;
-                            hitSound.play();
-                        } else {
-                            explosionSound.currentTime = 0;
-                            explosionSound.play();
-                        }
-                    }
-                });
-
-            powerUps.forEach(pad => {
-                if (
-                    !pad.isUsed
-                    && Math.abs(pad.getX() - hero.getX()) < 0.7
-                    && Math.abs(pad.getY() - hero.getY()) < 0.7
-                ) {
-                    pad.hit();
-                    padsRemaining -= 1;
-                    pointSound.currentTime = 0;
-                    pointSound.play();
-                }
-            });
-        }
-
-        composer.render();
+        level.render(fpsAdjustment);
     }
 
     function render2d() {
-        if (padsRemaining === 0) {
+        if (level.padsRemaining === 0) {
             finalText.text = "YOU WIN";
             finalText.x = (window.innerWidth - finalText.width) / 2;
             statusText.text = "";
-        } else if (hero.hitPoints <= 0) {
+        } else if (level.hero.hitPoints <= 0) {
             finalText.text = "TRY AGAIN";
             finalText.x = (window.innerWidth - finalText.width) / 2;
             statusText.text = "";
@@ -706,16 +487,16 @@
                 finalText.x = (window.innerWidth - finalText.width) / 2;
             }
             statusText.text =
-                "PADS: " + padsRemaining + "\n"
-                + "HEALTH: " + hero.hitPoints + "\n"
-                + "SHIELD: " + hero.shieldHitPoints + "\n";
+                "PADS: " + level.padsRemaining + "\n"
+                + "HEALTH: " + level.hero.hitPoints + "\n"
+                + "SHIELD: " + level.hero.shieldHitPoints + "\n";
         }
         rendererPixi.render(pixiStage, undefined, false);
     }
 
     function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        level.camera.aspect = window.innerWidth / window.innerHeight;
+        level.camera.updateProjectionMatrix();
         rendererThree.setSize(window.innerWidth, window.innerHeight);
         pixiStage.destroy(true);
         pixiStage = new PIXI.Container();
