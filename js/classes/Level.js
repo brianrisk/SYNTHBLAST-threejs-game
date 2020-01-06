@@ -135,7 +135,7 @@ class Level {
         // preserve ratio
         let geometry = new THREE.PlaneGeometry(5 * 358 / 32, 5);
         let mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(-10, 0, 20);
+        mesh.position.set(-20, 0, 10);
         mesh.rotation.y = -Math.PI / 2;
         mesh.rotation.x = Math.PI / 2;
         this.scene.add(mesh);
