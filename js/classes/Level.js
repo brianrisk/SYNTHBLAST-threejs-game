@@ -41,8 +41,8 @@ class Level {
 
         composer = new EffectComposer(rendererThree);
 
-        //hero = new Hero(scene, camera, -55, 0);
-        hero = new Hero(scene, camera, 10, 0);
+        hero = new Hero(scene, camera, -55, 0);
+        // hero = new Hero(scene, camera, 10, 0);
         // add buildings
         let halfArena = arenaSize / 2;
         for (let gridX = 0; gridX < arenaSize; gridX++) {
@@ -50,7 +50,7 @@ class Level {
                 if (gridY === halfArena) continue;
                 // if (gridY % 3 === 0 || gridX % 3 === 0) continue;
                 // if (!(gridY % 4 === 0 || gridY % 4 === 1 || gridX % 4 === 0 || gridX % 4 === 1)) {
-                if (Utils.randomInt(40) === 0) {
+                if (Utils.randomInt(30) === 0) {
                     let boxHeight = Utils.randomInt(10) + 1;
                     let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
                     buildings.push(building);
@@ -118,6 +118,8 @@ class Level {
         this.powerUps = powerUps;
         this.gun = gun;
         this.padsRemaining = padsRemaining;
+        this.hasStarted = false;
+        this.inPlay = false;
 
         // "synth blast" title
         this.addTitleImage();
@@ -140,6 +142,17 @@ class Level {
     }
 
     render(fpsAdjustment) {
+        // render a holding pattern before user input
+        // while position x < 10 is outside of square and game began
+        if (!this.inPlay && this.hasStarted) {
+            let pushDirection = new THREE.Vector3(1, 0, 0);
+            pushDirection.multiplyScalar(fpsAdjustment * 0.75);
+            this.hero.push(pushDirection);
+            if (this.hero.getX() >= 10) {
+                this.inPlay = true;
+            }
+        }
+
         // update our objects
         this.bullets.forEach(bullet => bullet.update());
         this.buildings.forEach(building => building.update(fpsAdjustment));

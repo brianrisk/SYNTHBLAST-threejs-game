@@ -78,7 +78,7 @@ class Enemy {
 
     update(hero, fpsAdjustment) {
         if (this.alive) {
-            if (hero.isAlive()) {
+            if (hero.isAlive() && hero.isActive) {
                 let pointA = hero.getFuturePosition();
                 let pointB = this.object.position;
                 let pointC = pointB.clone();

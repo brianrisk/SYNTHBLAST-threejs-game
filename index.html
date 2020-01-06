@@ -7,7 +7,7 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
     <meta name="format-detection" content="telephone=no"/>
     <link rel="apple-touch-icon" sizes="150x150" href="assets/img/apple-touch-icon.png">
-    <title>S Y N T H * B L A S T</title>
+    <title>SYNTH * BLAST</title>
     <style>
         body, html {
             margin: 0;
@@ -38,19 +38,11 @@
 <script src='lib/pixi.min.js'></script>
 <script type="module">
 
-
-    // make synthwave background (syntywave sunset)
-    // skybox: https://threejsfundamentals.org/threejs/lessons/threejs-backgrounds.html
-    // skybox SO: https://stackoverflow.com/questions/45443196/how-to-set-up-image-background-in-three-js
-    // https://videohive.net/item/80s-synthwave-retro-hd/24080448
-
-    // levels
-
-    // points display
-
-    // point pad
+    // add transitions between levels
 
     // add shooting stars
+
+    // lightning gun
 
     // make guns things you can pick up
 
@@ -61,7 +53,10 @@
     // see where blasts hit buildings:
     // https://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection
 
-
+    // make synthwave background (syntywave sunset)
+    // skybox: https://threejsfundamentals.org/threejs/lessons/threejs-backgrounds.html
+    // skybox SO: https://stackoverflow.com/questions/45443196/how-to-set-up-image-background-in-three-js
+    // https://videohive.net/item/80s-synthwave-retro-hd/24080448
 
 
     import * as THREE from "./lib/three/build/three.module.js";
@@ -107,7 +102,6 @@
     // song.crossOrigin = "anonymous";
 
     // State
-    let hasStarted = false;
     let isSongPlaying = false;
 
     // stats
@@ -268,15 +262,20 @@
         statusText.position.set(10, 50);
         pixiStage.addChild(statusText);
 
+        let finalSize = Math.max(window.innerWidth / 20, window.innerHeight / 8);
         let finalStyle = new PIXI.TextStyle({
             fontFamily: "\"Courier New\", Courier, monospace",
-            fontSize: 48,
+            fontSize: finalSize,
             fill: "#99FFFF",
-            align: "center"
+            align: "center",
+            dropShadow: true,
+            dropShadowBlur: 10,
+            dropShadowDistance: 0,
+            dropShadowAlpha: 0.5
         });
 
         finalText = new PIXI.Text("", finalStyle);
-        finalText.position.set(window.innerWidth / 2, window.innerHeight / 2);
+        finalText.position.set(window.innerWidth / 2, (window.innerHeight - finalSize) / 2);
         pixiStage.addChild(finalText);
     }
 
@@ -322,7 +321,7 @@
 
 
     function touchStart(event) {
-        hasStarted = true;
+        level.hasStarted = true;
         // if(audiosWeWantToUnlock) {
         //     for(let audio of audiosWeWantToUnlock) {
         //         audio.play();
@@ -362,6 +361,9 @@
     }
 
     function down(event) {
+        level.hasStarted = true;
+        // only be responsive when "inPlay"
+        if (!level.inPlay) return;
         for (let i = 0; i < event.touches.length; i++) {
             let touch = event.touches[i];
             let x = touch.clientX;
@@ -429,23 +431,25 @@
     }
 
     function onDocumentKeyDown(event) {
-        hasStarted = true;
+        level.hasStarted = true;
         if (!isSongPlaying) {
             song.play();
         }
         let keyCode = event["which"];
-        if (event.shiftKey) {
-            level.hero.changePerspective();
-        } else if (keyCode === 32) {
-            level.hero.startShooting();
-        } else if (keyCode === 37) {
-            level.hero.turnLeft();
-        } else if (keyCode === 38) {
-            level.hero.forward();
-        } else if (keyCode === 39) {
-            level.hero.turnRight();
-        } else if (keyCode === 40) {
-            level.hero.reverse();
+        if (level.inPlay) {
+            if (event.shiftKey) {
+                level.hero.changePerspective();
+            } else if (keyCode === 32) {
+                level.hero.startShooting();
+            } else if (keyCode === 37) {
+                level.hero.turnLeft();
+            } else if (keyCode === 38) {
+                level.hero.forward();
+            } else if (keyCode === 39) {
+                level.hero.turnRight();
+            } else if (keyCode === 40) {
+                level.hero.reverse();
+            }
         }
         pixiStage.removeChild(instructionText);
     }
@@ -485,10 +489,10 @@
         }
 
         else {
-            if (hasStarted) {
+            if (level.hasStarted) {
                 finalText.text = "";
             } else {
-                finalText.text = "COLLECT ALL PADS";
+                finalText.text = "LEVEL " + levelNumber;
                 finalText.x = (window.innerWidth - finalText.width) / 2;
             }
             statusText.text =

@@ -27,6 +27,7 @@ class Hero {
         this.isShooting = false;
         this.maxHitPoints = 10;
         this.shieldHitPoints = 5;
+        this.isActive = false;
 
         // setting up
         this.createObject();
@@ -83,7 +84,6 @@ class Hero {
         } else {
             this.camera.rotation.z = -90 * Math.PI / 180;
         }
-        this.isActive = true;
         this.hitPoints = this.maxHitPoints;
         this.direction = new THREE.Vector3(1, 0, 0);
     }
@@ -107,7 +107,6 @@ class Hero {
             this.shieldHitPoints = 0;
 
         }
-        if (this.hitPoints <= 0) this.isActive = false;
         if (this.shieldHitPoints <= 0) {
             this.shield.visible = false;
         }
@@ -137,6 +136,11 @@ class Hero {
             this.headTiltDelta += this.headTiltDelta - Math.PI / 2;
             this.perspectiveHeight = this.topZ;
         }
+    }
+
+    push(vector) {
+        this.camera.position.add(vector);
+        this.object.position.add(vector);
     }
 
     move(fpsAdjustment) {
@@ -187,10 +191,12 @@ class Hero {
     }
 
     turnLeft() {
+        this.isActive = true;
         this.turnSpeed = this.maxRotationSpeed;
     }
 
     turnRight() {
+        this.isActive = true;
         this.turnSpeed = -1.0 * this.maxRotationSpeed;
     }
 
@@ -199,10 +205,12 @@ class Hero {
     }
 
     forward() {
+        this.isActive = true;
         this.speed = this.maxSpeed;
     }
 
     reverse() {
+        this.isActive = true;
         this.speed = -1.0 * this.maxSpeed;
     }
 
@@ -241,6 +249,7 @@ class Hero {
     }
 
     startShooting() {
+        this.isActive = true;
         this.isShooting = true;
     }
 
@@ -249,7 +258,7 @@ class Hero {
     }
 
     isAlive() {
-        return this.isActive;
+        return this.hitPoints > 0;
     }
 
 }
