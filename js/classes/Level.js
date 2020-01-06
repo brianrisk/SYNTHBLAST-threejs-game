@@ -11,7 +11,7 @@ import Hero from "../../js/classes/Hero.js";
 import Building from "../../js/classes/Building.js";
 import Gun from "../../js/classes/Gun.js";
 import Enemy from "../../js/classes/Enemy.js";
-import Flipper from "../../js/classes/powerups/Flipper.js";
+import Pad from "./powerups/Pad.js";
 
 class Level {
     constructor(levelNumber, rendererThree, sounds) {
@@ -26,7 +26,8 @@ class Level {
         let bullets = [];
         let buildings = [];
         let enemies = [];
-        let powerUps = [];
+        let pointPads = [];
+        let flipPads = [];
         let gun = null;
         let padsRemaining = 0;
 
@@ -58,9 +59,12 @@ class Level {
                     let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
                     enemies.push(enemy);
                 } else if (Utils.randomInt(160) === 0) {
-                    let powerUp = new Flipper(gridX, gridY - halfArena, scene);
-                    powerUps.push(powerUp);
+                    let pointPad = new Pad(gridX, gridY - halfArena, scene, 0xFFFF88);
+                    pointPads.push(pointPad);
                     padsRemaining += 1;
+                } else if (levelNumber > 2 && Utils.randomInt(640) === 0) {
+                    let flipPad = new Pad(gridX, gridY - halfArena, scene, 0x88FF88);
+                    flipPads.push(flipPad);
                 }
             }
         }
@@ -115,7 +119,8 @@ class Level {
         this.bullets = bullets;
         this.buildings = buildings;
         this.enemies = enemies;
-        this.powerUps = powerUps;
+        this.pointPads = pointPads;
+        this.flipPads = flipPads;
         this.gun = gun;
         this.padsRemaining = padsRemaining;
         this.hasStarted = false;
@@ -157,7 +162,8 @@ class Level {
         this.bullets.forEach(bullet => bullet.update());
         this.buildings.forEach(building => building.update(fpsAdjustment));
         this.enemies.forEach(enemy => enemy.update(this.hero, fpsAdjustment));
-        this.powerUps.forEach(powerUp => powerUp.update(fpsAdjustment));
+        this.pointPads.forEach(pad => pad.update(fpsAdjustment));
+        this.flipPads.forEach(pad => pad.update(fpsAdjustment));
         this.hero.update(fpsAdjustment);
 
         // bullets hitting things
@@ -250,7 +256,7 @@ class Level {
                     }
                 });
 
-            this.powerUps.forEach(pad => {
+            this.pointPads.forEach(pad => {
                 if (
                     !pad.isUsed
                     && Math.abs(pad.getX() - this.hero.getX()) < 0.7
@@ -260,6 +266,17 @@ class Level {
                     this.padsRemaining -= 1;
                     this.sounds.point.currentTime = 0;
                     this.sounds.point.play();
+                }
+            });
+
+            this.flipPads.forEach(flipPad => {
+                if (
+                    !flipPad.isUsed
+                    && Math.abs(flipPad.getX() - this.hero.getX()) < 0.7
+                    && Math.abs(flipPad.getY() - this.hero.getY()) < 0.7
+                ) {
+                    flipPad.hit();
+                    this.hero.changePerspective();
                 }
             });
         }
