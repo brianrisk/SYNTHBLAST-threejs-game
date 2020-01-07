@@ -42,7 +42,7 @@ class Level {
 
         composer = new EffectComposer(rendererThree);
 
-        hero = new Hero(scene, camera, -55, 0);
+        hero = new Hero(scene, camera, -75, 0);
         // hero = new Hero(scene, camera, 10, 0);
         // add buildings
         let halfArena = arenaSize / 2;
@@ -83,6 +83,34 @@ class Level {
                     buildings.push(building);
                 }
             }
+        }
+
+        // add random mountains
+        for (let i = 0; i < 200; i++) {
+            let mountainMin = -65;
+            let mountainMax = arenaSize + 65;
+            let coneRadius = Utils.randomInt(10) + 2;
+            //let coneHeight = Utils.randomInt(20);
+            let coneHeight = coneRadius * 1.5;
+            let geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 4);
+            // rotate
+            let material = new THREE.LineBasicMaterial(
+                {
+                    color: 0x000000,
+                    opacity: 1,
+                    fog: true
+                });
+            // let wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000} );
+            let object = new THREE.Mesh(geometry, material);
+            // put the mountains outside the zone
+            let coneX =  -1 * Utils.randomInt(70) - coneRadius;
+            let coneY = Utils.randomInt(100) - 50;
+            object.position.x = coneX;
+            object.position.y = coneY;
+            object.position.z = 0;
+            object.rotation.x += Math.PI * .5;
+            // clear a path down the middle
+            if (Math.abs(coneY) > 5) scene.add(object);
         }
 
         gun = new Gun(scene, bullets, hero, this.sounds.pew);
@@ -140,7 +168,7 @@ class Level {
         // preserve ratio
         let geometry = new THREE.PlaneGeometry(5 * 358 / 32, 5);
         let mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(-20, 0, 10);
+        mesh.position.set(-30, 0, 15);
         mesh.rotation.y = -Math.PI / 2;
         mesh.rotation.x = Math.PI / 2;
         this.scene.add(mesh);
@@ -228,7 +256,7 @@ class Level {
             }
         });
 
-        if (this.hero.isAlive()) {
+        if (this.hero.isAlive() && this.inPlay) {
             let heroR = 0.4;
             if (this.hero.hasShield()) heroR = 1.5;
             this.enemies.forEach(
