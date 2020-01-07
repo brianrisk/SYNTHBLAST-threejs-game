@@ -73,6 +73,7 @@
 
     let level = null;
     let levelNumber = 1;
+    let levelChangeTime = (new Date()).getTime();
 
     // pixi objects
     let rendererPixi, pixiStage;
@@ -89,6 +90,7 @@
     let hitSound = new Audio('assets/audio/hit.wav');
     let explosionSound = new Audio('assets/audio/explosion2.wav');
     let impactSound = new Audio('assets/audio/impact.wav');
+    let flipSound = new Audio('assets/audio/flip.wav');
     // let audioArray = [pew, hitSound, explosionSound, song];
     let sounds = {
         song: song,
@@ -96,8 +98,10 @@
         point: pointSound,
         hit: hitSound,
         explosion: explosionSound,
-        impact: impactSound
+        impact: impactSound,
+        flip: flipSound
     };
+    let soundsLoaded = false;
 
     let frameCount = 0;
     let frameTimes = [];
@@ -325,20 +329,21 @@
     }
 
 
-
     function touchStart(event) {
-        level.hasStarted = true;
-        // if(audiosWeWantToUnlock) {
-        //     for(let audio of audiosWeWantToUnlock) {
+        // audio still choppy and causing low FPS!
+
+        // if(sounds && !soundsLoaded) {
+        //     for(let audio of Object.values(sounds)) {
         //         audio.play();
         //         audio.pause();
         //         audio.currentTime = 0;
         //     }
-        //     audiosWeWantToUnlock = null
+        //     soundsLoaded = true;
         // }
         if (!isSongPlaying) {
             song.play();
         }
+
         down(event);
         event.stopImmediatePropagation();
         event.preventDefault();
@@ -367,6 +372,8 @@
     }
 
     function down(event) {
+        // making us pause a second at the beginning of a level
+        if (((new Date()).getTime() - levelChangeTime) < 1000) return;
         level.hasStarted = true;
         // only be responsive when "inPlay"
         if (!level.inPlay) return;
@@ -437,6 +444,8 @@
     }
 
     function onDocumentKeyDown(event) {
+        // making us pause a second at the beginning of a level
+        if (((new Date()).getTime() - levelChangeTime) < 1000) return;
         level.hasStarted = true;
         if (!isSongPlaying) {
             song.play();
@@ -477,7 +486,8 @@
 
     function render3d() {
         if (level.hasWon()) {
-            levelNumber ++;
+            levelNumber++;
+            levelChangeTime = (new Date()).getTime();
             level = new Level(levelNumber, rendererThree, sounds);
         }
         level.render(fpsAdjustment);
@@ -492,9 +502,7 @@
             finalText.text = "TRY AGAIN";
             finalText.x = (window.innerWidth - finalText.width) / 2;
             statusText.text = "";
-        }
-
-        else {
+        } else {
             if (level.hasStarted) {
                 finalText.text = "";
             } else {
@@ -502,10 +510,10 @@
                 finalText.x = (window.innerWidth - finalText.width) / 2;
             }
             statusText.text =
-                  "LEVEL: " + levelNumber + "\n" +
-                  "PADS: " + level.padsRemaining + "\n" +
-                  "HEALTH: " + level.hero.hitPoints + "\n" +
-                  "SHIELD: " + level.hero.shieldHitPoints + "\n";
+                "LEVEL: " + levelNumber + "\n" +
+                "PADS: " + level.padsRemaining + "\n" +
+                "HEALTH: " + level.hero.hitPoints + "\n" +
+                "SHIELD: " + level.hero.shieldHitPoints + "\n";
         }
         rendererPixi.render(pixiStage, undefined, false);
     }

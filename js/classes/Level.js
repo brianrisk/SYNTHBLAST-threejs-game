@@ -55,7 +55,7 @@ class Level {
                     let boxHeight = Utils.randomInt(10) + 1;
                     let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
                     buildings.push(building);
-                } else if (Utils.randomInt(40) === 0) {
+                } else if (levelNumber > 1 && Utils.randomInt(64) === 0) {
                     let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
                     enemies.push(enemy);
                 } else if (Utils.randomInt(160) === 0) {
@@ -305,6 +305,8 @@ class Level {
                 ) {
                     flipPad.hit();
                     this.hero.changePerspective();
+                    this.sounds.flip.currentTime = 0;
+                    this.sounds.flip.play();
                 }
             });
         }
