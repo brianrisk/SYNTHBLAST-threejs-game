@@ -11,6 +11,7 @@ import Hero from "../../js/classes/Hero.js";
 import Building from "../../js/classes/Building.js";
 import Gun from "../../js/classes/Gun.js";
 import Enemy from "../../js/classes/Enemy.js";
+import Comet from "./Comet.js";
 import Pad from "./powerups/Pad.js";
 
 class Level {
@@ -28,6 +29,7 @@ class Level {
         let enemies = [];
         let pointPads = [];
         let flipPads = [];
+        let comets = [];
         let gun = null;
         let padsRemaining = 0;
 
@@ -113,6 +115,11 @@ class Level {
             if (Math.abs(coneY) > 5) scene.add(object);
         }
 
+        // add comets
+        for (let i = 0; i < 200; i++) {
+            comets.push(new Comet(scene, 10));
+        }
+
         gun = new Gun(scene, bullets, hero, this.sounds.pew);
         hero.setGun(gun);
 
@@ -149,6 +156,7 @@ class Level {
         this.enemies = enemies;
         this.pointPads = pointPads;
         this.flipPads = flipPads;
+        this.comets = comets;
         this.gun = gun;
         this.padsRemaining = padsRemaining;
         this.hasStarted = false;
@@ -192,6 +200,7 @@ class Level {
         this.enemies.forEach(enemy => enemy.update(this.hero, fpsAdjustment));
         this.pointPads.forEach(pad => pad.update(fpsAdjustment));
         this.flipPads.forEach(pad => pad.update(fpsAdjustment));
+        this.comets.forEach(comet => comet.update(fpsAdjustment));
         this.hero.update(fpsAdjustment);
 
         // bullets hitting things

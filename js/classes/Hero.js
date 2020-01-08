@@ -26,7 +26,7 @@ class Hero {
         this.gun = null;
         this.isShooting = false;
         this.maxHitPoints = 10;
-        this.shieldHitPoints = 5;
+        this.shieldHitPoints = 0;
         this.isActive = false;
 
         // setting up
@@ -95,7 +95,10 @@ class Hero {
         this.move(fpsAdjustment);
         this.shield.rotation.x += Math.PI / 180 * fpsAdjustment;
         this.shield.rotation.y += Math.PI / 180 * fpsAdjustment;
-        // this.shield.rotation.z += Math.PI / 180 * fpsAdjustment;
+        // this.shield.rotation.z += Math.PI / 180 *
+        if (this.shieldHitPoints <= 0) {
+            this.shield.visible = false;
+        }
     }
 
     hit(impact) {
@@ -107,9 +110,7 @@ class Hero {
             this.shieldHitPoints = 0;
 
         }
-        if (this.shieldHitPoints <= 0) {
-            this.shield.visible = false;
-        }
+
         return damage;
     }
 
