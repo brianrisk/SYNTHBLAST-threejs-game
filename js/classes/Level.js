@@ -13,6 +13,7 @@ import Gun from "../../js/classes/Gun.js";
 import Enemy from "../../js/classes/Enemy.js";
 import Comet from "./Comet.js";
 import Pad from "./powerups/Pad.js";
+import Shield from "./powerups/Shield.js";
 
 class Level {
     constructor(levelNumber, rendererThree, sounds) {
@@ -29,6 +30,7 @@ class Level {
         let enemies = [];
         let pointPads = [];
         let flipPads = [];
+        let shields = [];
         let comets = [];
         let gun = null;
         let padsRemaining = 0;
@@ -67,6 +69,9 @@ class Level {
                 } else if (levelNumber > 2 && Utils.randomInt(640) === 0) {
                     let flipPad = new Pad(gridX, gridY - halfArena, scene, 0x88FF88);
                     flipPads.push(flipPad);
+                } else if ( Utils.randomInt(100) === 0) {
+                    let shield = new Shield(gridX, gridY - halfArena, scene);
+                    shields.push(shield);
                 }
             }
         }
@@ -117,7 +122,7 @@ class Level {
 
         // add comets
         for (let i = 0; i < 200; i++) {
-            comets.push(new Comet(scene, 10));
+            comets.push(new Comet(scene, Utils.randomInt(5) + 5));
         }
 
         gun = new Gun(scene, bullets, hero, this.sounds.pew);
@@ -156,6 +161,7 @@ class Level {
         this.enemies = enemies;
         this.pointPads = pointPads;
         this.flipPads = flipPads;
+        this.shields = shields;
         this.comets = comets;
         this.gun = gun;
         this.padsRemaining = padsRemaining;
@@ -200,6 +206,7 @@ class Level {
         this.enemies.forEach(enemy => enemy.update(this.hero, fpsAdjustment));
         this.pointPads.forEach(pad => pad.update(fpsAdjustment));
         this.flipPads.forEach(pad => pad.update(fpsAdjustment));
+        this.shields.forEach(shield => shield.update(fpsAdjustment));
         this.comets.forEach(comet => comet.update(fpsAdjustment));
         this.hero.update(fpsAdjustment);
 
@@ -316,6 +323,19 @@ class Level {
                     this.hero.changePerspective();
                     this.sounds.flip.currentTime = 0;
                     this.sounds.flip.play();
+                }
+            });
+
+            this.shields.forEach(shield => {
+                if (
+                    !shield.isUsed
+                    && Math.abs(shield.getX() - this.hero.getX()) < 0.7
+                    && Math.abs(shield.getY() - this.hero.getY()) < 0.7
+                ) {
+                    shield.hit();
+                    this.hero.addShield();
+                    this.sounds.shield.currentTime = 0;
+                    this.sounds.shield.play();
                 }
             });
         }

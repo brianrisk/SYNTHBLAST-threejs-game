@@ -122,6 +122,11 @@ class Hero {
         return this.shieldHitPoints > 0;
     }
 
+    addShield() {
+        this.shieldHitPoints ++;
+        this.shield.visible = true;
+    }
+
     changePerspective() {
         this.setPerspective(!this.isFirstPerson);
     }

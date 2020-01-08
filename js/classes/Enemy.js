@@ -8,7 +8,8 @@ class Enemy {
         let material = new THREE.MeshPhongMaterial({
             color: 0x00FFFF
         });
-        let geometry = new THREE.ConeGeometry(.5, 1, 4);
+        let sizeFactor = 1;
+        let geometry = new THREE.ConeGeometry(.5 * sizeFactor, sizeFactor, 4);
         let cone = new THREE.Mesh(geometry, material);
         cone.position.x = x;
         cone.position.y = y;

@@ -91,7 +91,8 @@
     let explosionSound = new Audio('assets/audio/explosion2.wav');
     let impactSound = new Audio('assets/audio/impact.wav');
     let flipSound = new Audio('assets/audio/flip.wav');
-    // let audioArray = [pew, hitSound, explosionSound, song];
+    let shieldSound = new Audio('assets/audio/shield.wav');
+    let launchSound = new Audio('assets/audio/massive2.wav');
     let sounds = {
         song: song,
         pew: pew,
@@ -99,7 +100,9 @@
         hit: hitSound,
         explosion: explosionSound,
         impact: impactSound,
-        flip: flipSound
+        flip: flipSound,
+        shield: shieldSound,
+        launch: launchSound
     };
     let soundsLoaded = false;
 
@@ -341,7 +344,7 @@
         //     soundsLoaded = true;
         // }
         if (!isSongPlaying) {
-            song.play();
+            // song.play();
         }
 
         down(event);
@@ -374,6 +377,11 @@
     function down(event) {
         // making us pause a second at the beginning of a level
         if (((new Date()).getTime() - levelChangeTime) < 1000) return;
+        if (!level.hasStarted) {
+            sounds.launch.currentTime = 0;
+            sounds.launch.volume = 0.5;
+            sounds.launch.play();
+        }
         level.hasStarted = true;
         // only be responsive when "inPlay"
         if (!level.inPlay) return;
@@ -446,9 +454,14 @@
     function onDocumentKeyDown(event) {
         // making us pause a second at the beginning of a level
         if (((new Date()).getTime() - levelChangeTime) < 1000) return;
+        if (!level.hasStarted) {
+            sounds.launch.currentTime = 0;
+            sounds.launch.volume = 0.5;
+            sounds.launch.play();
+        }
         level.hasStarted = true;
         if (!isSongPlaying) {
-            song.play();
+            // song.play();
         }
         let keyCode = event["which"];
         if (level.inPlay) {
