@@ -26,7 +26,7 @@ class Comet {
     update(fpsAdjustment) {
         let inc = this.vector.clone();
         inc.multiplyScalar(fpsAdjustment);
-        if (Math.abs(this.object.position.x) > 200 || Math.abs(this.object.position.y) > 200) this.reset();
+        if (Math.abs(this.object.position.x) > 400 || Math.abs(this.object.position.y) > 400) this.reset();
         this.object.position.add(inc);
     }
 

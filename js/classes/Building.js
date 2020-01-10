@@ -22,6 +22,7 @@ class Building {
         this.object = cube;
         this.height = height;
         this.hitPoints = height;
+        if (!damageable) this.hitPoints = 100;
         this.desiredZ = cube.position.z;
         this.scene = scene;
         this.active = true;

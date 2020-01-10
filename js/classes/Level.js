@@ -56,7 +56,8 @@ class Level {
                 // if (gridY % 3 === 0 || gridX % 3 === 0) continue;
                 // if (!(gridY % 4 === 0 || gridY % 4 === 1 || gridX % 4 === 0 || gridX % 4 === 1)) {
                 if (Utils.randomInt(30) === 0) {
-                    let boxHeight = Utils.randomInt(10) + 1;
+                    // box height increases with level
+                    let boxHeight = Utils.randomInt(levelNumber) + 1;
                     let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
                     buildings.push(building);
                 } else if (levelNumber > 1 && Utils.randomInt(64) === 0) {
@@ -83,7 +84,7 @@ class Level {
                 if (gridY === halfArena && gridX === -1) continue;
                 // only filling in edges
                 if (gridX === -1 || gridY === -1 || gridX === arenaSize || gridY === arenaSize) {
-                    let boxHeight = 1;
+                    let boxHeight = 0.25;
                     // if (gridY % 2 === 0 || gridX % 2 === 0) boxHeight = 2;
                     if (gridX !== arenaSize && (gridY === halfArena - 1 || gridY === halfArena + 1)) boxHeight = 20;
                     let building = new Building(gridX, gridY - arenaSize / 2, boxHeight, scene, false);
@@ -222,8 +223,8 @@ class Level {
                         let buildingHitPoints = building.getHitPoints();
                         building.hit(bullet.getHitPoints());
                         bullet.hit(buildingHitPoints);
-                        this.sounds.impact.currentTime = 0;
-                        this.sounds.impact.play();
+                        // this.sounds.impact.currentTime = 0;
+                        // this.sounds.impact.play();
 
                     }
                 });

@@ -34,15 +34,43 @@
     </style>
 </head>
 <body>
+<script src='js/Facebook.js'></script>
 <script src='node_modules/stats.js/build/stats.min.js'></script>
 <script src='lib/pixi.min.js'></script>
 <script type="module">
 
-    // add transitions between levels
+    // leader board
+    // loading screen
 
-    // add shooting stars
+    // optimize for fullscreen: http://www.onlywebpro.com/2015/07/19/optimizing-full-screen-mobile-web-app-for-ios/
 
-    // add random large pyramids outside of arena
+    // hitting two flip pads in a row messes up view.
+
+    // ship upgrades:
+    //   shield capacity
+    //   speed
+    //   turn speed
+    //   hit points
+    //   HUD for pads
+
+    // gun upgrades
+    //   bullet refresh speed
+    //   bullet damage
+    //   bullet intelligence (how much it bends toward closest enemy)
+    //   Javelin
+    //   Energy balls that then electrify nearby targets when they hit something
+
+    // gun upgrades
+
+    // Powerups
+    //   turbo
+    //   out of body
+    //   drone
+    //   Coin Magnet
+
+    // levels are hours of the day:  level 1.  12:00 AM.  Sky changes; sun position.
+
+    // yellow flash or something when going over point pad
 
     // bomb pad
 
@@ -51,8 +79,6 @@
     // lightning gun
 
     // make guns things you can pick up
-
-    // have to be facing an enemy to shoot them
 
     // add UI elements: health bar
 
@@ -92,7 +118,7 @@
     let impactSound = new Audio('assets/audio/impact.wav');
     let flipSound = new Audio('assets/audio/flip.wav');
     let shieldSound = new Audio('assets/audio/shield.wav');
-    let launchSound = new Audio('assets/audio/massive2.wav');
+    let launchSound = new Audio('assets/audio/launch.wav');
     let sounds = {
         song: song,
         pew: pew,
@@ -378,6 +404,7 @@
         // making us pause a second at the beginning of a level
         if (((new Date()).getTime() - levelChangeTime) < 1000) return;
         if (!level.hasStarted) {
+            setAudio();
             sounds.launch.currentTime = 0;
             sounds.launch.volume = 0.5;
             sounds.launch.play();
@@ -451,10 +478,18 @@
 
     }
 
+    function setAudio() {
+        // setting up AudioContext to avoid sound delay in Safari
+        // https://stackoverflow.com/questions/9811429/html5-audio-tag-on-safari-has-a-delay
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+    }
+
     function onDocumentKeyDown(event) {
         // making us pause a second at the beginning of a level
         if (((new Date()).getTime() - levelChangeTime) < 1000) return;
         if (!level.hasStarted) {
+            setAudio();
             sounds.launch.currentTime = 0;
             sounds.launch.volume = 0.5;
             sounds.launch.play();
@@ -508,9 +543,7 @@
 
     function render2d() {
         if (level.padsRemaining === 0) {
-            finalText.text = "YOU WIN";
-            finalText.x = (window.innerWidth - finalText.width) / 2;
-            statusText.text = "";
+
         } else if (level.hero.hitPoints <= 0) {
             finalText.text = "TRY AGAIN";
             finalText.x = (window.innerWidth - finalText.width) / 2;
