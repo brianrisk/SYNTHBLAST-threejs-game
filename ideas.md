@@ -55,14 +55,18 @@
 * "enemies can shoot"
 
 ### Modes
-* mode: zombie mode (no buildings, quadrouple the enemies, more shields, one pad in the middle in a building fence)
-* mode: campaign
-* mode: maze
+* zombie mode (no buildings, quadrouple the enemies, more shields, one pad in the middle in a building fence)
+* campaign
+* maze
+* compete
 
 #### Zombie mode
 * have to kill all zombies before impervious wall descends to reveal the single pad
 * titan zombies
 
+#### compete mode;
+* trying to collect all pads before an opponent
+* every time you shoot an enemy they show up on your competitors screen
 
 ### skybox
 * make synthwave background (syntywave sunset)
