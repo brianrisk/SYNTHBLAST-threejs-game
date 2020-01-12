@@ -84,7 +84,7 @@ class Level {
         //     let drone = new Drone( halfArena, 0, scene);
         //     drones.push(drone);
         // }
-        
+
         // add fence around the buildings
         for (let gridX = -1; gridX <= arenaSize; gridX++) {
             for (let gridY = -1; gridY <= arenaSize; gridY++) {

@@ -1,3 +1,5 @@
+//https://stackoverflow.com/questions/27992147/three-js-include-mesh-data-in-code/27996338#27996338
+
 const drone = {
     "metadata": {
         "version": 4.5,
