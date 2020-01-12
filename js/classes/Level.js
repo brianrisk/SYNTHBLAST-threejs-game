@@ -36,12 +36,22 @@ class Level {
         let comets = [];
         let gun = null;
         let padsRemaining = 0;
+        let fogColors = [
+            0xFF00FF,
+            0xFFFF00,
+            0x00FFFF,
+            0x00FF00,
+            0xFF0000,
+            0x0000FF,
+            0x333333,
+        ]
 
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
         scene.background = new THREE.Color(0x000000);
         // scene.background = new THREE.Color(0xefd1b5);
-        scene.fog = new THREE.FogExp2(0xFF00FF, 0.05);
+        let fogColor = fogColors[(levelNumber - 1) % fogColors.length];
+        scene.fog = new THREE.FogExp2(fogColor, 0.05);
         scene.color = 0x00DD00;
 
         rendererThree.setSize(window.innerWidth, window.innerHeight);

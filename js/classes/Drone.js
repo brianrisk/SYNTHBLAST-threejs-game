@@ -164,7 +164,7 @@ class Drone {
     isAlive() {
         return this.alive;
     }
-    
+
 }
 
 export default Drone;
