@@ -11,6 +11,7 @@ import Hero from "../../js/classes/Hero.js";
 import Building from "../../js/classes/Building.js";
 import Gun from "../../js/classes/Gun.js";
 import Enemy from "../../js/classes/Enemy.js";
+import Drone from "../../js/classes/Drone.js";
 import Comet from "./Comet.js";
 import Pad from "./powerups/Pad.js";
 import Shield from "./powerups/Shield.js";
@@ -28,6 +29,7 @@ class Level {
         let bullets = [];
         let buildings = [];
         let enemies = [];
+        let drones = [];
         let pointPads = [];
         let flipPads = [];
         let shields = [];
@@ -77,6 +79,12 @@ class Level {
             }
         }
 
+        // putting in a drone
+        // for (let i = 0; i < 1; i++) {
+        //     let drone = new Drone( halfArena, 0, scene);
+        //     drones.push(drone);
+        // }
+        
         // add fence around the buildings
         for (let gridX = -1; gridX <= arenaSize; gridX++) {
             for (let gridY = -1; gridY <= arenaSize; gridY++) {
@@ -160,6 +168,7 @@ class Level {
         this.bullets = bullets;
         this.buildings = buildings;
         this.enemies = enemies;
+        this.drones = drones;
         this.pointPads = pointPads;
         this.flipPads = flipPads;
         this.shields = shields;
@@ -205,6 +214,7 @@ class Level {
         this.bullets.forEach(bullet => bullet.update());
         this.buildings.forEach(building => building.update(fpsAdjustment));
         this.enemies.forEach(enemy => enemy.update(this.hero, fpsAdjustment));
+        this.drones.forEach(drone => drone.update(this.hero, this.enemies,fpsAdjustment));
         this.pointPads.forEach(pad => pad.update(fpsAdjustment));
         this.flipPads.forEach(pad => pad.update(fpsAdjustment));
         this.shields.forEach(shield => shield.update(fpsAdjustment));
