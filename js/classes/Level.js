@@ -20,7 +20,7 @@ class Level {
     constructor(levelNumber, rendererThree, sounds) {
         this.rendererThree = rendererThree;
         this.sounds = sounds;
-        let arenaSize = 20 + 4 * (levelNumber - 1); // 20, 24, 28, etc.
+        let arenaSize = 16 + 4 * (levelNumber - 1); // 20, 24, 28, etc.
         let scene = null;
         let camera = null;
         let composer = null;
@@ -37,10 +37,9 @@ class Level {
         let gun = null;
         let padsRemaining = 0;
         let fogColors = [
-            0xFF00FF,
+            0xFF0088,
             0xFFFF00,
             0x00FFFF,
-            0x00FF00,
             0xFF0000,
             0x0000FF,
             0x333333,
