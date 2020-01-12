@@ -35,9 +35,9 @@
 </head>
 <body>
 <!--<script src='js/Facebook.js'></script>-->
-<script src='js/Sounds.js'></script>
 <script src='node_modules/stats.js/build/stats.min.js'></script>
 <script src='lib/pixi.min.js'></script>
+<script src='js/Sounds.js'></script>
 <script type="module">
 
     import * as THREE from "./lib/three/build/three.module.js";
@@ -46,15 +46,15 @@
     // three objects
     let rendererThree;
 
-    let level = null;
-    let levelNumber = 1;
-    let levelChangeTime = (new Date()).getTime();
-
     // pixi objects
     let rendererPixi, pixiStage;
     let instructionText, statusText, finalText;
     let b1, b2, b3, b4, b6, b7, b8, b9, bFire;
     let bWidth = 60;
+
+    let level = null;
+    let levelNumber = 1;
+    let levelChangeTime = (new Date()).getTime();
 
     let frameCount = 0;
     let frameTimes = [];

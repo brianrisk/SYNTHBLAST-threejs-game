@@ -5,37 +5,59 @@ import Particle from "./Particle.js";
 class Drone {
 
     constructor(x, y, scene) {
+        let self = this;
         this.scene = scene;
-
-        let material = new THREE.MeshPhongMaterial({
-            color: 0xFFFFFF
-        });
-        let sizeFactor = 0.5;
-        let geometry = new THREE.ConeGeometry(.5 * sizeFactor, sizeFactor, 4);
-        let cone = new THREE.Mesh(geometry, material);
-        cone.position.x = x;
-        cone.position.y = y;
-        cone.position.z = 2.0;
-        this.object = cone;
         this.alive = true;
         this.hitPoints = 2;
-        scene.add(cone);
+        this.loaded = false;
 
-        this.maxSpeed = 0.15;
+        let loader = new THREE.ObjectLoader();
+        loader.load(
+            // resource URL
+            "js/models/Drone.json",
+
+            // onLoad callback
+            // Here the loaded data is assumed to be an object
+            function ( obj ) {
+                // Add the loaded object to the scene
+                console.log("loaded");
+                self.object = obj;
+                self.loaded = true;
+                self.finishConstruction(x,y);
+            },
+
+            // onProgress callback
+            function ( xhr ) {
+                console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+            },
+
+            // onError callback
+            function ( err ) {
+                console.error("error loading");
+                console.error( err );
+            }
+        );
+
+    }
+
+    finishConstruction(x, y) {
+        this.object.position.x = x;
+        this.object.position.y = y;
+        this.object.position.z = 1.5;
+        this.object.rotation.x = 90 * Math.PI / 180;
+        // this.object.rotation.y = -90 * Math.PI / 180;
+
+        this.maxSpeed = 0.05;
         this.rotationAxis = new THREE.Vector3(0, 0, 1);
         let rotationAngle = 45 * Math.PI / 180;
         this.direction = new THREE.Vector3(0, 1, 0);
-        this.direction.applyAxisAngle(this.rotationAxis, rotationAngle);
-        this.object.rotateOnAxis(this.rotationAxis, rotationAngle);
+        // this.direction.applyAxisAngle(this.rotationAxis, rotationAngle);
+        // this.object.rotateOnAxis(this.rotationAxis, rotationAngle);
         this.moveInc = this.direction.clone();
         this.moveInc.multiplyScalar(this.maxSpeed);
         this.newWander();
         this.particles = [];
-
-        // this.object.rotation.x = -90 * Math.PI / 180;
-        // this.object.rotation.y = -90 * Math.PI / 180;
-
-
+        this.scene.add(this.object)
     }
 
     hit(impact, fpsAdjustment) {
@@ -128,7 +150,9 @@ class Drone {
     }
 
     move() {
-        this.object.position.add(this.moveInc);
+        if (this.loaded) {
+            this.object.position.add(this.moveInc);
+        }
     }
 
     unMove() {
@@ -140,9 +164,7 @@ class Drone {
     isAlive() {
         return this.alive;
     }
-
-
+    
 }
-
 
 export default Drone;

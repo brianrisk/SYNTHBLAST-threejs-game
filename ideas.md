@@ -74,5 +74,15 @@
 * buildings stored in 2d array
 * BoxBufferGeometry for buildings
 
+## menu
+* Leaderboard: login to compete against your friends
+* game modes
+* upgrades
+  * ships
+  * guns
+  * Equipment
+  * credits
+* settings
+
 
 

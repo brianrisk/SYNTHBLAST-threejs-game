@@ -79,7 +79,7 @@ class Level {
             }
         }
 
-        // putting in a drone
+        // drones
         // for (let i = 0; i < 1; i++) {
         //     let drone = new Drone( halfArena, 0, scene);
         //     drones.push(drone);
