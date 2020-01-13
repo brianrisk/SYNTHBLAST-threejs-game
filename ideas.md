@@ -48,7 +48,7 @@
 * 10 flips: flipper
 * 100 flips: flip master
 
-### Level messages
+### Game messages
 * "clear all pads"
 * "buildings can be shot"
 * "enemies"

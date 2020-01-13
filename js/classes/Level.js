@@ -13,14 +13,16 @@ import Gun from "../../js/classes/Gun.js";
 import Enemy from "../../js/classes/Enemy.js";
 import Drone from "../../js/classes/Drone.js";
 import Comet from "./Comet.js";
+import Game from "./Game.js";
 import Pad from "./powerups/Pad.js";
 import Shield from "./powerups/Shield.js";
 
 class Level {
-    constructor(levelNumber, rendererThree, sounds) {
+    constructor(game, rendererThree, sounds) {
+        this.game = game;
         this.rendererThree = rendererThree;
         this.sounds = sounds;
-        let arenaSize = 16 + 4 * (levelNumber - 1); // 20, 24, 28, etc.
+        let arenaSize = 16 + 4 * (game.levelNumber - 1); // 20, 24, 28, etc.
         let scene = null;
         let camera = null;
         let composer = null;
@@ -37,10 +39,11 @@ class Level {
         let gun = null;
         let padsRemaining = 0;
         let fogColors = [
-            0xFF0088,
-            0xFFFF00,
+            0xFF00FF,
             0x00FFFF,
             0xFF0000,
+            0xFF0088,
+            0x8800FF,
             0x0000FF,
             0x333333,
         ]
@@ -49,7 +52,7 @@ class Level {
         camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
         scene.background = new THREE.Color(0x000000);
         // scene.background = new THREE.Color(0xefd1b5);
-        let fogColor = fogColors[(levelNumber - 1) % fogColors.length];
+        let fogColor = fogColors[(game.levelNumber - 1) % fogColors.length];
         scene.fog = new THREE.FogExp2(fogColor, 0.05);
         scene.color = 0x00DD00;
 
@@ -68,17 +71,17 @@ class Level {
                 // if (!(gridY % 4 === 0 || gridY % 4 === 1 || gridX % 4 === 0 || gridX % 4 === 1)) {
                 if (Utils.randomInt(30) === 0) {
                     // box height increases with level
-                    let boxHeight = Utils.randomInt(levelNumber) + 1;
+                    let boxHeight = Utils.randomInt(game.levelNumber) + 1;
                     let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
                     buildings.push(building);
-                } else if (levelNumber > 1 && Utils.randomInt(64) === 0) {
+                } else if (game.levelNumber > 1 && Utils.randomInt(64) === 0) {
                     let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
                     enemies.push(enemy);
                 } else if (Utils.randomInt(160) === 0) {
                     let pointPad = new Pad(gridX, gridY - halfArena, scene, 0xFFFF88);
                     pointPads.push(pointPad);
                     padsRemaining += 1;
-                } else if (levelNumber > 2 && Utils.randomInt(640) === 0) {
+                } else if (game.levelNumber > 2 && Utils.randomInt(640) === 0) {
                     let flipPad = new Pad(gridX, gridY - halfArena, scene, 0x88FF88);
                     flipPads.push(flipPad);
                 } else if ( Utils.randomInt(100) === 0) {
@@ -365,10 +368,6 @@ class Level {
 
     hasWon() {
         return this.padsRemaining === 0;
-    }
-
-    hasDied() {
-        return this.hero.hitPoints <= 0;
     }
 
 }

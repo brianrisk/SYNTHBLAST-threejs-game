@@ -41,20 +41,39 @@
 <script type="module">
 
     import * as THREE from "./lib/three/build/three.module.js";
-    import Level from "./js/classes/Level.js";
+    import Game from "./js/classes/Game.js";
+    import UI from "./js/classes/UI.js";
 
-    // three objects
+    // Sounds
+    let audioContext = null;
+    // let massive = new Audio('assets/audio/massive2.wav');
+    // let song = new Audio('music/implant-128kbps.mp3');
+    let pew = new Audio('assets/audio/pip.wav');
+    let pointSound = new Audio('assets/audio/point.wav');
+    let hitSound = new Audio('assets/audio/hit.wav');
+    let explosionSound = new Audio('assets/audio/explosion2.wav');
+    let impactSound = new Audio('assets/audio/impact.wav');
+    let flipSound = new Audio('assets/audio/flip.wav');
+    let shieldSound = new Audio('assets/audio/shield.wav');
+    let launchSound = new Audio('assets/audio/launch.wav');
+    let sounds = {
+        // song: song,
+        pew: pew,
+        point: pointSound,
+        hit: hitSound,
+        explosion: explosionSound,
+        impact: impactSound,
+        flip: flipSound,
+        shield: shieldSound,
+        launch: launchSound
+    };
+
+    // Renderers
     let rendererThree;
+    let rendererPixi;
 
-    // pixi objects
-    let rendererPixi, pixiStage;
-    let instructionText, statusText, finalText;
-    let b1, b2, b3, b4, b6, b7, b8, b9, bFire;
-    let bWidth = 60;
-
-    let level = null;
-    let levelNumber = 1;
-    let levelChangeTime = (new Date()).getTime();
+    let ui = null;
+    let game = null;
 
     let frameCount = 0;
     let frameTimes = [];
@@ -89,6 +108,80 @@
         requestAnimationFrame(animate);
     }
 
+    function init() {
+        let canvas = document.getElementById("screen");
+        rendererThree = new THREE.WebGLRenderer({
+            canvas: canvas
+        });
+        rendererPixi = new PIXI.Renderer({
+            view: canvas,
+            context: rendererThree.getContext()
+        });
+
+        init3d();
+        init2d();
+
+        // listeners
+        window.addEventListener('resize', onWindowResize, false);
+        document.addEventListener('keydown', onDocumentKeyDown, false);
+        document.addEventListener('keyup', onDocumentKeyUp, false);
+        document.addEventListener('touchstart', touchStart, {passive: false});
+        document.addEventListener('touchend', touchEnd, {passive: false});
+        document.body.addEventListener('touchmove', touchStart, {passive: false});
+    }
+
+    function onDocumentKeyDown(event) {
+        if (!audioContext) {
+            setAudio();
+        }
+        ui.onDocumentKeyDown(event);
+    }
+
+    function onDocumentKeyUp(event) {
+        ui.onDocumentKeyUp(event);
+    }
+
+    function touchStart(event) {
+        if (!audioContext) {
+            setAudio();
+        }
+        ui.touchStart(event);
+    }
+
+    function touchEnd(event) {
+        ui.touchEnd(event);
+    }
+
+    function init3d() {
+        game = new Game(rendererThree, sounds);
+    }
+
+    function init2d() {
+        ui = new UI(game, rendererPixi, sounds);
+    }
+
+    function render3d() {
+        game.render(fpsAdjustment);
+    }
+
+    function render2d() {
+        ui.render();
+    }
+
+    function onWindowResize() {
+        game.level.camera.aspect = window.innerWidth / window.innerHeight;
+        game.level.camera.updateProjectionMatrix();
+        rendererThree.setSize(window.innerWidth, window.innerHeight);
+        ui.pixiStage.destroy(true);
+        ui.init();
+    }
+
+    function setAudio() {
+        // https://stackoverflow.com/questions/9811429/html5-audio-tag-on-safari-has-a-delay
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioContext = new AudioContext();
+    }
+
     function calculateFps() {
         frameCount++;
         if (frameCount < 10) {
@@ -103,397 +196,6 @@
                 fpsAdjustment = 60 / fps;
             }
         }
-    }
-
-
-    function init() {
-        let canvas = document.getElementById("screen");
-        rendererThree = new THREE.WebGLRenderer({
-            canvas: canvas
-        });
-        rendererPixi = new PIXI.Renderer({
-            view: canvas,
-            context: rendererThree.getContext()
-        });
-        pixiStage = new PIXI.Container();
-
-        init3d();
-        init2d();
-
-        // listeners
-        window.addEventListener('resize', onWindowResize, false);
-        document.addEventListener('keydown', onDocumentKeyDown, false);
-        document.addEventListener('keyup', onDocumentKeyUp, false);
-        document.addEventListener('touchstart', touchStart, {passive: false});
-        document.addEventListener('touchend', touchEnd, {passive: false});
-        document.body.addEventListener('touchmove', touchStart, {passive: false});
-    }
-
-    function init2d() {
-        let isMobile = 'ontouchstart' in document.documentElement;
-        if (isMobile) {
-            let half = bWidth / 2;
-            let offset = 10;
-            let x0 = offset;
-            let x1 = bWidth + offset;
-            let x2 = bWidth * 2 + offset;
-            let x3 = bWidth * 3 + offset;
-            let y1 = window.innerHeight - bWidth * 3 - offset;
-            let y2 = window.innerHeight - bWidth * 2 - offset;
-            let y3 = window.innerHeight - bWidth - offset;
-            let y4 = window.innerHeight - offset;
-
-            // squares
-            b1 = getSquare(x0, y1, bWidth);
-            pixiStage.addChild(b1);
-            b2 = getSquare(x1, y1, bWidth);
-            pixiStage.addChild(b2);
-            b3 = getSquare(x2, y1, bWidth);
-            pixiStage.addChild(b3);
-
-            b4 = getSquare(x0, y2, bWidth);
-            pixiStage.addChild(b4);
-            b6 = getSquare(x2, y2, bWidth);
-            pixiStage.addChild(b6);
-
-            b7 = getSquare(x0, y3, bWidth);
-            pixiStage.addChild(b7);
-            b8 = getSquare(x1, y3, bWidth);
-            pixiStage.addChild(b8);
-            b9 = getSquare(x2, y3, bWidth);
-            pixiStage.addChild(b9);
-
-            bFire = new PIXI.Graphics();
-            bFire.beginFill(0xFF00FF);
-            bFire.drawEllipse(window.innerWidth - (bWidth * 1.5), window.innerHeight - (bWidth * 1.5), bWidth, bWidth);
-            bFire.alpha = 0.6;
-            bFire.visible = false; // initially hidden
-            pixiStage.addChild(bFire);
-
-            let fireOutline = new PIXI.Graphics();
-            fireOutline.lineStyle(2, 0xCC88CC, 1);
-            fireOutline.drawEllipse(window.innerWidth - (bWidth * 1.5), window.innerHeight - (bWidth * 1.5), bWidth, bWidth);
-            pixiStage.addChild(fireOutline);
-
-            // grid
-            let gridThickness = 2;
-            drawLine(x0, y1, x3, y1, gridThickness);
-            drawLine(x0, y2, x3, y2, gridThickness);
-            drawLine(x0, y3, x3, y3, gridThickness);
-            drawLine(x0, y4, x3, y4, gridThickness);
-            drawLine(x0, y1, x0, y4, gridThickness);
-            drawLine(x1, y1, x1, y4, gridThickness);
-            drawLine(x2, y1, x2, y4, gridThickness);
-            drawLine(x3, y1, x3, y4, gridThickness);
-            //arrows
-            drawArrow(x0 + half, y1 + half, Math.PI * -.25);
-            drawArrow(x1 + half, y1 + half, 0);
-            drawArrow(x2 + half, y1 + half, Math.PI * .25);
-            drawArrow(x0 + half, y2 + half, Math.PI * -.5);
-            drawArrow(x2 + half, y2 + half, Math.PI * .5);
-            drawArrow(x0 + half, y3 + half, Math.PI * -.75);
-            drawArrow(x1 + half, y3 + half, Math.PI * -1);
-            drawArrow(x2 + half, y3 + half, Math.PI * -1.25);
-        } else {
-            // https://stackoverflow.com/questions/55692097/stop-pixel-font-from-being-blurred-when-rendered
-            let instructionStyle = new PIXI.TextStyle({
-                fontFamily: "\"Courier New\", Courier, monospace",
-                fontSize: 14,
-                fill: "#00FFFF",
-                stroke: '#ff00FF',
-                strokeThickness: 1,
-                dropShadow: true,
-                dropShadowColor: "#000000",
-                dropShadowBlur: 2,
-                dropShadowAngle: 0,
-                dropShadowDistance: 0,
-            });
-
-            instructionText = new PIXI.Text('ARROW KEYS TO MOVE; SPACE TO FIRE.', instructionStyle);
-            instructionText.position.set(10, window.innerHeight - 50);
-            pixiStage.addChild(instructionText);
-        }
-
-        let statusStyle = new PIXI.TextStyle({
-            fontFamily: "\"Courier New\", Courier, monospace",
-            fontSize: 18,
-            fill: "#99DDDD",
-        });
-
-        statusText = new PIXI.Text("", statusStyle);
-        statusText.position.set(10, 50);
-        pixiStage.addChild(statusText);
-
-        let finalSize = Math.max(window.innerWidth / 20, window.innerHeight / 8);
-        let finalStyle = new PIXI.TextStyle({
-            fontFamily: "\"Courier New\", Courier, monospace",
-            fontSize: finalSize,
-            fill: "#99FFFF",
-            align: "center",
-            dropShadow: true,
-            dropShadowBlur: 10,
-            dropShadowDistance: 0,
-            dropShadowAlpha: 0.5
-        });
-
-        finalText = new PIXI.Text("", finalStyle);
-        finalText.position.set(window.innerWidth / 2, (window.innerHeight - finalSize) / 2);
-        pixiStage.addChild(finalText);
-    }
-
-    function getSquare(x, y, width) {
-        let square = new PIXI.Graphics();
-        square.beginFill(0xFF00FF);
-        square.drawRect(x, y, width, width);
-        square.alpha = 0.6;
-        square.visible = false; // initially hidden
-        return square;
-    }
-
-    function drawLine(x1, y1, x2, y2, thickness) {
-        pixiStage.addChild(getLine(x1, y1, x2, y2, thickness));
-    }
-
-    function getLine(x1, y1, x2, y2, thickness) {
-        let line = new PIXI.Graphics();
-        line.lineStyle(thickness, 0xCC88CC, 1);
-        line.moveTo(x1, y1);
-        line.lineTo(x2, y2);
-        return line;
-    }
-
-    function drawArrow(x, y, rotation) {
-        const container = new PIXI.Container();
-        let l = 10;
-        let thickness = 2;
-        container.addChild(getLine(0, 5, 0, 0 - l, thickness));
-        container.addChild(getLine(0, 0 - l, 0 - l, 0, thickness));
-        container.addChild(getLine(0, 0 - l, l, 0, thickness));
-        container.x = x;
-        container.y = y;
-        container.rotation = rotation;
-        pixiStage.addChild(container);
-
-    }
-
-    function init3d() {
-        level = new Level(levelNumber, rendererThree, sounds);
-    }
-
-
-    function touchStart(event) {
-        // audio still choppy and causing low FPS!
-
-        // if(sounds && !soundsLoaded) {
-        //     for(let audio of Object.values(sounds)) {
-        //         audio.play();
-        //         audio.pause();
-        //         audio.currentTime = 0;
-        //     }
-        //     soundsLoaded = true;
-        // }
-        if (!isSongPlaying) {
-            // song.play();
-        }
-
-        down(event);
-        event.stopImmediatePropagation();
-        event.preventDefault();
-
-    }
-
-    function touchEnd(event) {
-        for (let i = 0; i < event.changedTouches.length; i++) {
-            let touch = event.changedTouches[i];
-            if (touch.clientX < window.innerWidth / 2) {
-                level.hero.stopTurning();
-                level.hero.stop();
-                b1.visible = false;
-                b2.visible = false;
-                b3.visible = false;
-                b4.visible = false;
-                b6.visible = false;
-                b7.visible = false;
-                b8.visible = false;
-                b9.visible = false;
-            } else {
-                bFire.visible = false;
-                level.hero.stopShooting();
-            }
-        }
-    }
-
-    function down(event) {
-        // making us pause a second at the beginning of a level
-        if (((new Date()).getTime() - levelChangeTime) < 1000) return;
-        if (!level.hasStarted) {
-            setAudio();
-            sounds.launch.currentTime = 0;
-            sounds.launch.volume = 0.5;
-            sounds.launch.play();
-        }
-        level.hasStarted = true;
-        // only be responsive when "inPlay"
-        if (!level.inPlay) return;
-        for (let i = 0; i < event.touches.length; i++) {
-            let touch = event.touches[i];
-            let x = touch.clientX;
-            let y = touch.clientY;
-            let offset = 10;
-            let x0 = 0;
-            let x1 = bWidth + offset;
-            let x2 = bWidth * 2 + offset;
-            let x3 = bWidth * 4 + offset;
-            let y1 = window.innerHeight - bWidth * 4 - offset;
-            let y2 = window.innerHeight - bWidth * 2 - offset;
-            let y3 = window.innerHeight - bWidth - offset;
-            let y4 = window.innerHeight;
-
-            if (x < x3 && y > y1) {
-                b1.visible = false;
-                b2.visible = false;
-                b3.visible = false;
-                b4.visible = false;
-                b6.visible = false;
-                b7.visible = false;
-                b8.visible = false;
-                b9.visible = false;
-
-                if (x > x0 && x < x1 && y > y1 && y < y2) b1.visible = true;
-                if (x > x1 && x < x2 && y > y1 && y < y2) b2.visible = true;
-                if (x > x2 && x < x3 && y > y1 && y < y2) b3.visible = true;
-
-                if (x > x0 && x < x1 && y > y2 && y < y3) b4.visible = true;
-                if (x > x2 && x < x3 && y > y2 && y < y3) b6.visible = true;
-
-                if (x > x0 && x < x1 && y > y3 && y < y4) b7.visible = true;
-                if (x > x1 && x < x2 && y > y3 && y < y4) b8.visible = true;
-                if (x > x2 && x < x3 && y > y3 && y < y4) b9.visible = true;
-            }
-
-            // check that we're in the control box
-            if (x < x3 && y > y1) {
-                if (x < x1) {
-                    level.hero.turnLeft();
-                }
-                if (x > x1 && x < x2) {
-                    level.hero.stopTurning();
-                }
-                if (x > x2) {
-                    level.hero.turnRight();
-                }
-                if (y < y2) {
-                    level.hero.forward();
-                }
-                if (y > y2 && y < y3) {
-                    level.hero.stop();
-                }
-                if (y > y3) {
-                    level.hero.reverse();
-                }
-            }
-
-            if (x > window.innerWidth - 3 * bWidth) {
-                level.hero.startShooting();
-                bFire.visible = true;
-            }
-        }
-
-    }
-
-    function setAudio() {
-        // setting up AudioContext to avoid sound delay in Safari
-        // https://stackoverflow.com/questions/9811429/html5-audio-tag-on-safari-has-a-delay
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-    }
-
-    function onDocumentKeyDown(event) {
-        // making us pause a second at the beginning of a level
-        if (((new Date()).getTime() - levelChangeTime) < 1000) return;
-        if (!level.hasStarted) {
-            setAudio();
-            sounds.launch.currentTime = 0;
-            sounds.launch.volume = 0.5;
-            sounds.launch.play();
-        }
-        level.hasStarted = true;
-        if (!isSongPlaying) {
-            // song.play();
-        }
-        let keyCode = event["which"];
-        if (level.inPlay) {
-            if (event.shiftKey) {
-                level.hero.changePerspective();
-            } else if (keyCode === 32) {
-                level.hero.startShooting();
-            } else if (keyCode === 37) {
-                level.hero.turnLeft();
-            } else if (keyCode === 38) {
-                level.hero.forward();
-            } else if (keyCode === 39) {
-                level.hero.turnRight();
-            } else if (keyCode === 40) {
-                level.hero.reverse();
-            }
-        }
-        pixiStage.removeChild(instructionText);
-    }
-
-    function onDocumentKeyUp(event) {
-        let keyCode = event["which"];
-        if (keyCode === 32) {
-            level.hero.stopShooting();
-        } else if (keyCode === 37) {
-            level.hero.stopTurning();
-        } else if (keyCode === 38) {
-            level.hero.stop();
-        } else if (keyCode === 39) {
-            level.hero.stopTurning();
-        } else if (keyCode === 40) {
-            level.hero.stop();
-        }
-    }
-
-    function render3d() {
-        if (level.hasWon()) {
-            levelNumber++;
-            levelChangeTime = (new Date()).getTime();
-            level = new Level(levelNumber, rendererThree, sounds);
-        }
-        level.render(fpsAdjustment);
-    }
-
-    function render2d() {
-        if (level.padsRemaining === 0) {
-
-        } else if (level.hero.hitPoints <= 0) {
-            finalText.text = "TRY AGAIN";
-            finalText.x = (window.innerWidth - finalText.width) / 2;
-            statusText.text = "";
-        } else {
-            if (level.hasStarted) {
-                finalText.text = "";
-            } else {
-                finalText.text = "LEVEL " + levelNumber;
-                finalText.x = (window.innerWidth - finalText.width) / 2;
-            }
-            statusText.text =
-                "LEVEL: " + levelNumber + "\n" +
-                "PADS: " + level.padsRemaining + "\n" +
-                "HEALTH: " + level.hero.hitPoints + "\n" +
-                "SHIELD: " + level.hero.shieldHitPoints + "\n";
-        }
-        rendererPixi.render(pixiStage, undefined, false);
-    }
-
-    function onWindowResize() {
-        level.camera.aspect = window.innerWidth / window.innerHeight;
-        level.camera.updateProjectionMatrix();
-        rendererThree.setSize(window.innerWidth, window.innerHeight);
-        pixiStage.destroy(true);
-        pixiStage = new PIXI.Container();
-        init2d();
     }
 
 

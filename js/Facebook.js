@@ -1,3 +1,6 @@
+
+// https://stackoverflow.com/questions/7125320/facebook-login-without-pop-up
+
 window.fbAsyncInit = function() {
     FB.init({
         appId      : '824809551314795',
