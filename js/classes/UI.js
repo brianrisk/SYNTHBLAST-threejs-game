@@ -337,7 +337,12 @@ class UI {
             if (this.game.level.hasStarted) {
                 this.finalText.text = "";
             } else {
-                this.finalText.text = "LEVEL " + this.game.levelNumber;
+                if (this.game.level.isZombie) {
+                    this.finalText.text = "ZOMBIE MODE";
+                } else {
+                    this.finalText.text = "LEVEL " + this.game.levelNumber;
+                }
+
                 this.finalText.x = (window.innerWidth - this.finalText.width) / 2;
             }
             this.statusText.text =

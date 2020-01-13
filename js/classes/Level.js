@@ -46,7 +46,7 @@ class Level {
             0x8800FF,
             0x0000FF,
             0x333333,
-        ]
+        ];
 
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
@@ -61,32 +61,63 @@ class Level {
         composer = new EffectComposer(rendererThree);
 
         hero = new Hero(scene, camera, -75, 0);
-        // hero = new Hero(scene, camera, 10, 0);
+        this.isZombie = (game.levelNumber % 7) === 0;
         // add buildings
         let halfArena = arenaSize / 2;
+
+        // single point pad
+        if (this.isZombie) {
+            let padX = Utils.randomInt(arenaSize - 2) + 1;
+            let padY = Utils.randomInt(arenaSize - 2) + 1 - halfArena;
+            while (Math.abs (padY - halfArena) < 2) {
+                padY = Utils.randomInt(arenaSize - 2) + 1 - halfArena;
+            }
+            let pointPad = new Pad(padX, padY, scene, 0xFFFF88);
+            pointPads.push(pointPad);
+            padsRemaining += 1;
+
+            buildings.push( new Building(padX - 1, padY, 15, scene, true));
+            buildings.push( new Building(padX + 1, padY, 15, scene, true));
+            buildings.push( new Building(padX, padY - 1, 15, scene, true));
+            buildings.push( new Building(padX, padY + 1, 15, scene, true));
+        }
+
         for (let gridX = 0; gridX < arenaSize; gridX++) {
             for (let gridY = 0; gridY < arenaSize; gridY++) {
-                if (gridY === halfArena) continue;
-                // if (gridY % 3 === 0 || gridX % 3 === 0) continue;
-                // if (!(gridY % 4 === 0 || gridY % 4 === 1 || gridX % 4 === 0 || gridX % 4 === 1)) {
-                if (Utils.randomInt(30) === 0) {
-                    // box height increases with level
-                    let boxHeight = Utils.randomInt(game.levelNumber) + 1;
-                    let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
-                    buildings.push(building);
-                } else if (game.levelNumber > 1 && Utils.randomInt(64) === 0) {
-                    let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
-                    enemies.push(enemy);
-                } else if (Utils.randomInt(160) === 0) {
-                    let pointPad = new Pad(gridX, gridY - halfArena, scene, 0xFFFF88);
-                    pointPads.push(pointPad);
-                    padsRemaining += 1;
-                } else if (game.levelNumber > 2 && Utils.randomInt(640) === 0) {
-                    let flipPad = new Pad(gridX, gridY - halfArena, scene, 0x88FF88);
-                    flipPads.push(flipPad);
-                } else if ( Utils.randomInt(100) === 0) {
-                    let shield = new Shield(gridX, gridY - halfArena, scene);
-                    shields.push(shield);
+                if (this.isZombie) {
+                    if (Utils.randomInt(16) === 0) {
+                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
+                        enemies.push(enemy);
+                    }  else if (Utils.randomInt(640) === 0) {
+                        let flipPad = new Pad(gridX, gridY - halfArena, scene, 0x88FF88);
+                        flipPads.push(flipPad);
+                    } else if (Utils.randomInt(100) === 0) {
+                        let shield = new Shield(gridX, gridY - halfArena, scene);
+                        shields.push(shield);
+                    }
+                } else {
+                    if (gridY === halfArena) continue;
+                    // if (gridY % 3 === 0 || gridX % 3 === 0) continue;
+                    // if (!(gridY % 4 === 0 || gridY % 4 === 1 || gridX % 4 === 0 || gridX % 4 === 1)) {
+                    if (Utils.randomInt(30) === 0) {
+                        // box height increases with level
+                        let boxHeight = Utils.randomInt(game.levelNumber) + 1;
+                        let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
+                        buildings.push(building);
+                    } else if (game.levelNumber > 1 && Utils.randomInt(64) === 0) {
+                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
+                        enemies.push(enemy);
+                    } else if (Utils.randomInt(160) === 0) {
+                        let pointPad = new Pad(gridX, gridY - halfArena, scene, 0xFFFF88);
+                        pointPads.push(pointPad);
+                        padsRemaining += 1;
+                    } else if (game.levelNumber > 2 && Utils.randomInt(640) === 0) {
+                        let flipPad = new Pad(gridX, gridY - halfArena, scene, 0x88FF88);
+                        flipPads.push(flipPad);
+                    } else if (Utils.randomInt(100) === 0) {
+                        let shield = new Shield(gridX, gridY - halfArena, scene);
+                        shields.push(shield);
+                    }
                 }
             }
         }
