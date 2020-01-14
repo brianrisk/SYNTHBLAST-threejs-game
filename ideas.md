@@ -6,6 +6,7 @@
 * leader board
 * loading screen
 * restart at end of game
+* enemies explode into coins
 * [optimize for fullscreen](http://www.onlywebpro.com/2015/07/19/optimizing-full-screen-mobile-web-app-for-ios/)
 * levels are hours of the day:  Dusk until dawn.  "rest" every 10 levels. level 1.  7PM.  Sky changes; sun position.
 * yellow flash or something when going over point pad

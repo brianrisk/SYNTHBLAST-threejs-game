@@ -298,13 +298,13 @@ class UI {
                 this.game.level.hero.changePerspective();
             } else if (keyCode === 32) {
                 this.game.level.hero.startShooting();
-            } else if (keyCode === 37) {
+            } else if (keyCode === 37 || keyCode === 65) {
                 this.game.level.hero.turnLeft();
-            } else if (keyCode === 38) {
+            } else if (keyCode === 38 || keyCode === 87) {
                 this.game.level.hero.forward();
-            } else if (keyCode === 39) {
+            } else if (keyCode === 39 || keyCode === 68) {
                 this.game.level.hero.turnRight();
-            } else if (keyCode === 40) {
+            } else if (keyCode === 40 || keyCode === 83) {
                 this.game.level.hero.reverse();
             }
         }
@@ -315,13 +315,13 @@ class UI {
         let keyCode = event["which"];
         if (keyCode === 32) {
             this.game.level.hero.stopShooting();
-        } else if (keyCode === 37) {
+        } else if (keyCode === 37 || keyCode === 65) {
             this.game.level.hero.stopTurning();
-        } else if (keyCode === 38) {
+        } else if (keyCode === 38 || keyCode === 87) {
             this.game.level.hero.stop();
-        } else if (keyCode === 39) {
+        } else if (keyCode === 39 || keyCode === 68) {
             this.game.level.hero.stopTurning();
-        } else if (keyCode === 40) {
+        } else if (keyCode === 40 || keyCode === 83) {
             this.game.level.hero.stop();
         }
     }
