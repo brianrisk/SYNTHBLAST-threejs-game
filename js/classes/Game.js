@@ -6,6 +6,7 @@ class Game {
         this.levelNumber = 1;
         this.levelChangeTime = (new Date()).getTime();
         this.level = new Level(this, this.rendererThree, this.sounds);
+        this.score = 0;
     }
 
     render(fpsAdjustment) {

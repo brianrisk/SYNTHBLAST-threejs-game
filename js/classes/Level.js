@@ -13,6 +13,7 @@ import Gun from "../../js/classes/Gun.js";
 import Enemy from "../../js/classes/Enemy.js";
 import Drone from "../../js/classes/Drone.js";
 import Comet from "./Comet.js";
+import Coin from "../../js/classes/Coin.js";
 import Game from "./Game.js";
 import Pad from "./powerups/Pad.js";
 import Shield from "./powerups/Shield.js";
@@ -215,6 +216,7 @@ class Level {
         this.pointPads = pointPads;
         this.flipPads = flipPads;
         this.shields = shields;
+        this.coins = [];
         this.comets = comets;
         this.gun = gun;
         this.padsRemaining = padsRemaining;
@@ -261,6 +263,7 @@ class Level {
         this.pointPads.forEach(pad => pad.update(fpsAdjustment));
         this.flipPads.forEach(pad => pad.update(fpsAdjustment));
         this.shields.forEach(shield => shield.update(fpsAdjustment));
+        this.coins.forEach(coin => coin.update(fpsAdjustment));
         this.comets.forEach(comet => comet.update(fpsAdjustment));
         this.hero.update(fpsAdjustment);
 
@@ -293,6 +296,7 @@ class Level {
                         if (!enemy.isAlive()) {
                             this.sounds.explosion.currentTime = 0;
                             this.sounds.explosion.play();
+                            this.coins.push(new Coin(enemy.getX(), enemy.getY(), this.scene))
                         } else {
                             this.sounds.impact.currentTime = 0;
                             this.sounds.impact.play();
@@ -390,6 +394,19 @@ class Level {
                     this.hero.addShield();
                     this.sounds.shield.currentTime = 0;
                     this.sounds.shield.play();
+                }
+            });
+
+            this.coins.forEach(coin => {
+                if (
+                    !coin.isTaken
+                    && Math.abs(coin.getX() - this.hero.getX()) < 0.4
+                    && Math.abs(coin.getY() - this.hero.getY()) < 0.4
+                ) {
+                    coin.isTaken = true;
+                    this.game.score ++;
+                    this.sounds.energy.currentTime = 0;
+                    this.sounds.energy.play();
                 }
             });
         }

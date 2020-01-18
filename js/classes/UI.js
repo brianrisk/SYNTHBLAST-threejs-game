@@ -349,7 +349,8 @@ class UI {
                 "LEVEL: " + this.game.levelNumber + "\n" +
                 "PADS: " + this.game.level.padsRemaining + "\n" +
                 "HEALTH: " + this.game.level.hero.hitPoints + "\n" +
-                "SHIELD: " + this.game.level.hero.shieldHitPoints + "\n";
+                "SHIELD: " + this.game.level.hero.shieldHitPoints + "\n" +
+                "POINTS: " + this.game.score + "\n";
         }
         this.rendererPixi.render(this.pixiStage, undefined, false);
     }
