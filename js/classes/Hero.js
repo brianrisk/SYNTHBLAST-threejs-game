@@ -26,7 +26,8 @@ class Hero {
         this.gun = null;
         this.isShooting = false;
         this.maxHitPoints = 10;
-        this.shieldHitPoints = 0;
+        this.maxShields = 5;
+        this.shields = 0;
         this.isActive = false;
 
         // setting up
@@ -44,10 +45,8 @@ class Hero {
 
         let dotMaterial = new THREE.PointsMaterial({
                 color: 0x333366,
-                // color: 0xFFFFFF,
                 opacity: 0.1,
                 size: 0.05,
-                // fog: false
             });
         let sphereGeometry = new THREE.SphereGeometry(1.5, 50);
         let sphereDots = new THREE.Points(sphereGeometry, dotMaterial);
@@ -96,18 +95,18 @@ class Hero {
         this.shield.rotation.x += Math.PI / 180 * fpsAdjustment;
         this.shield.rotation.y += Math.PI / 180 * fpsAdjustment;
         // this.shield.rotation.z += Math.PI / 180 *
-        if (this.shieldHitPoints <= 0) {
+        if (this.shields <= 0) {
             this.shield.visible = false;
         }
     }
 
     hit(impact) {
-        this.shieldHitPoints -= impact;
+        this.shields -= impact;
         let damage = 0;
-        if (this.shieldHitPoints < 0) {
-            damage = Math.abs(this.shieldHitPoints);
-            this.hitPoints += this.shieldHitPoints;
-            this.shieldHitPoints = 0;
+        if (this.shields < 0) {
+            damage = Math.abs(this.shields);
+            this.hitPoints += this.shields;
+            this.shields = 0;
 
         }
 
@@ -119,12 +118,14 @@ class Hero {
     }
 
     hasShield () {
-        return this.shieldHitPoints > 0;
+        return this.shields > 0;
     }
 
     addShield() {
-        this.shieldHitPoints ++;
-        this.shield.visible = true;
+        if (this.shields !== this.maxShields) {
+            this.shields ++;
+            this.shield.visible = true;
+        }
     }
 
     changePerspective() {

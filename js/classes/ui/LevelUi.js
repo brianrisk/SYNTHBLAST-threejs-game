@@ -1,4 +1,6 @@
-class UI {
+import ProgressBar from "./ProgressBar.js";
+
+class LevelUi {
 
     constructor(game, rendererPixi, sounds) {
         this.game = game;
@@ -127,6 +129,14 @@ class UI {
         this.finalText = new PIXI.Text("", finalStyle);
         this.finalText.position.set(window.innerWidth / 2, (window.innerHeight - finalSize) / 2);
         this.pixiStage.addChild(this.finalText);
+
+        // progress bars
+        let halfWindow = window.innerWidth / 2;
+        let rightMargin = 10;
+        let progressHeight = 10;
+        this.hpProgress =       new ProgressBar(halfWindow, 10, halfWindow - rightMargin, progressHeight, this.pixiStage, "HP");
+        this.shileldProgress =  new ProgressBar(halfWindow, 25, halfWindow - rightMargin, progressHeight, this.pixiStage, "SHIELD");
+
     }
 
     getSquare(x, y, width) {
@@ -327,6 +337,8 @@ class UI {
     }
 
     render() {
+
+        // updating text
         if (this.game.level.padsRemaining === 0) {
 
         } else if (this.game.level.hero.hitPoints <= 0) {
@@ -348,12 +360,19 @@ class UI {
             this.statusText.text =
                 "LEVEL: " + this.game.levelNumber + "\n" +
                 "PADS: " + this.game.level.padsRemaining + "\n" +
-                "HEALTH: " + this.game.level.hero.hitPoints + "\n" +
-                "SHIELD: " + this.game.level.hero.shieldHitPoints + "\n" +
                 "POINTS: " + this.game.score + "\n";
         }
+
+        // updating progress
+        let hpPercent = this.game.level.hero.hitPoints / this.game.level.hero.maxHitPoints;
+        this.hpProgress.setProgress(hpPercent);
+
+        let shieldPercent = this.game.level.hero.shields / this.game.level.hero.maxShields;
+        this.shileldProgress.setProgress(shieldPercent);
+
+        // final rendering
         this.rendererPixi.render(this.pixiStage, undefined, false);
     }
 }
 
-export default UI;
+export default LevelUi;

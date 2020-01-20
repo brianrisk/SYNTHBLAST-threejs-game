@@ -37,12 +37,11 @@
 <!--<script src='js/Facebook.js'></script>-->
 <script src='node_modules/stats.js/build/stats.min.js'></script>
 <script src='lib/pixi.min.js'></script>
-<script src='js/Sounds.js'></script>
 <script type="module">
 
     import * as THREE from "./lib/three/build/three.module.js";
     import Game from "./js/classes/Game.js";
-    import UI from "./js/classes/UI.js";
+    import LevelUi from "./js/classes/ui/LevelUi.js";
 
     // Sounds
     let audioContext = null;
@@ -74,7 +73,7 @@
     let rendererThree;
     let rendererPixi;
 
-    let ui = null;
+    let levelUi = null;
     let game = null;
 
     let frameCount = 0;
@@ -136,22 +135,22 @@
         if (!audioContext) {
             setAudio();
         }
-        ui.onDocumentKeyDown(event);
+        levelUi.onDocumentKeyDown(event);
     }
 
     function onDocumentKeyUp(event) {
-        ui.onDocumentKeyUp(event);
+        levelUi.onDocumentKeyUp(event);
     }
 
     function touchStart(event) {
         if (!audioContext) {
             setAudio();
         }
-        ui.touchStart(event);
+        levelUi.touchStart(event);
     }
 
     function touchEnd(event) {
-        ui.touchEnd(event);
+        levelUi.touchEnd(event);
     }
 
     function init3d() {
@@ -159,7 +158,7 @@
     }
 
     function init2d() {
-        ui = new UI(game, rendererPixi, sounds);
+        levelUi = new LevelUi(game, rendererPixi, sounds);
     }
 
     function render3d() {
@@ -167,15 +166,15 @@
     }
 
     function render2d() {
-        ui.render();
+        levelUi.render();
     }
 
     function onWindowResize() {
         game.level.camera.aspect = window.innerWidth / window.innerHeight;
         game.level.camera.updateProjectionMatrix();
         rendererThree.setSize(window.innerWidth, window.innerHeight);
-        ui.pixiStage.destroy(true);
-        ui.init();
+        levelUi.pixiStage.destroy(true);
+        levelUi.init();
     }
 
     function setAudio() {

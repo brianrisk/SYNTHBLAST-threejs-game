@@ -4,19 +4,42 @@ class Coin {
     constructor(x, y, scene) {
         this.scene = scene;
         let size = 0.3;
-        let geometry = new THREE.BoxBufferGeometry(size, size, size);
-        let material = new THREE.MeshBasicMaterial(
+        let cubeGeometry = new THREE.BoxBufferGeometry(size, size, size);
+        let cubeMaterial = new THREE.MeshBasicMaterial(
             {
-                color: 0xEEEEFF
+                color: 333355
             });
-        let cube = new THREE.Mesh(geometry, material);
-        cube.position.x = x;
-        cube.position.y = y;
-        cube.position.z = 0.5;
-        scene.add(cube);
-        this.object = cube;
+        let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        // cube.position.x = x;
+        // cube.position.y = y;
+        // cube.position.z = 0.5;
+
+        let wireframeGeometry = new THREE.BoxBufferGeometry(size + .001, size + .001, size + .001);
+        let wireframeMaterial = new THREE.MeshBasicMaterial(
+            {
+                color: 0xEEEEFF,
+                wireframe: true
+            });
+        let wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+        // wireframe.position.x = x;
+        // wireframe.position.y = y;
+        // wireframe.position.z = 0.5;
+
+        // cube.add(wireframe);
+        let group = new THREE.Group();
+        group.add( cube );
+        group.add( wireframe );
+        group.position.x = x;
+        group.position.y = y;
+        group.position.z = 0.5;
+
+        scene.add(group);
+        this.object = group;
         this.isTaken = false;
         this.isAlive = true;
+
+        this.rotationAxis = new THREE.Vector3(0, 0, 1);
+
     }
 
     getX() {
@@ -36,9 +59,7 @@ class Coin {
             this.object.visible = false;
             this.isAlive = false;
         } else {
-            this.object.rotation.x += Math.PI / 45;
-            this.object.rotation.y += Math.PI / 45;
-            this.object.rotation.z += Math.PI / 45;
+            this.object.rotateOnAxis(this.rotationAxis,  Math.PI / 45);
         }
     }
 }

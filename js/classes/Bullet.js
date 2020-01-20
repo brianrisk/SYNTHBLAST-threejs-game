@@ -4,8 +4,8 @@ class Bullet {
     constructor(bulletSize, bulletPosition, hitPoints, direction, scene, fpsAdjustment) {
         this.scene = scene;
         this.maxHitPoints = hitPoints;
-        let geometry = new THREE.BoxGeometry(bulletSize, bulletSize, bulletSize);
-        let material = new THREE.MeshBasicMaterial({color: 0xffffff});
+        let geometry = new THREE.SphereBufferGeometry(bulletSize, 4, 4);
+        let material = new THREE.MeshBasicMaterial({color: 0xFFFFFF});
         let bulletMesh = new THREE.Mesh(geometry, material);
         bulletMesh.position.x = bulletPosition.x;
         bulletMesh.position.y = bulletPosition.y;

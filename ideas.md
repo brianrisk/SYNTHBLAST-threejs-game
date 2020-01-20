@@ -3,6 +3,7 @@
 * ensure at least one pad per level
 
 ## Dev Items
+* health bars decrement from left to right
 * leader board
 * loading screen
 * restart at end of game
@@ -11,7 +12,6 @@
 * levels are hours of the day:  Dusk until dawn.  "rest" every 10 levels. level 1.  7PM.  Sky changes; sun position.
 * yellow flash or something when going over point pad
 * make guns things you can pick up
-* add UI elements: health bar
 * [see where blasts hit buildings](https://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection)
 * no buildings for first level.
 * reward text like: "Legendary!" or "combo!"

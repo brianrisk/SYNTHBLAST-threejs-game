@@ -220,6 +220,7 @@ class Level {
         this.comets = comets;
         this.gun = gun;
         this.padsRemaining = padsRemaining;
+        this.padsTotal = padsRemaining;
         this.hasStarted = false;
         this.inPlay = false;
 

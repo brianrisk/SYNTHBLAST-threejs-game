@@ -10,11 +10,12 @@ class Gun {
         this.hero = hero;
         this.pew = pew;
         this.bulletZ = 0.3;
+        this.bulletSize = .05
     }
 
     fire(soundOn, fpsAdjustment) {
         let currentTime = (new Date()).getTime();
-        if (currentTime - this.lastFired < 100) return;
+        if (currentTime - this.lastFired < 50) return;
 
         let heroPosition = this.hero.getPosition();
         let bulletPosition = new THREE.Vector3(heroPosition.x, heroPosition.y,  this.bulletZ);
@@ -39,9 +40,8 @@ class Gun {
     shoot(bulletPosition, direction, fpsAdjustment) {
         let fired = false;
         if (this.bullets.length < 50) {
-            let bulletSize = 0.15;
             let bullet = new Bullet(
-                bulletSize,
+                this.bulletSize,
                 bulletPosition,
                 1,
                 direction,
