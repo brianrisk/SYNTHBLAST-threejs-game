@@ -38,8 +38,9 @@ class ProgressBar {
         this.percent = percent;
         let bar = new PIXI.Graphics();
         let newWidth =  this.width * percent;
+        let delta = this.width - newWidth;
         bar.beginFill(0xFF00FF);
-        bar.drawRect(this.x, this.y, newWidth, this.height);
+        bar.drawRect(this.x + delta, this.y, newWidth, this.height);
         this.bar = bar;
         this.stage.addChild(bar);
     }

@@ -15,7 +15,7 @@ class Gun {
 
     fire(soundOn, fpsAdjustment) {
         let currentTime = (new Date()).getTime();
-        if (currentTime - this.lastFired < 50) return;
+        if (currentTime - this.lastFired < 300) return;
 
         let heroPosition = this.hero.getPosition();
         let bulletPosition = new THREE.Vector3(heroPosition.x, heroPosition.y,  this.bulletZ);

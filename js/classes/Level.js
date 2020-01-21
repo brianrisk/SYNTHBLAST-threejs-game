@@ -286,21 +286,31 @@ class Level {
                     }
                 });
                 this.enemies.forEach(enemy => {
+
                     if (
                         enemy.isAlive()
                         && Math.abs(enemy.getX() - bullet.getX()) < 0.5
                         && Math.abs(enemy.getY() - bullet.getY()) < 0.5
                     ) {
-                        let enemyHitPoints = enemy.getHitPoints();
-                        enemy.hit(bullet.getHitPoints(), fpsAdjustment);
-                        bullet.hit(enemyHitPoints);
-                        if (!enemy.isAlive()) {
-                            this.sounds.explosion.currentTime = 0;
-                            this.sounds.explosion.play();
-                            this.coins.push(new Coin(enemy.getX(), enemy.getY(), this.scene))
-                        } else {
-                            this.sounds.impact.currentTime = 0;
-                            this.sounds.impact.play();
+                        let pointA = enemy.getPosition();
+                        let pointB = this.hero.getPosition();
+                        let pointC = pointB.clone();
+                        pointC.add(this.hero.direction);
+                        let angle = Utils.find_angle(pointA, pointB, pointC);
+                        let heroIsFacingEnemy = (Math.abs(angle) < Math.PI / 4);
+                        if (heroIsFacingEnemy) {
+                            console.log(angle);
+                            let enemyHitPoints = enemy.getHitPoints();
+                            enemy.hit(bullet.getHitPoints(), fpsAdjustment);
+                            bullet.hit(enemyHitPoints);
+                            if (!enemy.isAlive()) {
+                                this.sounds.explosion.currentTime = 0;
+                                this.sounds.explosion.play();
+                                this.coins.push(new Coin(enemy.getX(), enemy.getY(), this.scene))
+                            } else {
+                                this.sounds.impact.currentTime = 0;
+                                this.sounds.impact.play();
+                            }
                         }
                     }
                 });

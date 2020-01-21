@@ -72,6 +72,10 @@ class Enemy {
         return this.object.position.z;
     }
 
+    getPosition() {
+        return this.object.position;
+    }
+
     newWander() {
         this.wanderAngle = Math.random() * Math.PI;
     }

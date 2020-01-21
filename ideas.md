@@ -3,17 +3,14 @@
 * ensure at least one pad per level
 
 ## Dev Items
-* health bars decrement from left to right
 * leader board
 * loading screen
 * restart at end of game
-* enemies explode into coins
 * [optimize for fullscreen](http://www.onlywebpro.com/2015/07/19/optimizing-full-screen-mobile-web-app-for-ios/)
 * levels are hours of the day:  Dusk until dawn.  "rest" every 10 levels. level 1.  7PM.  Sky changes; sun position.
 * yellow flash or something when going over point pad
 * make guns things you can pick up
 * [see where blasts hit buildings](https://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection)
-* no buildings for first level.
 * reward text like: "Legendary!" or "combo!"
 
 ### ship upgrades:
@@ -25,7 +22,9 @@
 
 ### gun upgrades
 * bullet refresh speed
+* bullet range
 * bullet damage
+* multiple shooters
 * bullet intelligence (how much it bends toward closest enemy)
 * Javelin
 * Energy balls that then electrify nearby targets when they hit something
@@ -77,11 +76,9 @@
 
 ## performance improvements
 * buildings stored in 2d array
-* BoxBufferGeometry for buildings
 
 ## menu
 * Leaderboard: login to compete against your friends
-* game modes
 * upgrades
   * ships
   * guns
