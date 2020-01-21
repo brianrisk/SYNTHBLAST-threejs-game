@@ -43,10 +43,16 @@
     import Game from "./js/classes/Game.js";
     import LevelUi from "./js/classes/ui/LevelUi.js";
 
+    // Music
+    let implant = new Audio('music/implant-128kbps.mp3');
+    let songs = {
+        isSongPlaying: false,
+        implant: implant
+    };
+
     // Sounds
     let audioContext = null;
     // let massive = new Audio('assets/audio/massive2.wav');
-    // let song = new Audio('music/implant-128kbps.mp3');
     let pew = new Audio('assets/audio/pip2.wav');
     let pointSound = new Audio('assets/audio/point.wav');
     let hitSound = new Audio('assets/audio/hit.wav');
@@ -57,7 +63,6 @@
     let launchSound = new Audio('assets/audio/launch.wav');
     let energySound = new Audio('assets/audio/energy2.wav');
     let sounds = {
-        // song: song,
         pew: pew,
         point: pointSound,
         hit: hitSound,
@@ -80,11 +85,6 @@
     let frameTimes = [];
     let fpsAdjustment = 1;
 
-    // Music
-    // let song = new Audio('music/implant-128kbps.mp3');
-
-    // State
-    let isSongPlaying = false;
 
     // stats
     let stats = new Stats();
@@ -181,6 +181,12 @@
         // https://stackoverflow.com/questions/9811429/html5-audio-tag-on-safari-has-a-delay
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContext();
+
+        if (!songs.isSongPlaying) {
+            songs.implant.currentTime = 0;
+            songs.implant.play();
+            songs.isSongPlaying = true;
+        }
     }
 
     function calculateFps() {
