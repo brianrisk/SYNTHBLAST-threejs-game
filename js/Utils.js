@@ -9,10 +9,14 @@ import * as THREE from "./../lib/three/build/three.module.js";
  * B center point
  */
 export function find_angle(A, B, C) {
-    var AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
-    var BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
-    var AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
+    let AB = distance(A,B);
+    let BC = distance(B,C);
+    let AC = distance(A,C);
     return Math.acos((BC * BC + AB * AB - AC * AC) / (2 * BC * AB));
+}
+
+export function distance(A, B) {
+    return Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
 }
 
 export function randomVector() {

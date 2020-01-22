@@ -3,11 +3,12 @@
 * ensure at least one pad per level
 
 ## Dev Items
+* buildings contain hidden treasures (energy, powerup)
+* hero state (health, shields, items) presists between levels
 * leader board
 * loading screen
 * restart at end of game
 * [optimize for fullscreen](http://www.onlywebpro.com/2015/07/19/optimizing-full-screen-mobile-web-app-for-ios/)
-* levels are hours of the day:  Dusk until dawn.  "rest" every 10 levels. level 1.  7PM.  Sky changes; sun position.
 * yellow flash or something when going over point pad
 * make guns things you can pick up
 * [see where blasts hit buildings](https://stackoverflow.com/questions/11586527/converting-world-coordinates-to-screen-coordinates-in-three-js-using-projection)
@@ -85,6 +86,12 @@
   * Equipment
   * credits
 * settings
+
+
+
+## achievements
+* 100, 1000, 10000 enemies killed
+* speed run: level finished in 10 seconds
 
 
 

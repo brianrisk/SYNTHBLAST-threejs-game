@@ -299,7 +299,6 @@ class Level {
                         let angle = Utils.find_angle(pointA, pointB, pointC);
                         let heroIsFacingEnemy = (Math.abs(angle) < Math.PI / 4);
                         if (heroIsFacingEnemy) {
-                            console.log(angle);
                             let enemyHitPoints = enemy.getHitPoints();
                             enemy.hit(bullet.getHitPoints(), fpsAdjustment);
                             bullet.hit(enemyHitPoints);

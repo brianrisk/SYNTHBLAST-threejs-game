@@ -30,11 +30,6 @@ class Enemy {
         this.moveInc.multiplyScalar(this.maxSpeed);
         this.newWander();
         this.particles = [];
-
-        // this.object.rotation.x = -90 * Math.PI / 180;
-        // this.object.rotation.y = -90 * Math.PI / 180;
-
-
     }
 
     hit(impact, fpsAdjustment) {
@@ -84,11 +79,14 @@ class Enemy {
     update(hero, fpsAdjustment) {
         if (this.alive) {
             if (hero.isAlive() && hero.isActive) {
-                let pointA = hero.getFuturePosition();
+                let heroDistance = Utils.distance(hero.getPosition(), this.object.position) * hero.speed * 6;
+                let pointA = hero.getFuturePositionWithDistance(heroDistance);
                 let pointB = this.object.position;
                 let pointC = pointB.clone();
                 pointC.add(this.direction);
                 let angle = Utils.find_angle(pointA, pointB, pointC);
+                // if (angle > Math.PI) angle -= Math.PI * 2;
+                //  console.log(angle);
                 if (angle > Math.PI / 18) {
                     let angleToRotate = angle / 25 * fpsAdjustment;
                     this.direction.applyAxisAngle(this.rotationAxis, angleToRotate);

@@ -3,7 +3,7 @@ class Game {
     constructor(rendererThree, sounds) {
         this.rendererThree = rendererThree;
         this.sounds = sounds;
-        this.levelNumber = 1;
+        this.levelNumber = 7;
         this.levelChangeTime = (new Date()).getTime();
         this.level = new Level(this, this.rendererThree, this.sounds);
         this.score = 0;

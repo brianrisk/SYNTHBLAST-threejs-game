@@ -242,11 +242,13 @@ class Hero {
     }
 
     getFuturePosition() {
+        return this.getFuturePositionWithDistance(this.speed * 10);
+    }
+
+    getFuturePositionWithDistance(distance) {
         let future = this.camera.position.clone();
-
         let futureInc = this.direction.clone();
-
-        futureInc.multiplyScalar(this.speed * 10);
+        futureInc.multiplyScalar(distance);
         future.add(futureInc);
         return future;
     }

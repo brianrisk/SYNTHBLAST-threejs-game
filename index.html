@@ -44,10 +44,10 @@
     import LevelUi from "./js/classes/ui/LevelUi.js";
 
     // Music
-    let implant = new Audio('music/implant-128kbps.mp3');
+    // let implant = new Audio('music/implant-128kbps.mp3');
     let songs = {
         isSongPlaying: false,
-        implant: implant
+        implant: null
     };
 
     // Sounds
@@ -183,9 +183,9 @@
         audioContext = new AudioContext();
 
         if (!songs.isSongPlaying) {
-            songs.implant.currentTime = 0;
-            songs.implant.play();
-            songs.isSongPlaying = true;
+            // songs.implant.currentTime = 0;
+            // songs.implant.play();
+            // songs.isSongPlaying = true;
         }
     }
 
