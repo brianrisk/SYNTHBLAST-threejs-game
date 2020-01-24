@@ -9,18 +9,21 @@ class Button {
 
         let outline = new PIXI.Graphics();
         outline.lineStyle(1, 0xCCCCCC, 1);
+        outline.beginFill(0xFF00FF);
+        outline.alpha = 0.25;
         outline.drawRect(x, y, width, height);
         this.outline = outline;
         stage.addChild(outline);
 
+        let fontSize = Math.round(height * 0.8);
         let labelStyle = new PIXI.TextStyle({
             fontFamily: "\"Courier New\", Courier, monospace",
-            fontSize: 10,
+            fontSize: fontSize,
             fill: "#99FFFF",
         });
 
         this.labelText = new PIXI.Text(label, labelStyle);
-        this.labelText.position.set(x - this.labelText.width - 5, y);
+        this.labelText.position.set(x + (width - this.labelText.width) / 2, y + (height - fontSize) / 2);
         stage.addChild(this.labelText);
 
 
@@ -28,7 +31,6 @@ class Button {
 
     down() {
         this.stage.removeChild(this.bar);
-        this.percent = percent;
         let bar = new PIXI.Graphics();
         let newWidth =  this.width * percent;
         bar.beginFill(0xFF00FF);

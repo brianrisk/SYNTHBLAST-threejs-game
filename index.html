@@ -43,6 +43,26 @@
     import Game from "./js/classes/Game.js";
     import LevelUi from "./js/classes/ui/LevelUi.js";
 
+    // The state we will save and load
+    // when making a purchase, this state is sent to the servers,
+    // the servers modify and persist the state and a new state is retrieved
+    let playerState = {
+        activeGame: {
+            hp: {
+                value: 10,
+                max: 10
+            },
+            shields: {
+                value: 0,
+                max: 5
+            },
+            level: 1,
+        },
+        gamesPlayed: 0,
+        highScore: 0,
+        coins: 0
+    };
+
     // Music
     // let implant = new Audio('music/implant-128kbps.mp3');
     let songs = {
@@ -173,7 +193,6 @@
         game.level.camera.aspect = window.innerWidth / window.innerHeight;
         game.level.camera.updateProjectionMatrix();
         rendererThree.setSize(window.innerWidth, window.innerHeight);
-        levelUi.pixiStage.destroy(true);
         levelUi.init();
     }
 

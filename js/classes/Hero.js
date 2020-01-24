@@ -166,9 +166,9 @@ class Hero {
         if (heightDiff < this.maxSpeed * .9) {
             this.camera.position.z = this.perspectiveHeight;
             this.headTiltDelta = 0;
-            if (heightDiff > 0.00001) {
-                this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), this.headTiltDelta);
-            }
+            // if (heightDiff > 0.00001) {
+            //     this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), this.headTiltDelta);
+            // }
         } else {
             let absDelta = Math.abs(this.headTiltDelta);
             let rotationMultiplier = 1;
@@ -186,8 +186,9 @@ class Hero {
                 this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), rotationMultiplier * absDelta);
                 this.headTiltDelta = 0;
             } else {
-                this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), rotationMultiplier * this.perspectiveRotationSpeed);
-                this.headTiltDelta += rotationMultiplier * this.perspectiveRotationSpeed * fpsAdjustment;
+                let rotationAmount = rotationMultiplier * this.perspectiveRotationSpeed * fpsAdjustment;
+                this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), rotationAmount);
+                this.headTiltDelta += rotationAmount;
             }
         }
     }

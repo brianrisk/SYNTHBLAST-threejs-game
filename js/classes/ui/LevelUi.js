@@ -1,4 +1,5 @@
 import ProgressBar from "./ProgressBar.js";
+import Button from "./Button.js";
 
 class LevelUi {
 
@@ -12,6 +13,7 @@ class LevelUi {
     }
 
     init() {
+        if (this.pixiStage) this.pixiStage.destroy(true);
         this.pixiStage = new PIXI.Container();
         if (this.isMobile) {
             let half = this.bWidth / 2;
