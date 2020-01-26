@@ -42,6 +42,7 @@
     import * as THREE from "./lib/three/build/three.module.js";
     import Game from "./js/classes/Game.js";
     import LevelUi from "./js/classes/ui/LevelUi.js";
+    import Menu from "./js/classes/ui/Menu.js";
 
     // The state we will save and load
     // when making a purchase, this state is sent to the servers,
@@ -60,7 +61,11 @@
         },
         gamesPlayed: 0,
         highScore: 0,
-        coins: 0
+        coins: 0,
+        settings: {
+            sound: true,
+            music: true
+        }
     };
 
     // Music
@@ -72,34 +77,29 @@
 
     // Sounds
     let audioContext = null;
-    // let massive = new Audio('assets/audio/massive2.wav');
-    let pew = new Audio('assets/audio/pip2.wav');
-    let pointSound = new Audio('assets/audio/point.wav');
-    let hitSound = new Audio('assets/audio/hit.wav');
-    let explosionSound = new Audio('assets/audio/explosion2.wav');
-    let impactSound = new Audio('assets/audio/impact.wav');
-    let flipSound = new Audio('assets/audio/flip.wav');
-    let shieldSound = new Audio('assets/audio/shield.wav');
-    let launchSound = new Audio('assets/audio/launch.wav');
-    let energySound = new Audio('assets/audio/energy2.wav');
+    let soundsLoaded = false;
     let sounds = {
-        pew: pew,
-        point: pointSound,
-        hit: hitSound,
-        explosion: explosionSound,
-        impact: impactSound,
-        flip: flipSound,
-        shield: shieldSound,
-        launch: launchSound,
-        energy: energySound
+        pew: new Audio('assets/audio/pip2.wav'),
+        point:  new Audio('assets/audio/point.wav'),
+        hit: new Audio('assets/audio/hit.wav'),
+        explosion: new Audio('assets/audio/explosion2.wav'),
+        impact: new Audio('assets/audio/impact.wav'),
+        flip: new Audio('assets/audio/flip.wav'),
+        shield:  new Audio('assets/audio/shield.wav'),
+        launch: new Audio('assets/audio/launch.wav'),
+        energy: new Audio('assets/audio/energy2.wav')
     };
 
     // Renderers
     let rendererThree;
     let rendererPixi;
 
-    let levelUi = null;
     let game = null;
+
+    // screens
+    let levelUi = null;
+    let menuScreen = null;
+    let activeScreen = null;
 
     let frameCount = 0;
     let frameTimes = [];
@@ -143,34 +143,14 @@
         init2d();
 
         // listeners
-        window.addEventListener('resize', onWindowResize, false);
-        document.addEventListener('keydown', onDocumentKeyDown, false);
-        document.addEventListener('keyup', onDocumentKeyUp, false);
+        window.addEventListener('resize', resize, false);
+        document.addEventListener('keydown', keyDown, false);
+        document.addEventListener('keyup', keyUp, false);
         document.addEventListener('touchstart', touchStart, {passive: false});
         document.addEventListener('touchend', touchEnd, {passive: false});
         document.body.addEventListener('touchmove', touchStart, {passive: false});
-    }
-
-    function onDocumentKeyDown(event) {
-        if (!audioContext) {
-            setAudio();
-        }
-        levelUi.onDocumentKeyDown(event);
-    }
-
-    function onDocumentKeyUp(event) {
-        levelUi.onDocumentKeyUp(event);
-    }
-
-    function touchStart(event) {
-        if (!audioContext) {
-            setAudio();
-        }
-        levelUi.touchStart(event);
-    }
-
-    function touchEnd(event) {
-        levelUi.touchEnd(event);
+        document.addEventListener('mousedown', mouseDown, false);
+        document.addEventListener('mouseup', mouseUp, false);
     }
 
     function init3d() {
@@ -178,22 +158,71 @@
     }
 
     function init2d() {
+        let uiCallbacks = {
+            pressPlay: pressPlay
+        };
         levelUi = new LevelUi(game, rendererPixi, sounds);
+        menuScreen = new Menu(game, rendererPixi, sounds, uiCallbacks);
+        activeScreen = menuScreen;
     }
+
+    function keyDown(event) {
+        if (!audioContext) {
+            setAudio();
+        }
+        activeScreen.onDocumentKeyDown(event);
+    }
+
+    function keyUp(event) {
+        activeScreen.onDocumentKeyUp(event);
+    }
+
+    function touchStart(event) {
+        if (!audioContext) {
+            setAudio();
+        }
+        if(sounds && !soundsLoaded) {
+            for(let audio of Object.values(sounds)) {
+                audio.play();
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            soundsLoaded = true;
+        }
+        activeScreen.touchStart(event);
+        event.stopImmediatePropagation();
+        event.preventDefault();
+    }
+
+    function touchEnd(event) {
+        activeScreen.touchEnd(event);
+    }
+
+    function mouseDown(event) {
+        activeScreen.mouseDown(event);
+    }
+    function mouseUp(event) {
+        activeScreen.mouseUp(event);
+    }
+
 
     function render3d() {
         game.render(fpsAdjustment);
     }
 
     function render2d() {
-        levelUi.render();
+        activeScreen.render();
     }
 
-    function onWindowResize() {
+    function pressPlay() {
+        activeScreen = levelUi;
+    }
+
+    function resize() {
         game.level.camera.aspect = window.innerWidth / window.innerHeight;
         game.level.camera.updateProjectionMatrix();
         rendererThree.setSize(window.innerWidth, window.innerHeight);
-        levelUi.init();
+        activeScreen.init();
     }
 
     function setAudio() {

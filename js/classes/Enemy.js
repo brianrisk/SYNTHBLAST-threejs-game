@@ -4,7 +4,7 @@ import Particle from "./Particle.js";
 
 class Enemy {
 
-    constructor(x, y, scene, hitPoints) {
+    constructor(x, y, scene, hitPoints, level) {
         let material = new THREE.MeshPhongMaterial({
             color: 0x00FFFF
         });
@@ -20,7 +20,7 @@ class Enemy {
         this.hitPoints = hitPoints;
         scene.add(cone);
 
-        this.maxSpeed = 0.05 + Math.random() * .05;
+        this.maxSpeed = level * .005 + Math.random() * .05;
         this.rotationAxis = new THREE.Vector3(0, 0, 1);
         let rotationAngle = 45 * Math.PI / 180;
         this.direction = new THREE.Vector3(0, 1, 0);

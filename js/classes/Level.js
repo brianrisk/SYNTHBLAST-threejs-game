@@ -40,8 +40,8 @@ class Level {
         let gun = null;
         let padsRemaining = 0;
         let fogColors = [
-            0xFF00FF,
             0x00FFFF,
+            0xFF00FF,
             0xFF0000,
             0xFF0088,
             0x8800FF,
@@ -87,7 +87,7 @@ class Level {
             for (let gridY = 0; gridY < arenaSize; gridY++) {
                 if (this.isZombie) {
                     if (Utils.randomInt(16) === 0) {
-                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
+                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1, game.levelNumber);
                         enemies.push(enemy);
                     }  else if (Utils.randomInt(640) === 0) {
                         let flipPad = new Pad(gridX, gridY - halfArena, scene, 0x88FF88);
@@ -106,7 +106,7 @@ class Level {
                         let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
                         buildings.push(building);
                     } else if (game.levelNumber > 1 && Utils.randomInt(64) === 0) {
-                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1);
+                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1, game.levelNumber);
                         enemies.push(enemy);
                     } else if (Utils.randomInt(160) === 0) {
                         let pointPad = new Pad(gridX, gridY - halfArena, scene, 0xFFFF88);
@@ -297,7 +297,7 @@ class Level {
                         let pointC = pointB.clone();
                         pointC.add(this.hero.direction);
                         let angle = Utils.find_angle(pointA, pointB, pointC);
-                        let heroIsFacingEnemy = (Math.abs(angle) < Math.PI / 4);
+                        let heroIsFacingEnemy = (Math.abs(angle) < Math.PI / 8);
                         if (heroIsFacingEnemy) {
                             let enemyHitPoints = enemy.getHitPoints();
                             enemy.hit(bullet.getHitPoints(), fpsAdjustment);

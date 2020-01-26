@@ -1,19 +1,21 @@
 class Button {
-    constructor(x, y, width, height, stage, label) {
+
+    constructor(x, y, width, height, stage, label, callback) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.stage = stage;
         this.label = label;
+        this.callback = callback;
 
-        let outline = new PIXI.Graphics();
-        outline.lineStyle(1, 0xCCCCCC, 1);
-        outline.beginFill(0xFF00FF);
-        outline.alpha = 0.25;
-        outline.drawRect(x, y, width, height);
-        this.outline = outline;
-        stage.addChild(outline);
+        // FILL
+        let fill = new PIXI.Graphics();
+        fill.beginFill(0xFF00FF);
+        fill.alpha = 0.35;
+        fill.drawRect(x, y, width, height);
+        this.fill = fill;
+        stage.addChild(fill);
 
         let fontSize = Math.round(height * 0.8);
         let labelStyle = new PIXI.TextStyle({
@@ -22,25 +24,58 @@ class Button {
             fill: "#99FFFF",
         });
 
+        let glow = new PIXI.filters.BlurFilter();
+        glow.blur = 8;
+        this.glow = glow;
+
+        // nice, neon glow (blur)
+        this.blurText = new PIXI.Text(label, labelStyle);
+        while (this.blurText.width > width * .9) labelStyle.fontSize -= 1;
+        this.blurText.position.set(x + (width - this.blurText.width) / 2, y + (height - labelStyle.fontSize) / 2);
+        this.blurText.filters = [glow];
+        stage.addChild(this.blurText);
+
+        // the text
         this.labelText = new PIXI.Text(label, labelStyle);
-        this.labelText.position.set(x + (width - this.labelText.width) / 2, y + (height - fontSize) / 2);
+        this.labelText.position.set(x + (width - this.labelText.width) / 2, y + (height - labelStyle.fontSize) / 2);
         stage.addChild(this.labelText);
 
+        // button outline glow
+        let outlineBlur = new PIXI.Graphics();
+        outlineBlur.lineStyle(1, 0x99FFFF, 1);
+        outlineBlur.drawRect(x, y, width, height);
+        outlineBlur.filters = [glow];
+        this.outlineBlur = outlineBlur;
+        stage.addChild(outlineBlur);
+
+        // button outline
+        let outline = new PIXI.Graphics();
+        outline.lineStyle(2, 0x99FFFF, 1);
+        outline.drawRect(x, y, width, height);
+        outline.alpha = 0.5;
+        this.outline = outline;
+        stage.addChild(outline);
 
     }
 
-    down() {
-        this.stage.removeChild(this.bar);
-        let bar = new PIXI.Graphics();
-        let newWidth =  this.width * percent;
-        bar.beginFill(0xFF00FF);
-        bar.drawRect(this.x, this.y, newWidth, this.height);
-        this.bar = bar;
-        this.stage.addChild(bar);
+    isIn(x, y) {
+        return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
     }
 
-    up() {
+    down(event) {
+        if (this.isIn(event.clientX, event.clientY)) {
+            this.fill.alpha = .7;
+        } else {
+            this.fill.alpha = .35;
+        }
 
+    }
+
+    up(event) {
+        this.fill.alpha = 0.35;
+        if (this.isIn(event.clientX, event.clientY)) {
+            this.callback();
+        }
     }
 
 

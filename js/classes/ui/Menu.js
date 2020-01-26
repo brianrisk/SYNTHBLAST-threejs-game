@@ -2,25 +2,71 @@ import Button from "./Button.js";
 
 class Menu {
 
-    constructor(game, rendererPixi, sounds) {
+    constructor(game, rendererPixi, sounds, uiCallbacks) {
         this.game = game;
         this.rendererPixi = rendererPixi;
         this.sounds = sounds;
         this.isMobile = 'ontouchstart' in document.documentElement;
         this.bWidth = 60;
+        this.uiCallbacks = uiCallbacks;
         this.init();
     }
 
     init() {
         if (this.pixiStage) this.pixiStage.destroy(true);
         this.pixiStage = new PIXI.Container();
-        new Button(100,100,350,50,this.pixiStage, "Facebook Login");
+        this.elements = [];
+        let buttonWidth = Math.max(window.innerWidth / 3, 350);
+        let buttonHeight = Math.min(window.innerHeight / 17, 70);
+        let buttonSpacing = 30;
+        let allHeight  = 5 * buttonHeight + 4 * buttonSpacing;
+        let y = (window.innerHeight - allHeight) / 2;
+        let x = (window.innerWidth - buttonWidth) / 2;
+
+        let fill = new PIXI.Graphics();
+        fill.beginFill(0x000000);
+        fill.alpha = .8;
+        fill.drawRect(x, y, buttonWidth, allHeight);
+        this.fill = fill;
+        this.pixiStage.addChild(fill);
+
+        // play
+        this.elements.push(
+            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "P ^ Ł * 4 ^ ¥", this.uiCallbacks.pressPlay)
+        );
+        y += buttonHeight + buttonSpacing;
+
+        // upgrades
+        this.elements.push(
+            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "UPGRADES")
+        );
+        y += buttonHeight + buttonSpacing;
+
+
+        // leaderboard
+        this.elements.push(
+            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "LEADERBOARD")
+        );
+        y += buttonHeight + buttonSpacing;
+
+
+        // settings
+        this.elements.push(
+            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "SETTINGS")
+        );
+        y += buttonHeight + buttonSpacing;
+
+        //login
+        this.elements.push(
+            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "FACEBOOK LOGIN")
+        );
+
+
         if (this.isMobile) {
 
         } else {
 
         }
-        new Button(100,100,350,50,this.pixiStage, "Facebook Login");
     }
 
 
@@ -29,29 +75,25 @@ class Menu {
      */
 
     touchStart(event) {
-        // audio still choppy and causing low FPS!
-
-        // if(sounds && !soundsLoaded) {
-        //     for(let audio of Object.values(sounds)) {
-        //         audio.play();
-        //         audio.pause();
-        //         audio.currentTime = 0;
-        //     }
-        //     soundsLoaded = true;
-        // }
-
-        this.down(event);
-        event.stopImmediatePropagation();
-        event.preventDefault();
-
+        for (let i = 0; i < event.changedTouches.length; i++) {
+            let touch = event.changedTouches[i];
+            this.down(touch);
+        }
     }
 
     touchEnd(event) {
-
+        for (let i = 0; i < event.changedTouches.length; i++) {
+            let touch = event.changedTouches[i];
+            this.up(touch);
+        }
     }
 
     down(event) {
+        this.elements.forEach(element => element.down(event));
+    }
 
+    up(event) {
+        this.elements.forEach(element => element.up(event));
     }
 
     onDocumentKeyDown(event) {
@@ -73,8 +115,16 @@ class Menu {
         }
     }
 
-    render() {
+     mouseDown(event) {
+        this.down(event);
+    }
 
+     mouseUp(event) {
+        this.up(event);
+    }
+
+    render() {
+        this.rendererPixi.render(this.pixiStage, undefined, false);
     }
 }
 
