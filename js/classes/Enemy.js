@@ -85,7 +85,7 @@ class Enemy {
                 let pointC = pointB.clone();
                 pointC.add(this.direction);
                 let angle = Utils.find_angle(pointA, pointB, pointC);
-                // if (angle > Math.PI) angle -= Math.PI * 2;
+                if (angle > Math.PI) angle -= Math.PI;
                 //  console.log(angle);
                 if (angle > Math.PI / 18) {
                     let angleToRotate = angle / 25 * fpsAdjustment;

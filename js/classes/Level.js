@@ -11,7 +11,8 @@ import Hero from "../../js/classes/Hero.js";
 import Building from "../../js/classes/Building.js";
 import Gun from "../../js/classes/Gun.js";
 import Enemy from "../../js/classes/Enemy.js";
-import Drone from "../../js/classes/Drone.js";
+// not importing so doesn't have to load
+// import Drone from "../../js/classes/Drone.js";
 import Comet from "./Comet.js";
 import Coin from "../../js/classes/Coin.js";
 import Game from "./Game.js";
@@ -40,8 +41,8 @@ class Level {
         let gun = null;
         let padsRemaining = 0;
         let fogColors = [
-            0x00FFFF,
             0xFF00FF,
+            0x00FFFF,
             0xFF0000,
             0xFF0088,
             0x8800FF,
@@ -70,17 +71,17 @@ class Level {
         if (this.isZombie) {
             let padX = Utils.randomInt(arenaSize - 2) + 1;
             let padY = Utils.randomInt(arenaSize - 2) + 1 - halfArena;
-            while (Math.abs (padY - halfArena) < 2) {
+            while (Math.abs(padY - halfArena) < 2) {
                 padY = Utils.randomInt(arenaSize - 2) + 1 - halfArena;
             }
             let pointPad = new Pad(padX, padY, scene, 0xFFFF88);
             pointPads.push(pointPad);
             padsRemaining += 1;
-
-            buildings.push( new Building(padX - 1, padY, 15, scene, true));
-            buildings.push( new Building(padX + 1, padY, 15, scene, true));
-            buildings.push( new Building(padX, padY - 1, 15, scene, true));
-            buildings.push( new Building(padX, padY + 1, 15, scene, true));
+            // surround pad with tall buildings
+            buildings.push(new Building(padX - 1, padY, 15, scene, true));
+            buildings.push(new Building(padX + 1, padY, 15, scene, true));
+            buildings.push(new Building(padX, padY - 1, 15, scene, true));
+            buildings.push(new Building(padX, padY + 1, 15, scene, true));
         }
 
         for (let gridX = 0; gridX < arenaSize; gridX++) {
@@ -89,7 +90,7 @@ class Level {
                     if (Utils.randomInt(16) === 0) {
                         let enemy = new Enemy(gridX, gridY - halfArena, scene, 1, game.levelNumber);
                         enemies.push(enemy);
-                    }  else if (Utils.randomInt(640) === 0) {
+                    } else if (Utils.randomInt(640) === 0) {
                         let flipPad = new Pad(gridX, gridY - halfArena, scene, 0x88FF88);
                         flipPads.push(flipPad);
                     } else if (Utils.randomInt(100) === 0) {
@@ -123,6 +124,13 @@ class Level {
             }
         }
 
+        // ensure there is at least one point pad
+        if (padsRemaining === 0) {
+            let pointPad = new Pad(arenaSize - 1, 0, scene, 0xFFFF88);
+            pointPads.push(pointPad);
+            padsRemaining += 1;
+        }
+
         // drones
         // for (let i = 0; i < 1; i++) {
         //     let drone = new Drone( halfArena, 0, scene);
@@ -146,31 +154,39 @@ class Level {
         }
 
         // add random mountains
-        for (let i = 0; i < 200; i++) {
-            let mountainMin = -65;
-            let mountainMax = arenaSize + 65;
-            let coneRadius = Utils.randomInt(10) + 2;
-            //let coneHeight = Utils.randomInt(20);
-            let coneHeight = coneRadius * 1.5;
-            let geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 4);
-            // rotate
-            let material = new THREE.LineBasicMaterial(
-                {
-                    color: 0x000000,
-                    opacity: 1,
-                    fog: true
-                });
-            // let wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000} );
-            let object = new THREE.Mesh(geometry, material);
+        for (let i = 0; i < 600; i++) {
             // put the mountains outside the zone
-            let coneX =  -1 * Utils.randomInt(70) - coneRadius;
-            let coneY = Utils.randomInt(100) - 50;
-            object.position.x = coneX;
-            object.position.y = coneY;
-            object.position.z = 0;
-            object.rotation.x += Math.PI * .5;
-            // clear a path down the middle
-            if (Math.abs(coneY) > 5) scene.add(object);
+            // let coneX =  -1 * Utils.randomInt(70) - coneRadius;
+            // let coneY = Utils.randomInt(100) - 50;
+            let coneX = Utils.randomInt(200) - 100;
+            let coneY = Utils.randomInt(200) - 100;
+            let coneRadius = Utils.randomInt(10) + 2;
+            let coneHeight = coneRadius * 1.5;
+            if (
+                // clearing a path
+                (Math.abs(coneY) > 5) &&
+                // nothing in the arena
+                !(
+                    (coneX > -1 - coneRadius && coneX < arenaSize + coneRadius) &&
+                    (coneY > -1 - coneRadius || coneY < arenaSize + coneRadius)
+                )
+            ) {
+
+
+                let geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 4);
+                let material = new THREE.LineBasicMaterial(
+                    {
+                        color: 0x000000,
+                        opacity: 1,
+                        fog: true
+                    });
+                let object = new THREE.Mesh(geometry, material);
+                object.position.x = coneX;
+                object.position.y = coneY;
+                object.position.z = 0;
+                object.rotation.x += Math.PI * .5;
+                scene.add(object);
+            }
         }
 
         // add comets
@@ -190,6 +206,20 @@ class Level {
         let plane = new THREE.Mesh(floorGeometry, floorMaterial);
         plane.position.z = 0;
         scene.add(plane);
+
+
+        const cubeTextureLoader = new THREE.CubeTextureLoader();
+        const skybox = cubeTextureLoader.load([
+            'assets/img/night.gif',
+            'assets/img/sunset.gif',
+            'assets/img/night.gif',
+            'assets/img/night.gif',
+            'assets/img/night.gif',
+            'assets/img/night.gif',
+        ]);
+
+        // skybox
+        scene.background = skybox;
 
         // light
         let dirLight;
@@ -260,7 +290,7 @@ class Level {
         this.bullets.forEach(bullet => bullet.update());
         this.buildings.forEach(building => building.update(fpsAdjustment));
         this.enemies.forEach(enemy => enemy.update(this.hero, fpsAdjustment));
-        this.drones.forEach(drone => drone.update(this.hero, this.enemies,fpsAdjustment));
+        this.drones.forEach(drone => drone.update(this.hero, this.enemies, fpsAdjustment));
         this.pointPads.forEach(pad => pad.update(fpsAdjustment));
         this.flipPads.forEach(pad => pad.update(fpsAdjustment));
         this.shields.forEach(shield => shield.update(fpsAdjustment));
@@ -414,7 +444,7 @@ class Level {
                     && Math.abs(coin.getY() - this.hero.getY()) < 0.4
                 ) {
                     coin.isTaken = true;
-                    this.game.score ++;
+                    this.game.score++;
                     this.sounds.energy.currentTime = 0;
                     this.sounds.energy.play();
                 }

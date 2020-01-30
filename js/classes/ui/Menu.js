@@ -17,8 +17,8 @@ class Menu {
         this.pixiStage = new PIXI.Container();
         this.elements = [];
         let buttonWidth = Math.max(window.innerWidth / 3, 350);
-        let buttonHeight = Math.min(window.innerHeight / 17, 70);
-        let buttonSpacing = 30;
+        let buttonHeight = Math.min(window.innerHeight / 15, 70);
+        let buttonSpacing = Math.min(window.innerHeight / 30, 30);
         let allHeight  = 5 * buttonHeight + 4 * buttonSpacing;
         let y = (window.innerHeight - allHeight) / 2;
         let x = (window.innerWidth - buttonWidth) / 2;
@@ -38,28 +38,29 @@ class Menu {
 
         // upgrades
         this.elements.push(
-            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "UPGRADES")
+            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "UPGR4D3Ƶ", function() {})
         );
         y += buttonHeight + buttonSpacing;
 
 
         // leaderboard
         this.elements.push(
-            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "LEADERBOARD")
+            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "LEAD3RB04RD", function() {})
         );
         y += buttonHeight + buttonSpacing;
 
 
         // settings
         this.elements.push(
-            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "SETTINGS")
+            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "S3TT1NG5", function() {})
         );
         y += buttonHeight + buttonSpacing;
 
         //login
         this.elements.push(
-            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "FACEBOOK LOGIN")
+            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "RESTORE PROGRESS", FB.login)
         );
+        y += buttonHeight + buttonSpacing;
 
 
         if (this.isMobile) {
@@ -88,31 +89,12 @@ class Menu {
         }
     }
 
-    down(event) {
-        this.elements.forEach(element => element.down(event));
-    }
-
-    up(event) {
-        this.elements.forEach(element => element.up(event));
-    }
-
     onDocumentKeyDown(event) {
 
     }
 
     onDocumentKeyUp(event) {
-        let keyCode = event["which"];
-        if (keyCode === 32) {
-            this.game.level.hero.stopShooting();
-        } else if (keyCode === 37 || keyCode === 65) {
-            this.game.level.hero.stopTurning();
-        } else if (keyCode === 38 || keyCode === 87) {
-            this.game.level.hero.stop();
-        } else if (keyCode === 39 || keyCode === 68) {
-            this.game.level.hero.stopTurning();
-        } else if (keyCode === 40 || keyCode === 83) {
-            this.game.level.hero.stop();
-        }
+
     }
 
      mouseDown(event) {
@@ -121,6 +103,14 @@ class Menu {
 
      mouseUp(event) {
         this.up(event);
+    }
+
+    down(event) {
+        this.elements.forEach(element => element.down(event));
+    }
+
+    up(event) {
+        this.elements.forEach(element => element.up(event));
     }
 
     render() {

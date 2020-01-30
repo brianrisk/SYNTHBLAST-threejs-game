@@ -22,9 +22,23 @@
 * HUD for pads
 
 ### gun upgrades
+* gun
+  * refresh speed
+  * range
+  * damage
+* ship
+  * rotation
+  * speed
+  * armor
+  * shield capacity
+* utilities
+  * cube magnet
+  * tetra magnet
+  
 * bullet refresh speed
 * bullet range
 * bullet damage
+* bullet velocity
 * multiple shooters
 * bullet intelligence (how much it bends toward closest enemy)
 * Javelin

@@ -338,6 +338,14 @@ class LevelUi {
         }
     }
 
+    mouseDown(event) {
+        // empty but required
+    }
+
+    mouseUp(event) {
+        // empty but required
+    }
+
     render() {
 
         // updating text

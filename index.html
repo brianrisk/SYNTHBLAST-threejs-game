@@ -69,10 +69,13 @@
     };
 
     // Music
-    // let implant = new Audio('music/implant-128kbps.mp3');
+    // let motel_bedroom = new Audio('music/motel_bedroom.mp3');
+    let motel_bedroom = null;
+    if (motel_bedroom) motel_bedroom.loop = true;
+    let musicOn = false;
     let songs = {
         isSongPlaying: false,
-        implant: null
+        motel_bedroom: motel_bedroom
     };
 
     // Sounds
@@ -167,9 +170,7 @@
     }
 
     function keyDown(event) {
-        if (!audioContext) {
-            setAudio();
-        }
+        startAudio();
         activeScreen.onDocumentKeyDown(event);
     }
 
@@ -178,17 +179,7 @@
     }
 
     function touchStart(event) {
-        if (!audioContext) {
-            setAudio();
-        }
-        if(sounds && !soundsLoaded) {
-            for(let audio of Object.values(sounds)) {
-                audio.play();
-                audio.pause();
-                audio.currentTime = 0;
-            }
-            soundsLoaded = true;
-        }
+        startAudio();
         activeScreen.touchStart(event);
         event.stopImmediatePropagation();
         event.preventDefault();
@@ -204,7 +195,6 @@
     function mouseUp(event) {
         activeScreen.mouseUp(event);
     }
-
 
     function render3d() {
         game.render(fpsAdjustment);
@@ -225,15 +215,23 @@
         activeScreen.init();
     }
 
-    function setAudio() {
-        // https://stackoverflow.com/questions/9811429/html5-audio-tag-on-safari-has-a-delay
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioContext();
-
-        if (!songs.isSongPlaying) {
-            // songs.implant.currentTime = 0;
-            // songs.implant.play();
-            // songs.isSongPlaying = true;
+    function startAudio() {
+        if (!audioContext) {
+            // https://stackoverflow.com/questions/9811429/html5-audio-tag-on-safari-has-a-delay
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioContext = new AudioContext();
+        }
+        if(sounds && !soundsLoaded) {
+            for(let audio of Object.values(sounds)) {
+                audio.play();
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            soundsLoaded = true;
+        }
+        if (musicOn && !songs.isSongPlaying) {
+            songs.motel_bedroom.play();
+            songs.isSongPlaying = true;
         }
     }
 
@@ -251,6 +249,17 @@
                 fpsAdjustment = 60 / fps;
             }
         }
+    }
+
+    function getHighScores() {
+        let url = 'https://example.com';
+
+        fetch(url)
+            .then(res => res.json())
+            .then((out) => {
+                console.log('Checkout this JSON! ', out);
+            })
+            .catch(err => { throw err });
     }
 
 
