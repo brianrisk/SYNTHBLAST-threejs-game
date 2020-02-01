@@ -51,14 +51,15 @@ class Level {
         ];
 
         scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 50);
+        camera = new THREE.PerspectiveCamera(65, game.width / game.height, 0.1, 50);
+        rendererThree.setSize(game.width, game.height);
         scene.background = new THREE.Color(0x000000);
         // scene.background = new THREE.Color(0xefd1b5);
         let fogColor = fogColors[(game.levelNumber - 1) % fogColors.length];
         scene.fog = new THREE.FogExp2(fogColor, 0.05);
         scene.color = 0x00DD00;
 
-        rendererThree.setSize(window.innerWidth, window.innerHeight);
+
 
         composer = new EffectComposer(rendererThree);
 
@@ -425,6 +426,15 @@ class Level {
             });
 
             this.shields.forEach(shield => {
+                // magnet
+                if (
+                    !shield.isUsed
+                    && Math.abs(shield.getX() - this.hero.getX()) < 5
+                    && Math.abs(shield.getY() - this.hero.getY()) < 5
+                ) {
+                    shield.moveTo(this.hero.getPosition(), fpsAdjustment);
+                }
+                // take
                 if (
                     !shield.isUsed
                     && Math.abs(shield.getX() - this.hero.getX()) < 0.7
@@ -435,9 +445,20 @@ class Level {
                     this.sounds.shield.currentTime = 0;
                     this.sounds.shield.play();
                 }
+
             });
 
             this.coins.forEach(coin => {
+                // magnet
+                if (
+                    !coin.isTaken
+                    && Math.abs(coin.getX() - this.hero.getX()) < 1
+                    && Math.abs(coin.getY() - this.hero.getY()) < 1
+                ) {
+                    coin.moveTo(this.hero.getPosition(), fpsAdjustment);
+                }
+
+                // take coin
                 if (
                     !coin.isTaken
                     && Math.abs(coin.getX() - this.hero.getX()) < 0.4

@@ -1,24 +1,13 @@
 class ProgressBar {
-    constructor(x, y, width, height, stage, label) {
+    constructor(x, y, width, height, stage, label, color) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.stage = stage;
         this.label = label;
+        this.color = color;
         this.percent = 0;
-
-        // let bar = new PIXI.Graphics();
-        // bar.beginFill(0xFF00FF);
-        // bar.drawRect(x, y, width, height);
-        // this.bar = bar;
-        // stage.addChild(bar);
-
-        let outline = new PIXI.Graphics();
-        outline.lineStyle(1, 0xCCCCCC, 1);
-        outline.drawRect(x, y, width, height);
-        this.outline = outline;
-        stage.addChild(outline);
 
         let labelStyle = new PIXI.TextStyle({
             fontFamily: "\"Courier New\", Courier, monospace",
@@ -27,6 +16,21 @@ class ProgressBar {
         });
 
         this.labelText = new PIXI.Text(label, labelStyle);
+
+        let bkgnd = new PIXI.Graphics();
+        bkgnd.beginFill(0x000000);
+        let padding = 3;
+        bkgnd.alpha = 1;
+        bkgnd.drawRect(x - (padding + this.labelText.width + 5) , y, width + ( padding + this.labelText.width + 5), height );
+        stage.addChild(bkgnd);
+
+        // let outline = new PIXI.Graphics();
+        // outline.lineStyle(1, 0xCCCCCC, 1);
+        // outline.drawRect(x, y, width, height);
+        // this.outline = outline;
+        // stage.addChild(outline);
+
+
         this.labelText.position.set(x - this.labelText.width - 5, y);
         stage.addChild(this.labelText);
 
@@ -39,7 +43,7 @@ class ProgressBar {
         let bar = new PIXI.Graphics();
         let newWidth =  this.width * percent;
         let delta = this.width - newWidth;
-        bar.beginFill(0xFF00FF);
+        bar.beginFill(this.color);
         bar.drawRect(this.x + delta, this.y, newWidth, this.height);
         this.bar = bar;
         this.stage.addChild(bar);

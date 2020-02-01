@@ -32,6 +32,7 @@
         }
 
     </style>
+    <script data-ad-client="ca-pub-0228360753064464" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
 <script src='js/Facebook.js'></script>
@@ -65,14 +66,15 @@
         settings: {
             sound: true,
             music: true
-        }
+        },
+
     };
 
     // Music
-    // let motel_bedroom = new Audio('music/motel_bedroom.mp3');
-    let motel_bedroom = null;
+    let motel_bedroom = new Audio('music/motel_bedroom.mp3');
+    // let motel_bedroom = null;
     if (motel_bedroom) motel_bedroom.loop = true;
-    let musicOn = false;
+    let musicOn = true;
     let songs = {
         isSongPlaying: false,
         motel_bedroom: motel_bedroom
@@ -157,7 +159,7 @@
     }
 
     function init3d() {
-        game = new Game(rendererThree, sounds);
+        game = new Game(rendererThree, sounds, window.innerWidth, window.innerHeight - 50);
     }
 
     function init2d() {
@@ -209,9 +211,9 @@
     }
 
     function resize() {
-        game.level.camera.aspect = window.innerWidth / window.innerHeight;
+        game.level.camera.aspect = game.width / game.height;
         game.level.camera.updateProjectionMatrix();
-        rendererThree.setSize(window.innerWidth, window.innerHeight);
+        rendererThree.setSize(game.width, game.height);
         activeScreen.init();
     }
 
@@ -230,6 +232,14 @@
             soundsLoaded = true;
         }
         if (musicOn && !songs.isSongPlaying) {
+            // gapless audio loop
+            // https://stackoverflow.com/questions/7330023/gapless-looping-audio-html5
+            songs.motel_bedroom.addEventListener('timeupdate', function(){
+                let buffer = .4;
+                if(this.currentTime > this.duration - buffer){
+                    this.currentTime = 0;
+                    this.play();
+                }}, false);
             songs.motel_bedroom.play();
             songs.isSongPlaying = true;
         }
@@ -265,5 +275,27 @@
 
 </script>
 <canvas id="screen"></canvas>
+<style>
+    #banner {
+        width: 320px;
+        height: 50px;
+        background-color: #000000;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+<div id="banner">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <!-- Synthblast responsive -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-0228360753064464"
+         data-ad-slot="3958750446"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
 </body>
 </html>

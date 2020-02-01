@@ -21,11 +21,14 @@
 * hit points
 * HUD for pads
 
-### gun upgrades
+### upgrades
 * gun
   * refresh speed
   * range
   * damage
+* weapons
+  * proximity bombs
+  * demolisher (destroy all buildings)
 * ship
   * rotation
   * speed
@@ -34,20 +37,23 @@
 * utilities
   * cube magnet
   * tetra magnet
+  * shield magnet
+  * flip control
+* misc ideas
+  * multiple shooters
+  * bullet intelligence (how much it bends toward closest enemy)
+  * Javelin
+  * Energy balls that then electrify nearby targets when they hit something
+  * lightning gun
   
-* bullet refresh speed
-* bullet range
-* bullet damage
-* bullet velocity
-* multiple shooters
-* bullet intelligence (how much it bends toward closest enemy)
-* Javelin
-* Energy balls that then electrify nearby targets when they hit something
-* lightning gun
+### in-between levels
+* repair armor
+* buy shields
+* cube magnet
+* turbo
 
 ### Powerups
 * turbo
-* out of body
 * drone
 * Coin Magnet
 * bomb pad

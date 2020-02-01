@@ -22,10 +22,10 @@ class LevelUi {
             let x1 = this.bWidth + offset;
             let x2 = this.bWidth * 2 + offset;
             let x3 = this.bWidth * 3 + offset;
-            let y1 = window.innerHeight - this.bWidth * 3 - offset;
-            let y2 = window.innerHeight - this.bWidth * 2 - offset;
-            let y3 = window.innerHeight - this.bWidth - offset;
-            let y4 = window.innerHeight - offset;
+            let y1 = this.game.height - this.bWidth * 3 - offset;
+            let y2 = this.game.height - this.bWidth * 2 - offset;
+            let y3 = this.game.height - this.bWidth - offset;
+            let y4 = this.game.height - offset;
 
             // squares
             this.b1 = this.getSquare(x0, y1, this.bWidth);
@@ -50,8 +50,8 @@ class LevelUi {
             this.bFire = new PIXI.Graphics();
             this.bFire.beginFill(0xFF00FF);
             this.bFire.drawEllipse(
-                window.innerWidth - (this.bWidth * 1.5),
-                window.innerHeight - (this.bWidth * 1.5),
+                this.game.width - (this.bWidth * 1.5),
+                this.game.height - (this.bWidth * 1.5),
                 this.bWidth,
                 this.bWidth);
             this.bFire.alpha = 0.6;
@@ -61,8 +61,8 @@ class LevelUi {
             let fireOutline = new PIXI.Graphics();
             fireOutline.lineStyle(2, 0xCC88CC, 1);
             fireOutline.drawEllipse(
-                window.innerWidth - (this.bWidth * 1.5),
-                window.innerHeight - (this.bWidth * 1.5),
+                this.game.width - (this.bWidth * 1.5),
+                this.game.height - (this.bWidth * 1.5),
                 this.bWidth,
                 this.bWidth);
             this.pixiStage.addChild(fireOutline);
@@ -102,7 +102,7 @@ class LevelUi {
             });
 
             this.instructionText = new PIXI.Text('ARROW KEYS TO MOVE; SPACE TO FIRE.', instructionStyle);
-            this.instructionText.position.set(10, window.innerHeight - 50);
+            this.instructionText.position.set(10, this.game.height - 50);
             this.pixiStage.addChild(this.instructionText);
         }
 
@@ -116,7 +116,7 @@ class LevelUi {
         this.statusText.position.set(10, 50);
         this.pixiStage.addChild(this.statusText);
 
-        let finalSize = Math.max(window.innerWidth / 20, window.innerHeight / 8);
+        let finalSize = Math.max(this.game.width / 20, this.game.height / 8);
         let finalStyle = new PIXI.TextStyle({
             fontFamily: "\"Courier New\", Courier, monospace",
             fontSize: finalSize,
@@ -129,15 +129,16 @@ class LevelUi {
         });
 
         this.finalText = new PIXI.Text("", finalStyle);
-        this.finalText.position.set(window.innerWidth / 2, (window.innerHeight - finalSize) / 2);
+        this.finalText.position.set(this.game.width / 2, (this.game.height - finalSize) / 2);
         this.pixiStage.addChild(this.finalText);
 
         // progress bars
-        let halfWindow = window.innerWidth / 2;
+        let progressWidth = this.game.width / 4;
         let rightMargin = 10;
         let progressHeight = 10;
-        this.hpProgress =       new ProgressBar(halfWindow, 10, halfWindow - rightMargin, progressHeight, this.pixiStage, "HP");
-        this.shileldProgress =  new ProgressBar(halfWindow, 25, halfWindow - rightMargin, progressHeight, this.pixiStage, "SHIELD");
+        this.hpProgress =       new ProgressBar(this.game.width - progressWidth, 10, progressWidth - rightMargin, progressHeight, this.pixiStage, "ARMOR",  0xFF00FF);
+        this.shileldProgress =  new ProgressBar(this.game.width - progressWidth, 25, progressWidth - rightMargin, progressHeight, this.pixiStage, "SHIELD", 0x8800FF);
+        this.padProgress =      new ProgressBar(this.game.width - progressWidth, 40, progressWidth - rightMargin, progressHeight, this.pixiStage, "PADS",   0xFFFF00);
 
     }
 
@@ -201,7 +202,7 @@ class LevelUi {
     touchEnd(event) {
         for (let i = 0; i < event.changedTouches.length; i++) {
             let touch = event.changedTouches[i];
-            if (touch.clientX < window.innerWidth / 2) {
+            if (touch.clientX < this.game.width / 2) {
                 this.game.level.hero.stopTurning();
                 this.game.level.hero.stop();
                 this.b1.visible = false;
@@ -239,10 +240,10 @@ class LevelUi {
             let x1 = this.bWidth + offset;
             let x2 = this.bWidth * 2 + offset;
             let x3 = this.bWidth * 4 + offset;
-            let y1 = window.innerHeight - this.bWidth * 4 - offset;
-            let y2 = window.innerHeight - this.bWidth * 2 - offset;
-            let y3 = window.innerHeight - this.bWidth - offset;
-            let y4 = window.innerHeight;
+            let y1 = this.game.height - this.bWidth * 4 - offset;
+            let y2 = this.game.height - this.bWidth * 2 - offset;
+            let y3 = this.game.height - this.bWidth - offset;
+            let y4 = this.game.height;
 
             if (x < x3 && y > y1) {
                 this.b1.visible = false;
@@ -288,7 +289,7 @@ class LevelUi {
                 }
             }
 
-            if (x > window.innerWidth - 3 * this.bWidth) {
+            if (x > this.game.width - 3 * this.bWidth) {
                 this.game.level.hero.startShooting();
                 this.bFire.visible = true;
             }
@@ -353,7 +354,7 @@ class LevelUi {
 
         } else if (this.game.level.hero.hitPoints <= 0) {
             this.finalText.text = "TRY AGAIN";
-            this.finalText.x = (window.innerWidth - this.finalText.width) / 2;
+            this.finalText.x = (this.game.width - this.finalText.width) / 2;
             this.statusText.text = "";
         } else {
             if (this.game.level.hasStarted) {
@@ -365,12 +366,11 @@ class LevelUi {
                     this.finalText.text = "LEVEL " + this.game.levelNumber;
                 }
 
-                this.finalText.x = (window.innerWidth - this.finalText.width) / 2;
+                this.finalText.x = (this.game.width - this.finalText.width) / 2;
             }
             this.statusText.text =
-                "LEVEL: " + this.game.levelNumber + "\n" +
-                "PADS: " + this.game.level.padsRemaining + "\n" +
                 "POINTS: " + this.game.score + "\n";
+
         }
 
         // updating progress
@@ -379,6 +379,9 @@ class LevelUi {
 
         let shieldPercent = this.game.level.hero.shields / this.game.level.hero.maxShields;
         this.shileldProgress.setProgress(shieldPercent);
+
+        let padPercent = (this.game.level.padsTotal - this.game.level.padsRemaining) / this.game.level.padsTotal;
+        this.padProgress.setProgress(padPercent);
 
         // final rendering
         this.rendererPixi.render(this.pixiStage, undefined, false);

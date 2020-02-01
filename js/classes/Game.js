@@ -1,8 +1,10 @@
 import Level from "./Level.js";
 class Game {
-    constructor(rendererThree, sounds) {
+    constructor(rendererThree, sounds, width, height) {
         this.rendererThree = rendererThree;
         this.sounds = sounds;
+        this.width = width;
+        this.height = height;
         this.levelNumber = 1;
         this.levelChangeTime = (new Date()).getTime();
         this.level = new Level(this, this.rendererThree, this.sounds);

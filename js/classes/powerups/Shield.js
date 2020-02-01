@@ -40,6 +40,13 @@ class Shield {
     getY() {
         return this.object.position.y;
     }
+
+    moveTo(v, fpsAdjustment) {
+        let delta = new THREE.Vector3(v.x - this.getX(), v.y - this.getY(), 0);
+        delta.normalize();
+        delta.multiplyScalar(.1 * fpsAdjustment);
+        this.object.position.add(delta);
+    }
 }
 
 export default Shield;

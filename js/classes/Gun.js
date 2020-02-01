@@ -10,20 +10,21 @@ class Gun {
         this.hero = hero;
         this.pew = pew;
         this.bulletZ = 0.3;
-        this.bulletSize = .05
+        this.bulletSize = .05;
+        this.recharge = 150;
     }
 
     fire(soundOn, fpsAdjustment) {
         let currentTime = (new Date()).getTime();
-        if (currentTime - this.lastFired < 150) return;
+        if (currentTime - this.lastFired < this.recharge) return;
 
         let heroPosition = this.hero.getPosition();
         let bulletPosition = new THREE.Vector3(heroPosition.x, heroPosition.y,  this.bulletZ);
         let direction = this.hero.direction.clone();
         let left = this.hero.direction.clone();
-        left.applyAxisAngle(new THREE.Vector3(0,0,1), .1);
+        left.applyAxisAngle(new THREE.Vector3(0,0,1), .2);
         let right = this.hero.direction.clone();
-        right.applyAxisAngle(new THREE.Vector3(0,0,1), -.1);
+        right.applyAxisAngle(new THREE.Vector3(0,0,1), -.2);
         let fired = false;
         fired = this.shoot(bulletPosition, direction, fpsAdjustment) || fired;
         // fired = this.shoot(bulletPosition, left, fpsAdjustment) || fired;

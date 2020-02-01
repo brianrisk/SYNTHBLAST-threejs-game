@@ -54,6 +54,17 @@ class Coin {
         return this.object.position.z;
     }
 
+    getPosition() {
+        return this.object.position;
+    }
+
+    moveTo(v, fpsAdjustment) {
+        let delta = new THREE.Vector3(v.x - this.getX(), v.y - this.getY(), 0);
+        delta.normalize();
+        delta.multiplyScalar(.1 * fpsAdjustment);
+        this.object.position.add(delta);
+    }
+
     update() {
         if (this.isAlive && this.isTaken) {
             this.object.visible = false;

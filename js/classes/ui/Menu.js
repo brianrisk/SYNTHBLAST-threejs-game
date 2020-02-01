@@ -16,12 +16,12 @@ class Menu {
         if (this.pixiStage) this.pixiStage.destroy(true);
         this.pixiStage = new PIXI.Container();
         this.elements = [];
-        let buttonWidth = Math.max(window.innerWidth / 3, 350);
-        let buttonHeight = Math.min(window.innerHeight / 15, 70);
-        let buttonSpacing = Math.min(window.innerHeight / 30, 30);
+        let buttonWidth = Math.max(this.game.width / 3, 350);
+        let buttonHeight = Math.min(this.game.height / 15, 70);
+        let buttonSpacing = Math.min(this.game.height / 30, 30);
         let allHeight  = 5 * buttonHeight + 4 * buttonSpacing;
-        let y = (window.innerHeight - allHeight) / 2;
-        let x = (window.innerWidth - buttonWidth) / 2;
+        let y = (this.game.height - allHeight) / 2;
+        let x = (this.game.width - buttonWidth) / 2;
 
         let fill = new PIXI.Graphics();
         fill.beginFill(0x000000);
@@ -44,10 +44,10 @@ class Menu {
 
 
         // leaderboard
-        this.elements.push(
-            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "LEAD3RB04RD", function() {})
-        );
-        y += buttonHeight + buttonSpacing;
+        // this.elements.push(
+        //     new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "LEAD3RB04RD", function() {})
+        // );
+        // y += buttonHeight + buttonSpacing;
 
 
         // settings
