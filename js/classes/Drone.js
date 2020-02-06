@@ -4,8 +4,9 @@ import Particle from "./Particle.js";
 
 class Drone {
 
-    constructor(x, y, scene) {
+    constructor(x, y, scene, level) {
         let self = this;
+        this.level = level;
         this.scene = scene;
         this.alive = true;
         this.hitPoints = 2;
@@ -104,7 +105,7 @@ class Drone {
         // go to enemy closest to hero
         // if no enemy close to hero, go to hero
         if (this.alive) {
-            if (hero.isAlive() && hero.isActive) {
+            if (hero.isAlive() && this.level.inPlay) {
                 let pointA = hero.getFuturePosition();
                 let pointB = this.object.position;
                 let pointC = pointB.clone();

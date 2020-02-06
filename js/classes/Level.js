@@ -7,7 +7,6 @@ import {RenderPass} from '../../lib/three/examples/jsm/postprocessing/RenderPass
 import {GlitchPass} from '../../js/CustomGlitchPass.js';
 
 // my classes
-import Hero from "../../js/classes/Hero.js";
 import Building from "../../js/classes/Building.js";
 import Gun from "../../js/classes/Gun.js";
 import Enemy from "../../js/classes/Enemy.js";
@@ -29,7 +28,6 @@ class Level {
         let camera = null;
         let composer = null;
         let glitchPass = null;
-        let hero = null;
         let bullets = [];
         let buildings = [];
         let enemies = [];
@@ -59,11 +57,10 @@ class Level {
         scene.fog = new THREE.FogExp2(fogColor, 0.05);
         scene.color = 0x00DD00;
 
-
-
         composer = new EffectComposer(rendererThree);
 
-        hero = new Hero(scene, camera, -75, 0);
+        game.hero.reset(scene, camera);
+
         this.isZombie = (game.levelNumber % 7) === 0;
         // add buildings
         let halfArena = arenaSize / 2;
@@ -89,7 +86,7 @@ class Level {
             for (let gridY = 0; gridY < arenaSize; gridY++) {
                 if (this.isZombie) {
                     if (Utils.randomInt(16) === 0) {
-                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1, game.levelNumber);
+                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1, game.levelNumber, this);
                         enemies.push(enemy);
                     } else if (Utils.randomInt(640) === 0) {
                         let flipPad = new Pad(gridX, gridY - halfArena, scene, 0x88FF88);
@@ -108,7 +105,7 @@ class Level {
                         let building = new Building(gridX, gridY - halfArena, boxHeight, scene, true);
                         buildings.push(building);
                     } else if (game.levelNumber > 1 && Utils.randomInt(64) === 0) {
-                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1, game.levelNumber);
+                        let enemy = new Enemy(gridX, gridY - halfArena, scene, 1, game.levelNumber, this);
                         enemies.push(enemy);
                     } else if (Utils.randomInt(160) === 0) {
                         let pointPad = new Pad(gridX, gridY - halfArena, scene, 0xFFFF88);
@@ -195,8 +192,8 @@ class Level {
             comets.push(new Comet(scene, Utils.randomInt(5) + 5));
         }
 
-        gun = new Gun(scene, bullets, hero, this.sounds.pew);
-        hero.setGun(gun);
+        gun = new Gun(scene, bullets, game.hero, this.sounds.pew);
+        game.hero.setGun(gun);
 
         // floor
         let floorTexture = new THREE.TextureLoader().load('assets/img/floor-tile.png');
@@ -239,7 +236,7 @@ class Level {
         this.camera = camera;
         this.composer = composer;
         this.glitchPass = glitchPass;
-        this.hero = hero;
+        this.hero = game.hero;
         this.bullets = bullets;
         this.buildings = buildings;
         this.enemies = enemies;

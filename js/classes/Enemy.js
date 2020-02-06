@@ -4,7 +4,9 @@ import Particle from "./Particle.js";
 
 class Enemy {
 
-    constructor(x, y, scene, hitPoints, level) {
+    constructor(x, y, scene, hitPoints, levelNumber, level) {
+        this.levelNumber = levelNumber;
+        this.level = level;
         let material = new THREE.MeshPhongMaterial({
             color: 0x00FFFF
         });
@@ -20,7 +22,7 @@ class Enemy {
         this.hitPoints = hitPoints;
         scene.add(cone);
 
-        this.maxSpeed = level * .005 + Math.random() * .05;
+        this.maxSpeed = levelNumber * .005 + Math.random() * .05;
         this.rotationAxis = new THREE.Vector3(0, 0, 1);
         let rotationAngle = 45 * Math.PI / 180;
         this.direction = new THREE.Vector3(0, 1, 0);
@@ -78,7 +80,7 @@ class Enemy {
 
     update(hero, fpsAdjustment) {
         if (this.alive) {
-            if (hero.isAlive() && hero.isActive) {
+            if (hero.isAlive() && this.level.inPlay) {
                 let heroDistance = Utils.distance(hero.getPosition(), this.object.position) * hero.speed * 6;
                 let pointA = hero.getFuturePositionWithDistance(heroDistance);
                 let pointB = this.object.position;
@@ -86,7 +88,6 @@ class Enemy {
                 pointC.add(this.direction);
                 let angle = Utils.find_angle(pointA, pointB, pointC);
                 if (angle > Math.PI) angle -= Math.PI;
-                //  console.log(angle);
                 if (angle > Math.PI / 18) {
                     let angleToRotate = angle / 25 * fpsAdjustment;
                     this.direction.applyAxisAngle(this.rotationAxis, angleToRotate);

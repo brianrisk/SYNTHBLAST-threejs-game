@@ -230,7 +230,7 @@ class LevelUi {
         }
         this.game.level.hasStarted = true;
         // only be responsive when "inPlay"
-        if (!this.game.level.inPlay) return;
+        if (!(this.game.level.inPlay  && this.game.hero.isAlive())) return;
         for (let i = 0; i < event.touches.length; i++) {
             let touch = event.touches[i];
             let x = touch.clientX;
@@ -306,7 +306,7 @@ class LevelUi {
         }
         this.game.level.hasStarted = true;
         let keyCode = event["which"];
-        if (this.game.level.inPlay) {
+        if (this.game.level.inPlay  && this.game.hero.isAlive()) {
             if (event.shiftKey) {
                 this.game.level.hero.changePerspective();
             } else if (keyCode === 32) {

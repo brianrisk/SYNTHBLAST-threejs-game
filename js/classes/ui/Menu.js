@@ -16,10 +16,11 @@ class Menu {
         if (this.pixiStage) this.pixiStage.destroy(true);
         this.pixiStage = new PIXI.Container();
         this.elements = [];
+        let numberOfButtons = 3;
         let buttonWidth = Math.max(this.game.width / 3, 350);
         let buttonHeight = Math.min(this.game.height / 15, 70);
         let buttonSpacing = Math.min(this.game.height / 30, 30);
-        let allHeight  = 5 * buttonHeight + 4 * buttonSpacing;
+        let allHeight = numberOfButtons * buttonHeight + (numberOfButtons - 1) * buttonSpacing;
         let y = (this.game.height - allHeight) / 2;
         let x = (this.game.width - buttonWidth) / 2;
 
@@ -32,13 +33,14 @@ class Menu {
 
         // play
         this.elements.push(
-            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "P ^ Ł * 4 ^ ¥", this.uiCallbacks.pressPlay)
+            new Button(x, y, buttonWidth, buttonHeight, this.pixiStage, "P ^ Ł * 4 ^ ¥", this.uiCallbacks.pressPlay)
         );
         y += buttonHeight + buttonSpacing;
 
         // upgrades
         this.elements.push(
-            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "UPGR4D3Ƶ", function() {})
+            new Button(x, y, buttonWidth, buttonHeight, this.pixiStage, "EQU1PM3NT", function () {
+            })
         );
         y += buttonHeight + buttonSpacing;
 
@@ -52,15 +54,18 @@ class Menu {
 
         // settings
         this.elements.push(
-            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "S3TT1NG5", function() {})
+            new Button(x, y, buttonWidth, buttonHeight, this.pixiStage, "S3TT1NG5", function () {
+            })
         );
         y += buttonHeight + buttonSpacing;
 
         //login
-        this.elements.push(
-            new Button(x,y,buttonWidth,buttonHeight,this.pixiStage, "RESTORE PROGRESS", FB.login)
-        );
-        y += buttonHeight + buttonSpacing;
+        if (typeof FB !== 'undefined') {
+            this.elements.push(
+                new Button(x, y, buttonWidth, buttonHeight, this.pixiStage, "RESTORE PROGRESS", FB.login)
+            );
+            y += buttonHeight + buttonSpacing;
+        }
 
 
         if (this.isMobile) {
@@ -97,11 +102,11 @@ class Menu {
 
     }
 
-     mouseDown(event) {
+    mouseDown(event) {
         this.down(event);
     }
 
-     mouseUp(event) {
+    mouseUp(event) {
         this.up(event);
     }
 

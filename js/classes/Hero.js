@@ -2,11 +2,7 @@ import * as THREE from "../../lib/three/build/three.module.js";
 
 class Hero {
 
-    constructor(scene, camera, x, y) {
-        // rendering
-        this.scene = scene;
-        this.camera = camera;
-
+    constructor(x, y) {
         // positioning
         this.turnSpeed = 0;
         this.speed = 0;
@@ -24,30 +20,32 @@ class Hero {
 
         // attributes
         this.gun = null;
-        this.isShooting = false;
         this.maxHitPoints = 10;
         this.maxShields = 5;
+
+        // initial state
+        this.hitPoints = this.maxHitPoints;
         this.shields = 0;
-        this.isActive = false;
+        this.isFirstPerson = true;
 
         // setting up
         this.createObject();
-        this.setPerspective(true);
-        this.reset();
     }
 
     createObject(x, y) {
+        // ship
         let shinyMaterial = new THREE.MeshBasicMaterial({
             color: 0xFFFFFF
         });
         let geometry = new THREE.ConeGeometry(.5, 1, 4);
         let cone = new THREE.Mesh(geometry, shinyMaterial);
 
+        // shield
         let dotMaterial = new THREE.PointsMaterial({
-                color: 0x333366,
-                opacity: 0.1,
-                size: 0.05,
-            });
+            color: 0x333366,
+            opacity: 0.1,
+            size: 0.05,
+        });
         let sphereGeometry = new THREE.SphereGeometry(1.5, 50);
         let sphereDots = new THREE.Points(sphereGeometry, dotMaterial);
         this.shield = sphereDots;
@@ -55,18 +53,15 @@ class Hero {
         let object = new THREE.Group();
         object.add(cone);
         object.add(sphereDots);
-
-        object.position.x = this.originalX;
-        object.position.y = this.originalY;
-        object.position.z = 0.66;
-        object.rotation.y = -90 * Math.PI / 180;
-        object.rotateOnWorldAxis(this.rotationAxis, -90 * Math.PI / 180);
-
         this.object = object;
-        this.scene.add(object);
     }
 
-    reset() {
+    reset(scene, camera) {
+        // rendering
+        this.scene = scene;
+        this.camera = camera;
+        this.isFirstPerson = true;
+        this.isShooting = false;
         this.camera.position.z = this.bottomZ;
         this.camera.position.x = this.originalX;
         this.camera.position.y = this.originalY;
@@ -74,17 +69,14 @@ class Hero {
         this.object.position.y = this.originalY;
         this.object.rotation.y = -90 * Math.PI / 180;
         this.object.rotateOnWorldAxis(this.rotationAxis, -90 * Math.PI / 180);
-        if (this.isFirstPerson) {
-            this.camera.rotation.z = 0;
-            this.camera.rotation.x = 90 * Math.PI / 180;
-            this.camera.rotation.y = -90 * Math.PI / 180;
-            // tilt up just a bit to make buildings look more imposing
-            this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), -0.1);
-        } else {
-            this.camera.rotation.z = -90 * Math.PI / 180;
-        }
-        this.hitPoints = this.maxHitPoints;
+        this.camera.rotation.z = 0;
+        this.camera.rotation.x = 90 * Math.PI / 180;
+        this.camera.rotation.y = -90 * Math.PI / 180;
+        // tilt up just a bit to make buildings look more imposing
+        this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), -0.1);
         this.direction = new THREE.Vector3(1, 0, 0);
+        this.setPerspective(this.isFirstPerson);
+        scene.add(this.object);
     }
 
     update(fpsAdjustment) {
@@ -117,13 +109,13 @@ class Hero {
         return Math.max(0, this.hitPoints);
     }
 
-    hasShield () {
+    hasShield() {
         return this.shields > 0;
     }
 
     addShield() {
         if (this.shields !== this.maxShields) {
-            this.shields ++;
+            this.shields++;
             this.shield.visible = true;
         }
     }
@@ -199,12 +191,10 @@ class Hero {
     }
 
     turnLeft() {
-        this.isActive = true;
         this.turnSpeed = this.maxRotationSpeed;
     }
 
     turnRight() {
-        this.isActive = true;
         this.turnSpeed = -1.0 * this.maxRotationSpeed;
     }
 
@@ -213,12 +203,10 @@ class Hero {
     }
 
     forward() {
-        this.isActive = true;
         this.speed = this.maxSpeed;
     }
 
     reverse() {
-        this.isActive = true;
         this.speed = -1.0 * this.maxSpeed;
     }
 
@@ -259,7 +247,6 @@ class Hero {
     }
 
     startShooting() {
-        this.isActive = true;
         this.isShooting = true;
     }
 

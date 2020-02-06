@@ -32,10 +32,10 @@
         }
 
     </style>
-    <script data-ad-client="ca-pub-0228360753064464" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <!--    <script data-ad-client="ca-pub-0228360753064464" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>-->
 </head>
 <body>
-<script src='js/Facebook.js'></script>
+<!--<script src='js/Facebook.js'></script>-->
 <script src='node_modules/stats.js/build/stats.min.js'></script>
 <script src='lib/pixi.min.js'></script>
 <script type="module">
@@ -85,12 +85,12 @@
     let soundsLoaded = false;
     let sounds = {
         pew: new Audio('assets/audio/pip2.wav'),
-        point:  new Audio('assets/audio/point.wav'),
+        point: new Audio('assets/audio/point.wav'),
         hit: new Audio('assets/audio/hit.wav'),
         explosion: new Audio('assets/audio/explosion2.wav'),
         impact: new Audio('assets/audio/impact.wav'),
         flip: new Audio('assets/audio/flip.wav'),
-        shield:  new Audio('assets/audio/shield.wav'),
+        shield: new Audio('assets/audio/shield.wav'),
         launch: new Audio('assets/audio/launch.wav'),
         energy: new Audio('assets/audio/energy2.wav')
     };
@@ -194,6 +194,7 @@
     function mouseDown(event) {
         activeScreen.mouseDown(event);
     }
+
     function mouseUp(event) {
         activeScreen.mouseUp(event);
     }
@@ -223,8 +224,8 @@
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             audioContext = new AudioContext();
         }
-        if(sounds && !soundsLoaded) {
-            for(let audio of Object.values(sounds)) {
+        if (sounds && !soundsLoaded) {
+            for (let audio of Object.values(sounds)) {
                 audio.play();
                 audio.pause();
                 audio.currentTime = 0;
@@ -234,12 +235,13 @@
         if (musicOn && !songs.isSongPlaying) {
             // gapless audio loop
             // https://stackoverflow.com/questions/7330023/gapless-looping-audio-html5
-            songs.motel_bedroom.addEventListener('timeupdate', function(){
+            songs.motel_bedroom.addEventListener('timeupdate', function () {
                 let buffer = .4;
-                if(this.currentTime > this.duration - buffer){
+                if (this.currentTime > this.duration - buffer) {
                     this.currentTime = 0;
                     this.play();
-                }}, false);
+                }
+            }, false);
             songs.motel_bedroom.play();
             songs.isSongPlaying = true;
         }
@@ -269,12 +271,85 @@
             .then((out) => {
                 console.log('Checkout this JSON! ', out);
             })
-            .catch(err => { throw err });
+            .catch(err => {
+                throw err
+            });
     }
 
 
 </script>
-<canvas id="screen"></canvas>
+<canvas id="screen">
+    <h1>SYNTH BLAST</h1>
+    <h2>Retro Shooter Cyberpunk Tank Game: Battlezone + Blade Runner 2049 + Synthwave</h2>
+
+    <p>
+        The goal of Synth Blast is to complete as many levels as possible as quickly as possible. Levels are policed
+        by malevolent tanks that home in on your position.
+    </p>
+
+    <p>
+        SYNTH BLAST is inspired by the first-person, futuristic tank shooter games of the 80's and early 90's as well as
+        classic synthesizer music. The neon colors, the Miami nights, the music, the
+        trees lining the road, the infinite road trip into the sunset that extends all through the night...
+        What's not to love about the 80's?
+    </p>
+
+    <p>
+        Games similar to Synth Blast:
+    <ul>
+        <li>Tank 1974</li>
+        <li>Battlezone 1980</li>
+        <li>Battle City 1985</li>
+        <li>Stellar 7 1983</li>
+        <li>Arcticfox 1986</li>
+        <li>Bolo 1987</li>
+        <li>Spectre 1990</li>
+
+    </ul>
+    </p>
+
+    <h3>
+        Features
+    </h3>
+
+    <p>
+    <ul>
+        <li>Top-down mode: "flip pad" launch you into a third-person perspective. Hitting another flip pad brings you
+            back down to first-person
+        </li>
+        <li>
+            Coin Magnets: pulls energy cubes (coins) to you if they are within a certain radius of your character. The
+            radius can be expanded with upgrades.
+        </li>
+        <li>
+            Shield Magnet: similar to the energy cube coin magnet, this will pull shields towards you. Pro tip: upgrade
+            this along with your shield maximum capacity.
+        </li>
+    </ul>
+    </p>
+
+    <h3>
+        Synth*Blast: Soundtrack
+    </h3>
+
+    <p>
+        Synth*Blast soundtrack: The hit retro sound of swirling, driving synthesizers and ethereal vocals.
+        Songs about love, alienation, longing and the expanse of eternity.
+    </p>
+
+
+    <h3>
+        Merchandise
+    </h3>
+
+    <p>
+    <ul>
+        <li>Hoodies</li>
+        <li>T-Shirts</li>
+    </ul>
+    </p>
+
+</canvas>
 <style>
     #banner {
         width: 320px;
@@ -285,17 +360,17 @@
     }
 </style>
 <div id="banner">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <!-- Synthblast responsive -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-0228360753064464"
-         data-ad-slot="3958750446"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+    <!--    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>-->
+    <!--    &lt;!&ndash; Synthblast responsive &ndash;&gt;-->
+    <!--    <ins class="adsbygoogle"-->
+    <!--         style="display:block"-->
+    <!--         data-ad-client="ca-pub-0228360753064464"-->
+    <!--         data-ad-slot="3958750446"-->
+    <!--         data-ad-format="auto"-->
+    <!--         data-full-width-responsive="true"></ins>-->
+    <!--    <script>-->
+    <!--        (adsbygoogle = window.adsbygoogle || []).push({});-->
+    <!--    </script>-->
 </div>
 </body>
 </html>
