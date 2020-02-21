@@ -71,13 +71,14 @@
     };
 
     // Music
-    let motel_bedroom = new Audio('music/motel_bedroom.mp3');
-    // let motel_bedroom = null;
-    if (motel_bedroom) motel_bedroom.loop = true;
+    // let motel_bedroom = new Audio('music/motel_bedroom.mp3');
+    // if (motel_bedroom) motel_bedroom.loop = true;
+    let take_the_world = new Audio('music/taketheworld-outro.mp3');
+    if (take_the_world) take_the_world.loop = true;
     let musicOn = true;
     let songs = {
         isSongPlaying: false,
-        motel_bedroom: motel_bedroom
+        motel_bedroom: take_the_world
     };
 
     // Sounds
@@ -92,7 +93,7 @@
         flip: new Audio('assets/audio/flip.wav'),
         shield: new Audio('assets/audio/shield.wav'),
         launch: new Audio('assets/audio/launch.wav'),
-        energy: new Audio('assets/audio/energy2.wav')
+        energy: new Audio('assets/audio/energy3.wav')
     };
 
     // Renderers

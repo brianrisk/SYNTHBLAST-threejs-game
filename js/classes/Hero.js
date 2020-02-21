@@ -3,20 +3,23 @@ import * as THREE from "../../lib/three/build/three.module.js";
 class Hero {
 
     constructor(x, y) {
+        this.originalX = x;
+        this.originalY = y;
+
         // positioning
         this.turnSpeed = 0;
         this.speed = 0;
         this.maxSpeed = 0.15;
+        this.perspectiveSpeed = 0.15 * 1.5;
         this.moveInc = null;
         this.maxRotationSpeed = 2 * Math.PI / 180;
-        this.perspectiveRotationSpeed = Math.PI / 180;
+        this.perspectiveRotationSpeed = Math.PI / 180 * 1.5;
         this.bottomZ = 0.5;
         this.topZ = 15;
         this.rotationAxis = new THREE.Vector3(0, 0, 1);
         this.headTiltDelta = 0;
-        this.perspectiveHeight = 0;
-        this.originalX = x;
-        this.originalY = y;
+        this.perspectiveHeight = this.bottomZ;
+        this.perspectiveDirection = -1;
 
         // attributes
         this.gun = null;
@@ -75,7 +78,11 @@ class Hero {
         // tilt up just a bit to make buildings look more imposing
         this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), -0.1);
         this.direction = new THREE.Vector3(1, 0, 0);
-        this.setPerspective(this.isFirstPerson);
+
+        // setting perspective
+        this.headTiltDelta = 0;
+        this.perspectiveHeight = this.bottomZ;
+        this.perspectiveDirection = -1;
         scene.add(this.object);
     }
 
@@ -84,11 +91,12 @@ class Hero {
             this.gun.fire(true, fpsAdjustment);
         }
         this.move(fpsAdjustment);
-        this.shield.rotation.x += Math.PI / 180 * fpsAdjustment;
-        this.shield.rotation.y += Math.PI / 180 * fpsAdjustment;
-        // this.shield.rotation.z += Math.PI / 180 *
+
         if (this.shields <= 0) {
             this.shield.visible = false;
+        } else {
+            this.shield.rotation.x += Math.PI / 180 * fpsAdjustment;
+            this.shield.rotation.y += Math.PI / 180 * fpsAdjustment;
         }
     }
 
@@ -101,7 +109,6 @@ class Hero {
             this.shields = 0;
 
         }
-
         return damage;
     }
 
@@ -121,20 +128,25 @@ class Hero {
     }
 
     changePerspective() {
+        this.perspectiveDirection *= -1;
         this.setPerspective(!this.isFirstPerson);
     }
 
     setPerspective(isFirstPerson) {
-        this.isFirstPerson = isFirstPerson;
-        if (this.isFirstPerson) {
-            this.headTiltDelta += this.headTiltDelta + Math.PI / 2;
-            this.perspectiveHeight = this.bottomZ;
-        }
-        // overhead
-        else {
-            this.headTiltDelta += this.headTiltDelta - Math.PI / 2;
-            this.perspectiveHeight = this.topZ;
-        }
+        // if (isFirstPerson !== this.isFirstPerson) {
+            this.isFirstPerson = isFirstPerson;
+            if (this.isFirstPerson) {
+                this.headTiltDelta = this.headTiltDelta + Math.PI / 2;
+                this.perspectiveHeight = this.bottomZ;
+                this.perspectiveDirection = -1;
+            }
+            // overhead
+            else {
+                this.headTiltDelta = this.headTiltDelta - Math.PI / 2;
+                this.perspectiveHeight = this.topZ;
+                this.perspectiveDirection = 1;
+            }
+        // }
     }
 
     push(vector) {
@@ -152,33 +164,29 @@ class Hero {
         this.camera.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed * fpsAdjustment);
         this.object.rotateOnWorldAxis(this.rotationAxis, this.turnSpeed * fpsAdjustment);
 
-        // drop down to ground level
-        // if (this.isFirstPerson) {
+        // switching perspective height
         let heightDiff = Math.abs(this.camera.position.z - this.perspectiveHeight);
         if (heightDiff < this.maxSpeed * .9) {
-            this.camera.position.z = this.perspectiveHeight;
-            this.headTiltDelta = 0;
-            // if (heightDiff > 0.00001) {
-            //     this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), this.headTiltDelta);
-            // }
+            // this.camera.position.z = this.perspectiveHeight;
         } else {
-            let absDelta = Math.abs(this.headTiltDelta);
-            let rotationMultiplier = 1;
-            // switching perspective height
             if (this.camera.position.z < this.perspectiveHeight) {
-                let up = new THREE.Vector3(0, 0, this.maxSpeed * fpsAdjustment);
+                let up = new THREE.Vector3(0, 0, this.perspectiveSpeed * fpsAdjustment);
                 this.camera.position.add(up);
             } else {
-                let down = new THREE.Vector3(0, 0, -1 * this.maxSpeed * fpsAdjustment);
+                let down = new THREE.Vector3(0, 0, -1 * this.perspectiveSpeed * fpsAdjustment);
                 this.camera.position.add(down);
-                rotationMultiplier = -1;
             }
-            // switching perspective rotation
+        }
+
+        // switching perspective rotation
+        let absDelta = Math.abs(this.headTiltDelta);
+        if (absDelta > 0) {
             if (absDelta <= this.perspectiveRotationSpeed) {
-                this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), rotationMultiplier * absDelta);
+                let rotationAmount = this.perspectiveDirection *  this.headTiltDelta;
+                this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), rotationAmount);
                 this.headTiltDelta = 0;
             } else {
-                let rotationAmount = rotationMultiplier * this.perspectiveRotationSpeed * fpsAdjustment;
+                let rotationAmount = this.perspectiveDirection * this.perspectiveRotationSpeed * fpsAdjustment;
                 this.camera.rotateOnAxis(new THREE.Vector3(-1, 0, 0), rotationAmount);
                 this.headTiltDelta += rotationAmount;
             }

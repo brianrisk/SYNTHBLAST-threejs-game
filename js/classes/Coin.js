@@ -5,11 +5,12 @@ class Coin {
         this.scene = scene;
         let size = 0.3;
         let cubeGeometry = new THREE.BoxBufferGeometry(size, size, size);
-        let cubeMaterial = new THREE.MeshBasicMaterial(
+        let cubeMaterial = new THREE.MeshPhongMaterial(
             {
-                color: 333355
+                color: 0xBB9933
             });
         let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.rotation.x = Math.PI / 4;
         // cube.position.x = x;
         // cube.position.y = y;
         // cube.position.z = 0.5;
@@ -28,7 +29,7 @@ class Coin {
         // cube.add(wireframe);
         let group = new THREE.Group();
         group.add( cube );
-        group.add( wireframe );
+        // group.add( wireframe );
         group.position.x = x;
         group.position.y = y;
         group.position.z = 0.5;
@@ -70,7 +71,7 @@ class Coin {
             this.object.visible = false;
             this.isAlive = false;
         } else {
-            this.object.rotateOnAxis(this.rotationAxis,  Math.PI / 45);
+            this.object.rotateOnAxis(this.rotationAxis,  Math.PI / 60);
         }
     }
 }

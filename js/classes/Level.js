@@ -19,6 +19,7 @@ import Pad from "./powerups/Pad.js";
 import Shield from "./powerups/Shield.js";
 
 class Level {
+
     constructor(game, rendererThree, sounds) {
         this.game = game;
         this.rendererThree = rendererThree;
@@ -259,8 +260,10 @@ class Level {
     //https://codepen.io/duhaime/pen/jaYdLg
     addTitleImage() {
         let loader = new THREE.TextureLoader();
+        let texture = loader.load('assets/img/synthblast.png');
+        texture.minFilter = THREE.LinearFilter;
         let material = new THREE.MeshLambertMaterial({
-            map: loader.load('assets/img/synthblast.png'),
+            map: texture,
             fog: false
         });
         // preserve ratio
