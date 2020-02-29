@@ -58,6 +58,7 @@
 * Coin Magnet
 * bomb pad
 * teleport pad
+* proximity bomb pad (fires all around, limited range)
 
 ### Badges
 * tutorial completion

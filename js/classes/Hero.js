@@ -27,6 +27,7 @@ class Hero {
         this.maxShields = 5;
 
         // initial state
+        this.score = 10000;
         this.hitPoints = this.maxHitPoints;
         this.shields = 0;
         this.isFirstPerson = true;
@@ -87,8 +88,9 @@ class Hero {
     }
 
     update(fpsAdjustment) {
-        if (this.isShooting) {
+        if (this.isShooting && this.score > 0) {
             this.gun.fire(true, fpsAdjustment);
+            this.score--;
         }
         this.move(fpsAdjustment);
 

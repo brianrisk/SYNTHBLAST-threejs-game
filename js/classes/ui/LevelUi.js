@@ -369,7 +369,7 @@ class LevelUi {
                 this.finalText.x = (this.game.width - this.finalText.width) / 2;
             }
             this.statusText.text =
-                "POINTS: " + this.game.score + "\n";
+                "ETHER: " + this.game.hero.score + "\n";
 
         }
 

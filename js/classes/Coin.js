@@ -3,36 +3,47 @@ import * as THREE from "../../lib/three/build/three.module.js";
 class Coin {
     constructor(x, y, scene) {
         this.scene = scene;
-        let size = 0.3;
-        let cubeGeometry = new THREE.BoxBufferGeometry(size, size, size);
-        let cubeMaterial = new THREE.MeshPhongMaterial(
+        this.value = 20;
+
+        let sizeFactor = 1;
+
+        let size = 0.25 * sizeFactor;
+        let bottomSize = 0.25 * sizeFactor;
+        let bottomHeight = bottomSize * .6;
+
+        // let cubeGeometry = new THREE.BoxBufferGeometry(size / 2, size, size);
+        let cubeGeometry = new THREE.ConeGeometry(.6 * size, size, 4);
+        let cubeMaterial = new THREE.MeshLambertMaterial(
             {
-                color: 0xBB9933
+                color: 0xFFFFFF,
+                emissive: 0x550055
             });
         let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-        cube.rotation.x = Math.PI / 4;
+        //cube.rotation.x = Math.PI / 4;
+        cube.rotation.x = Math.PI / 2;
         // cube.position.x = x;
         // cube.position.y = y;
-        // cube.position.z = 0.5;
+        cube.position.z = 0.25 * sizeFactor;
 
-        let wireframeGeometry = new THREE.BoxBufferGeometry(size + .001, size + .001, size + .001);
-        let wireframeMaterial = new THREE.MeshBasicMaterial(
+
+        let bottomGeometry = new THREE.ConeGeometry(.6 * size, bottomHeight, 4);
+        let bottomMaterial = new THREE.MeshLambertMaterial(
             {
-                color: 0xEEEEFF,
-                wireframe: true
+                color: 0x00FFFF,
+                emissive: 0x330033
             });
-        let wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
-        // wireframe.position.x = x;
-        // wireframe.position.y = y;
-        // wireframe.position.z = 0.5;
+        let bottom = new THREE.Mesh(bottomGeometry, bottomMaterial);
+        bottom.rotation.x = Math.PI / 2 * 3;
+        bottom.position.z = .03;
 
-        // cube.add(wireframe);
+
+
         let group = new THREE.Group();
         group.add( cube );
-        // group.add( wireframe );
+        group.add( bottom );
         group.position.x = x;
         group.position.y = y;
-        group.position.z = 0.5;
+        group.position.z = bottomSize;
 
         scene.add(group);
         this.object = group;

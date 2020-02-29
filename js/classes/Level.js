@@ -323,23 +323,28 @@ class Level {
                         && Math.abs(enemy.getX() - bullet.getX()) < 0.5
                         && Math.abs(enemy.getY() - bullet.getY()) < 0.5
                     ) {
+
                         let pointA = enemy.getPosition();
                         let pointB = this.hero.getPosition();
-                        let pointC = pointB.clone();
-                        pointC.add(this.hero.direction);
-                        let angle = Utils.find_angle(pointA, pointB, pointC);
-                        let heroIsFacingEnemy = (Math.abs(angle) < Math.PI / 8);
-                        if (heroIsFacingEnemy) {
-                            let enemyHitPoints = enemy.getHitPoints();
-                            enemy.hit(bullet.getHitPoints(), fpsAdjustment);
-                            bullet.hit(enemyHitPoints);
-                            if (!enemy.isAlive()) {
-                                this.sounds.explosion.currentTime = 0;
-                                this.sounds.explosion.play();
-                                this.coins.push(new Coin(enemy.getX(), enemy.getY(), this.scene))
-                            } else {
-                                this.sounds.impact.currentTime = 0;
-                                this.sounds.impact.play();
+                        // if enemy is close, hero must be facing them to shoot them
+                        let distance = Utils.distance(pointA, pointB);
+                        if (distance > 1.5) {
+                            let pointC = pointB.clone();
+                            pointC.add(this.hero.direction);
+                            let angle = Utils.find_angle(pointA, pointB, pointC);
+                            let heroIsFacingEnemy = (Math.abs(angle) < Math.PI / 8);
+                            if (heroIsFacingEnemy || distance > 1.5) {
+                                let enemyHitPoints = enemy.getHitPoints();
+                                enemy.hit(bullet.getHitPoints(), fpsAdjustment);
+                                bullet.hit(enemyHitPoints);
+                                if (!enemy.isAlive()) {
+                                    this.sounds.explosion.currentTime = 0;
+                                    this.sounds.explosion.play();
+                                    this.coins.push(new Coin(enemy.getX(), enemy.getY(), this.scene))
+                                } else {
+                                    this.sounds.impact.currentTime = 0;
+                                    this.sounds.impact.play();
+                                }
                             }
                         }
                     }
@@ -395,6 +400,7 @@ class Level {
                         } else {
                             this.sounds.explosion.currentTime = 0;
                             this.sounds.explosion.play();
+                            this.coins.push(new Coin(enemy.getX(), enemy.getY(), this.scene))
                         }
                     }
                 });
@@ -465,7 +471,7 @@ class Level {
                     && Math.abs(coin.getY() - this.hero.getY()) < 0.4
                 ) {
                     coin.isTaken = true;
-                    this.game.score++;
+                    this.game.hero.score += coin.value;
                     this.sounds.energy.currentTime = 0;
                     this.sounds.energy.play();
                 }
