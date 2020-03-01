@@ -1,14 +1,10 @@
 import Button from "./Button.js";
+import Screen from "./Screen.js";
 
-class Menu {
+class MenuScreen extends Screen {
 
     constructor(game, rendererPixi, sounds, uiCallbacks) {
-        this.game = game;
-        this.rendererPixi = rendererPixi;
-        this.sounds = sounds;
-        this.isMobile = 'ontouchstart' in document.documentElement;
-        this.bWidth = 60;
-        this.uiCallbacks = uiCallbacks;
+        super(game, rendererPixi, sounds, uiCallbacks);
         this.init();
     }
 
@@ -123,4 +119,4 @@ class Menu {
     }
 }
 
-export default Menu;
+export default MenuScreen;

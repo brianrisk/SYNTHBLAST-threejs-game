@@ -42,8 +42,8 @@
 
     import * as THREE from "./lib/three/build/three.module.js";
     import Game from "./js/classes/Game.js";
-    import LevelUi from "./js/classes/ui/LevelUi.js";
-    import Menu from "./js/classes/ui/Menu.js";
+    import LevelScreen from "./js/classes/ui/LevelScreen.js";
+    import MenuScreen from "./js/classes/ui/MenuScreen.js";
 
     // The state we will save and load
     // when making a purchase, this state is sent to the servers,
@@ -167,8 +167,8 @@
         let uiCallbacks = {
             pressPlay: pressPlay
         };
-        levelUi = new LevelUi(game, rendererPixi, sounds);
-        menuScreen = new Menu(game, rendererPixi, sounds, uiCallbacks);
+        levelUi = new LevelScreen(game, rendererPixi, sounds, uiCallbacks);
+        menuScreen = new MenuScreen(game, rendererPixi, sounds, uiCallbacks);
         activeScreen = menuScreen;
     }
 

@@ -1,18 +1,15 @@
 import ProgressBar from "./ProgressBar.js";
-import Button from "./Button.js";
+import Screen from "./Screen.js";
 
-class LevelUi {
+class LevelScreen extends Screen {
 
-    constructor(game, rendererPixi, sounds) {
-        this.game = game;
-        this.rendererPixi = rendererPixi;
-        this.sounds = sounds;
-        this.isMobile = 'ontouchstart' in document.documentElement;
-        this.bWidth = 60;
+    constructor(game, rendererPixi, sounds, uiCallbacks) {
+        super(game, rendererPixi, sounds, uiCallbacks);
         this.init();
     }
 
     init() {
+        this.bWidth = 60;
         if (this.pixiStage) this.pixiStage.destroy(true);
         this.pixiStage = new PIXI.Container();
         if (this.isMobile) {
@@ -388,4 +385,4 @@ class LevelUi {
     }
 }
 
-export default LevelUi;
+export default LevelScreen;

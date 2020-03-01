@@ -1,7 +1,7 @@
 import * as THREE from "../../lib/three/build/three.module.js";
 import Game from "../../js/classes/Game.js";
-import LevelUi from "../../js/classes/ui/LevelUi.js";
-import Menu from "../../js/classes/ui/Menu.js";
+import LevelScreen from "./ui/LevelScreen.js";
+import MenuScreen from "./ui/MenuScreen.js";
 
 class App {
 
