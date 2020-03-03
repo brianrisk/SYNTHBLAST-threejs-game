@@ -7,7 +7,7 @@ class Game {
         this.sounds = sounds;
         this.width = width;
         this.height = height;
-        this.levelNumber = 7;
+        this.levelNumber = 8;
         this.levelChangeTime = (new Date()).getTime();
         this.hero = new Hero(-75, 0);
         this.level = new Level(this, this.rendererThree, this.sounds);

@@ -51,6 +51,7 @@
 * buy shields
 * cube magnet
 * turbo
+* proximity bomb
 
 ### Powerups
 * turbo

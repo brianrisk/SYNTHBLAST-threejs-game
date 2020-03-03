@@ -90,7 +90,6 @@ class Hero {
     update(fpsAdjustment) {
         if (this.isShooting && this.score > 0) {
             this.gun.fire(true, fpsAdjustment);
-            this.score--;
         }
         this.move(fpsAdjustment);
 

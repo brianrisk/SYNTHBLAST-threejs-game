@@ -1,4 +1,4 @@
-import ProgressBar from "./ProgressBar.js";
+import LabeledProgressBar from "./LabeledProgressBar.js";
 import Screen from "./Screen.js";
 
 class LevelScreen extends Screen {
@@ -133,9 +133,9 @@ class LevelScreen extends Screen {
         let progressWidth = this.game.width / 4;
         let rightMargin = 10;
         let progressHeight = 10;
-        this.hpProgress =       new ProgressBar(this.game.width - progressWidth, 10, progressWidth - rightMargin, progressHeight, this.pixiStage, "ARMOR",  0xFF00FF);
-        this.shileldProgress =  new ProgressBar(this.game.width - progressWidth, 25, progressWidth - rightMargin, progressHeight, this.pixiStage, "SHIELD", 0x8800FF);
-        this.padProgress =      new ProgressBar(this.game.width - progressWidth, 40, progressWidth - rightMargin, progressHeight, this.pixiStage, "PADS",   0xFFFF00);
+        this.hpProgress =       new LabeledProgressBar(this.game.width - progressWidth, 10, progressWidth - rightMargin, progressHeight, this.pixiStage, "ARMOR",  0xFF00FF);
+        this.shileldProgress =  new LabeledProgressBar(this.game.width - progressWidth, 25, progressWidth - rightMargin, progressHeight, this.pixiStage, "SHIELD", 0x8800FF);
+        this.padProgress =      new LabeledProgressBar(this.game.width - progressWidth, 40, progressWidth - rightMargin, progressHeight, this.pixiStage, "PADS",   0xFFFF00);
 
     }
 
