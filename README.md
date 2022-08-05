@@ -7,6 +7,13 @@
 
 [SYNTHBLAST.COM](https://synthblast.com)
 
+<a href="https://gitter.im/SYNTH-BLAST/community">
+<img src="https://badges.gitter.im/SYNTH-BLAST/SYNTH-BLAST.svg">
+</a>
+<a href="https://github.com/brianrisk/SYNTHBLAST/graphs/contributors">
+<img src="https://img.shields.io/github/contributors/brianrisk/SYNTHBLAST.svg">
+</a>
+
 </div>
 
 ## Gameplay
