@@ -1,8 +1,6 @@
 .DS_Store
 .idea/
-assets/
-jsm/
-music/
+assets/fonts
 node_modules/
 package-lock.json
-lib/three/
+lib
