@@ -7,9 +7,7 @@
 
 [SYNTHBLAST.COM](https://synthblast.com)
 
-<a href="https://gitter.im/SYNTH-BLAST/community">
-<img src="https://badges.gitter.im/SYNTH-BLAST/SYNTH-BLAST.svg">
-</a>
+[![Join the chat at https://gitter.im/SYNTH-BLAST/community](https://badges.gitter.im/SYNTH-BLAST/community.svg)](https://gitter.im/SYNTH-BLAST/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 <a href="https://github.com/brianrisk/SYNTHBLAST/graphs/contributors">
 <img src="https://img.shields.io/github/contributors/brianrisk/SYNTHBLAST.svg">
 </a>
@@ -18,7 +16,7 @@
 
 ## Gameplay
 
-[![Join the chat at https://gitter.im/SYNTH-BLAST/community](https://badges.gitter.im/SYNTH-BLAST/community.svg)](https://gitter.im/SYNTH-BLAST/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 * shoot tanks
 * Run over all yellow pads to advance a level
