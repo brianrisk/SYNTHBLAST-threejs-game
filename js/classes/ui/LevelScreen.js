@@ -218,6 +218,10 @@ class LevelScreen extends Screen {
     }
 
     down(event) {
+        if (this.game.isOver()) {
+            this.uiCallbacks.newGame();
+            return;
+        }
         // making us pause a second at the beginning of a level
         if (((new Date()).getTime() - this.game.levelChangeTime) < 1000) return;
         if (!this.game.level.hasStarted) {
@@ -294,6 +298,10 @@ class LevelScreen extends Screen {
     }
 
     onDocumentKeyDown(event) {
+        if (this.game.isOver()) {
+            this.uiCallbacks.newGame();
+            return;
+        }
         // making us pause a second at the beginning of a level
         if (((new Date()).getTime() - this.game.levelChangeTime) < 1000) return;
         if (!this.game.level.hasStarted) {
@@ -349,7 +357,7 @@ class LevelScreen extends Screen {
         // updating text
         if (this.game.level.padsRemaining === 0) {
 
-        } else if (this.game.level.hero.hitPoints <= 0) {
+        } else if (this.game.isOver()) {
             this.finalText.text = "TRY AGAIN";
             this.finalText.x = (this.game.width - this.finalText.width) / 2;
             this.statusText.text = "";

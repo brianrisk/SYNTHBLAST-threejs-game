@@ -145,8 +145,7 @@
             context: rendererThree.getContext()
         });
 
-        init3d();
-        init2d();
+        newGame();
 
         // listeners
         window.addEventListener('resize', resize, false);
@@ -159,14 +158,14 @@
         document.addEventListener('mouseup', mouseUp, false);
     }
 
-    function init3d() {
-        game = new Game(rendererThree, sounds, window.innerWidth, window.innerHeight - 50);
-    }
 
-    function init2d() {
+
+    function newGame() {
         let uiCallbacks = {
-            pressPlay: pressPlay
+            pressPlay: pressPlay,
+            newGame: newGame
         };
+        game = new Game(rendererThree, sounds, window.innerWidth, window.innerHeight - 50);
         levelUi = new LevelScreen(game, rendererPixi, sounds, uiCallbacks);
         menuScreen = new MenuScreen(game, rendererPixi, sounds, uiCallbacks);
         activeScreen = menuScreen;

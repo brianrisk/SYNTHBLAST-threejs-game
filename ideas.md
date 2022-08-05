@@ -2,6 +2,12 @@
 * hitting two flip pads in a row sometimes messes up view.
 * ensure at least one pad per level
 
+## more interesting
+* firing decreases speed 50%
+* more interaction with environment. Hit buildings glow for a bit?
+* camera motion?
+* try speeding up
+
 ## Dev Items
 * buildings contain hidden treasures (energy, powerup)
 * hero state (health, shields, items) presists between levels

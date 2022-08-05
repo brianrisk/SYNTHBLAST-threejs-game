@@ -264,7 +264,8 @@ class Level {
         texture.minFilter = THREE.LinearFilter;
         let material = new THREE.MeshLambertMaterial({
             map: texture,
-            fog: false
+            fog: false,
+            transparent: true
         });
         // preserve ratio
         let geometry = new THREE.PlaneGeometry(5 * 358 / 32, 5);
