@@ -12,7 +12,7 @@ class MenuScreen extends Screen {
         if (this.pixiStage) this.pixiStage.destroy(true);
         this.pixiStage = new PIXI.Container();
         this.elements = [];
-        let numberOfButtons = 3;
+        let numberOfButtons = 2;
         let buttonWidth = Math.max(this.game.width / 3, 350);
         let buttonHeight = Math.min(this.game.height / 15, 70);
         let buttonSpacing = Math.min(this.game.height / 30, 30);
@@ -33,12 +33,21 @@ class MenuScreen extends Screen {
         );
         y += buttonHeight + buttonSpacing;
 
-        // upgrades
         this.elements.push(
-            new Button(x, y, buttonWidth, buttonHeight, this.pixiStage, "EQU1PM3NT", function () {
-            })
+            new Button(x, y, buttonWidth, buttonHeight, this.pixiStage, "S0URC3 C0D3",
+                function () {
+                    window.location.href = 'https://github.com/brianrisk/SYNTHBLAST'
+                }
+            )
         );
         y += buttonHeight + buttonSpacing;
+
+        // upgrades
+        // this.elements.push(
+        //     new Button(x, y, buttonWidth, buttonHeight, this.pixiStage, "EQU1PM3NT", function () {
+        //     })
+        // );
+        // y += buttonHeight + buttonSpacing;
 
 
         // leaderboard
@@ -49,11 +58,11 @@ class MenuScreen extends Screen {
 
 
         // settings
-        this.elements.push(
-            new Button(x, y, buttonWidth, buttonHeight, this.pixiStage, "S3TT1NG5", function () {
-            })
-        );
-        y += buttonHeight + buttonSpacing;
+        // this.elements.push(
+        //     new Button(x, y, buttonWidth, buttonHeight, this.pixiStage, "S3TT1NG5", function () {
+        //     })
+        // );
+        // y += buttonHeight + buttonSpacing;
 
         //login
         if (typeof FB !== 'undefined') {
