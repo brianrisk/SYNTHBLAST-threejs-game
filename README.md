@@ -1,4 +1,4 @@
-<div style="text-align: center">
+<div align="center">
   <a href="https://synthblast.com">
     <img src="https://synthblast.com/assets/img/title-screenshot.jpg" alt="SYNTH BLAST logo">
   </a>
