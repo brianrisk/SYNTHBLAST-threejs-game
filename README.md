@@ -17,6 +17,9 @@
 </div>
 
 ## Gameplay
+
+[![Join the chat at https://gitter.im/SYNTH-BLAST/community](https://badges.gitter.im/SYNTH-BLAST/community.svg)](https://gitter.im/SYNTH-BLAST/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 * shoot tanks
 * Run over all yellow pads to advance a level
 * collect the ether they leave behind
