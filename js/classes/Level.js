@@ -200,6 +200,7 @@ class Level {
         let floorTexture = new THREE.TextureLoader().load('assets/img/floor-tile.png');
         floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
         floorTexture.repeat.set(1000, 1000);
+        floorTexture.anisotropy = Math.min(8, this.rendererThree.capabilities.getMaxAnisotropy());
         let floorMaterial = new THREE.MeshBasicMaterial({map: floorTexture, side: THREE.FrontSide});
         let floorGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
         let plane = new THREE.Mesh(floorGeometry, floorMaterial);

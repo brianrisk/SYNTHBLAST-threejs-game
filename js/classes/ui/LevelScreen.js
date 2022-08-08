@@ -1,6 +1,9 @@
 import LabeledProgressBar from "./LabeledProgressBar.js";
 import Screen from "./Screen.js";
 
+/**
+ * Handles the 2D UI screen elements like the HUD progress bars and touch-based motion controls
+ */
 class LevelScreen extends Screen {
 
     constructor(game, rendererPixi, sounds, uiCallbacks) {
