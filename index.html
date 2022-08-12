@@ -165,7 +165,7 @@
             pressPlay: pressPlay,
             newGame: newGame
         };
-        game = new Game(rendererThree, sounds, window.innerWidth, window.innerHeight - 50);
+        game = new Game(rendererThree, sounds, window.innerWidth, window.innerHeight);
         levelUi = new LevelScreen(game, rendererPixi, sounds, uiCallbacks);
         menuScreen = new MenuScreen(game, rendererPixi, sounds, uiCallbacks);
         activeScreen = menuScreen;
@@ -212,6 +212,7 @@
     }
 
     function resize() {
+        game.updateWidthHeight(window.innerWidth, window.innerHeight);
         game.level.camera.aspect = game.width / game.height;
         game.level.camera.updateProjectionMatrix();
         rendererThree.setSize(game.width, game.height);

@@ -3,7 +3,7 @@
     <img src="https://synthblast.com/assets/img/title-screenshot.jpg" alt="SYNTH BLAST logo">
   </a>
 
-**Futuristic tank game. Pure JavaScript with ThreeJS.  Open Source**
+**Retro-futuristic tank game. Pure JavaScript with ThreeJS.  Open Source**
 
 [SYNTHBLAST.COM](https://synthblast.com)
 
@@ -37,3 +37,7 @@ To run locally, in addition to the files in this repository, you'll also need se
 * lib/three/build/three.module.js
 * lib/pixi.min.js
 * node_modules/stats.js/build/stats.min.js
+
+## Discussions:
+* [Hacker News](https://news.ycombinator.com/item?id=32379430)
+* [Three.JS Forum](https://discourse.threejs.org/t/retro-futuristic-tank-game-synth-blast/41146)

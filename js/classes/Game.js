@@ -5,8 +5,7 @@ class Game {
     constructor(rendererThree, sounds, width, height) {
         this.rendererThree = rendererThree;
         this.sounds = sounds;
-        this.width = width;
-        this.height = height;
+        this.updateWidthHeight(width, height);
         this.levelNumber = 1;
         this.levelChangeTime = (new Date()).getTime();
         this.hero = new Hero(-75, 0);
@@ -29,6 +28,11 @@ class Game {
 
     isOver() {
         return this.hero.hitPoints <= 0
+    }
+
+    updateWidthHeight(width, height) {
+        this.width = width;
+        this.height = height; // - 50; // possible ad space
     }
 }
 
